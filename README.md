@@ -21,7 +21,7 @@ iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vis
 
 ## Build and test
 
-`./init.sh` is the only command: it checks the toolchain and simulator, enforces the source rules (no JSONSerialization, UIKit, XCTest, third-party packages or bundled PDFs; Spanish translations complete), then builds with warnings as errors and runs the tests. Requires Xcode 27 and an iPhone 18 Pro simulator with iOS 27.0.
+`./init.sh` is the only command: it checks the toolchain and simulator, enforces the source rules (no JSONSerialization, UIKit, XCTest, third-party packages or bundled PDFs; Spanish translations complete), then builds with warnings as errors, runs the tests and checks that every string the compiler extracts from the app is in the catalog (the CLI build never adds them; add each key with its Spanish translation by hand). Requires Xcode 27 and an iPhone 18 Pro simulator with iOS 27.0.
 
 ## Documentation
 

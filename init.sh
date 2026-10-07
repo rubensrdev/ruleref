@@ -13,6 +13,7 @@ XCODE_MAJOR="27"
 
 SOURCE_DIRS=(RuleRef RuleRefTests)
 APP_DIR="RuleRef"
+APP_TARGET="RuleRef"
 
 SUMMARY=()
 FAILED=0
@@ -125,7 +126,8 @@ paths = sorted(
     if name.endswith(".xcstrings")
 )
 if not paths:
-    sys.exit(3)
+    print("No .xcstrings found; the app is bilingual (en, es) and needs RuleRef/Localizable.xcstrings.")
+    sys.exit(1)
 
 ok = True
 for path in paths:
@@ -152,11 +154,11 @@ for path in paths:
             print(f"  {key!r}")
 sys.exit(0 if ok else 1)
 PY
-case $? in
-  0) pass "string-catalog" ;;
-  3) skip "string-catalog" "no .xcstrings found" ;;
-  *) fail "string-catalog"; RULES_OK=0 ;;
-esac
+if [ $? -eq 0 ]; then
+  pass "string-catalog"
+else
+  fail "string-catalog"; RULES_OK=0
+fi
 
 # --- c) Build and tests --------------------------------------------------------
 
@@ -174,7 +176,8 @@ if [ "$PREFLIGHT_OK" -eq 1 ] && [ "$RULES_OK" -eq 1 ]; then
     -resultBundlePath "$RESULT_BUNDLE" \
     SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
     > "$LOG" 2>&1
-  if [ $? -eq 0 ]; then
+  BUILD_STATUS=$?
+  if [ "$BUILD_STATUS" -eq 0 ]; then
     pass "xcodebuild-test"
   else
     echo "xcodebuild test failed. Relevant lines (full log: $LOG):"
@@ -200,11 +203,99 @@ sys.exit(0 if ok else 1)
     fail "test-results"
   fi
 
+  # The CLI never syncs the catalog (only the IDE does), so replay that sync on a copy
+  # and fail on any key the copy gains. Runs only after a clean build, so the
+  # .stringsdata files of every compiled source are current.
+  if [ "$BUILD_STATUS" -eq 0 ]; then
+    OBJ_DIR=$(xcodebuild -showBuildSettings -json -project "$PROJECT" -scheme "$SCHEME" \
+      -destination "$DESTINATION" 2>/dev/null | python3 -c '
+import json, sys
+for entry in json.load(sys.stdin):
+    if entry.get("target") == sys.argv[1]:
+        print(entry["buildSettings"].get("OBJECT_FILE_DIR_normal", ""))
+' "$APP_TARGET")
+    if python3 - "$OBJ_DIR" "$APP_TARGET" "$APP_DIR" "$WORK_DIR/catalog-sync" <<'PY'
+import glob, json, os, shutil, subprocess, sys
+
+obj_dir, target, app_dir, sync_dir = sys.argv[1:5]
+
+file_lists = glob.glob(os.path.join(obj_dir, "*", target + ".SwiftFileList")) if obj_dir else []
+if len(file_lists) != 1:
+    print(f"Expected one {target}.SwiftFileList under '{obj_dir}', found {len(file_lists)}.")
+    sys.exit(1)
+arch_dir = os.path.dirname(file_lists[0])
+with open(file_lists[0], encoding="utf-8") as f:
+    sources = {line.strip() for line in f if line.strip()}
+
+# A source deleted from the app leaves its .stringsdata behind; keep only those of
+# sources compiled in this build.
+stringsdata, tables = {}, set()
+for path in glob.glob(os.path.join(arch_dir, "*.stringsdata")):
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    if data.get("source") in sources:
+        stringsdata[data["source"]] = path
+        tables.update(t for t, keys in data.get("tables", {}).items() if keys)
+unextracted = sorted(sources - stringsdata.keys())
+if unextracted:
+    print("No .stringsdata for these sources (is SWIFT_EMIT_LOC_STRINGS on?):")
+    print("\n".join(f"  {s}" for s in unextracted[:10]))
+    sys.exit(1)
+
+catalogs = sorted(
+    os.path.join(root, name)
+    for root, _, names in os.walk(app_dir)
+    for name in names
+    if name.endswith(".xcstrings")
+)
+# sync matches tables by file name, so each copy keeps its name in its own folder.
+copies = []
+for index, original in enumerate(catalogs):
+    copy = os.path.join(sync_dir, str(index), os.path.basename(original))
+    os.makedirs(os.path.dirname(copy))
+    shutil.copyfile(original, copy)
+    copies.append((original, copy))
+
+command = ["xcrun", "xcstringstool", "sync", *[c for _, c in copies], "--skip-marking-strings-stale"]
+for path in sorted(stringsdata.values()):
+    command += ["--stringsdata", path]
+result = subprocess.run(command, capture_output=True, text=True)
+if result.returncode != 0:
+    print("xcstringstool sync failed:", result.stderr.strip() or result.stdout.strip())
+    sys.exit(1)
+
+def keys(path):
+    with open(path, encoding="utf-8") as f:
+        return set(json.load(f).get("strings", {}))
+
+ok = True
+for original, copy in copies:
+    missing = sorted(keys(copy) - keys(original))
+    if missing:
+        ok = False
+        print(f"{original}: {len(missing)} string(s) in code but not in the catalog (add each with its 'es' translation):")
+        print("\n".join(f"  {k!r}" for k in missing[:10]))
+orphan_tables = sorted(tables - {os.path.splitext(os.path.basename(c))[0] for c in catalogs})
+if orphan_tables:
+    ok = False
+    print("Strings in code use tables with no catalog: " + ", ".join(orphan_tables))
+sys.exit(0 if ok else 1)
+PY
+    then
+      pass "catalog-coverage"
+    else
+      fail "catalog-coverage"
+    fi
+  else
+    skip "catalog-coverage" "build failed"
+  fi
+
   # Keep the log and result bundle only when something failed.
   [ "$FAILED" -eq 0 ] && rm -r "$WORK_DIR"
 else
   skip "xcodebuild-test" "preflight or rules failed"
   skip "test-results" "preflight or rules failed"
+  skip "catalog-coverage" "preflight or rules failed"
 fi
 
 # --- d) Summary ----------------------------------------------------------------
