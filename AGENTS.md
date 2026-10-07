@@ -41,6 +41,11 @@ The harness is the main deliverable; the app is its test bed.
 - `blocked` means the user must decide. Its note says whether it came from a `block` verdict (a missing condition) or a `stop` (the revise limit).
 - `init.sh` validates the file (`feature-list`).
 
+## Specs (`docs/specs/`)
+
+- Every feature is implemented from `docs/specs/<feature-id>.md`. A spec is approved only when it contains the line `Approval: approved by the user on YYYY-MM-DD`, which only the user writes, by hand.
+- Never add that line and never edit an approved spec; `spec-approval-guard.sh` blocks both. If an approved spec must change, ask the user to remove the line.
+
 ## Apple documentation
 
 Before using an Apple API, and whenever a platform question comes up, query the Cupertino MCP (declared in `.mcp.json`) for the most modern API and Apple's recommended practice. If it is unavailable, search developer.apple.com on the web. Never improvise or assume how an API behaves.
@@ -96,6 +101,7 @@ Speak Spanish with the user. Code, comments, files and commit messages are in En
 - `secrets-commit-guard.sh` (before Bash): on `git commit`, blocks staged secret files and diffs that look like keys or passwords.
 - `constitution-lint.sh` (after Write/Edit of `.swift`): warns about `try!`, `as!`, unsafe isolation escapes, GCD, legacy Observation, `NavigationView`, `AnyView`, `JSONSerialization`, UIKit/XCTest, `print()` outside tests and two Xcode 27 pitfalls.
 - `stop-build-gate.sh` (on Stop): runs `./init.sh` when non-Markdown files changed since the last green run, and keeps the turn going if it fails.
+- `spec-approval-guard.sh` (before Write/Edit and Bash): blocks any agent from approving a spec or editing an approved one.
 
 ## Definition of Done
 
