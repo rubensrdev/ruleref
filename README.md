@@ -17,7 +17,7 @@ No AI before m4. On-device AI comes later as a pluggable layer.
 
 ## Stack
 
-iOS 27, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vision, no third-party dependencies, built and tested via `xcodebuild`. See [ADR-001](docs/adr/0001-stack-and-build-doctrine.md).
+iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vision, no third-party dependencies, built and tested via `xcodebuild`. See [ADR-001](docs/adr/0001-stack-and-build-doctrine.md).
 
 ## Documentation
 
