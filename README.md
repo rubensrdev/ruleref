@@ -26,6 +26,7 @@ iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vis
 ## Documentation
 
 - [`AGENTS.md`](AGENTS.md): instructions for coding agents, with rules, workflow and Definition of Done. [`CLAUDE.md`](CLAUDE.md) only imports it.
+- [`.agents/skills/`](.agents/skills/): the harness skills (`build-brief`, `feature-flow`, `feature-implementer`, `feature-validator`). `.claude/` holds the subagents, hooks and settings that wire them.
 - [`feature_list.json`](feature_list.json): status of every feature, with dependencies, verification steps and evidence.
 - [`docs/idea.md`](docs/idea.md): original idea, course context and initial decisions (Spanish).
 - [`docs/build-brief.md`](docs/build-brief.md): problem, goals, non-goals and feature slices up to m4.

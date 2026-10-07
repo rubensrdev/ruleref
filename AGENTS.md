@@ -40,6 +40,7 @@ The harness is the main deliverable; the app is its test bed.
 - A feature gets at most 3 `revise` verdicts. After the third, stop: set the feature to `blocked`, add the reason to its `notes`, and leave the decision to the user.
 - `blocked` means the user must decide. Its note says whether it came from a `block` verdict (a missing condition) or a `stop` (the revise limit).
 - `init.sh` validates the file (`feature-list`).
+- Run a feature with `/feature-flow [feature-id]`. It delegates to the `feature-implementer` and `feature-validator` subagents and records each verdict in `docs/validations/<feature-id>.md`, which only the orchestrator writes.
 
 ## Specs (`docs/specs/`)
 
@@ -102,6 +103,9 @@ Speak Spanish with the user. Code, comments, files and commit messages are in En
 - `constitution-lint.sh` (after Write/Edit of `.swift`): warns about `try!`, `as!`, unsafe isolation escapes, GCD, legacy Observation, `NavigationView`, `AnyView`, `JSONSerialization`, UIKit/XCTest, `print()` outside tests and two Xcode 27 pitfalls.
 - `stop-build-gate.sh` (on Stop): runs `./init.sh` when non-Markdown files changed since the last green run, and keeps the turn going if it fails.
 - `spec-approval-guard.sh` (before Write/Edit and Bash): blocks any agent from approving a spec or editing an approved one.
+- `validator-readonly-bash.sh` (validator subagent only, before Bash): allows only `./init.sh`, read-only git, `xcrun xcresulttool get` and focused `xcodebuild test`.
+- `implementer-no-accept.sh` (implementer subagent only, before Write/Edit and Bash): blocks setting any feature to `accepted`.
+- Hook tests: `.claude/hooks/tests/run-cases.sh <hook> <cases.json>`, one cases file per hook; run them after changing a hook.
 
 ## Definition of Done
 
