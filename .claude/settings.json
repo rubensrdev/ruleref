@@ -14,7 +14,8 @@
       "Bash(xcodebuild test-without-building *)",
       "Bash(xcrun simctl list *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "mcp__cupertino__*"
     ],
     "ask": [
       "Bash(git push *)"
@@ -26,7 +27,8 @@
       "Read(/**/.env.*)",
       "Edit(/**/*.xcodeproj/**)",
       "Edit(/**/*.xcworkspace/**)",
-      "Edit(/.git/**)"
+      "Edit(/.git/**)",
+      "mcp__pencil"
     ]
   },
   "hooks": {

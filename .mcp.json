@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "cupertino": {
+      "type": "stdio",
+      "command": "cupertino",
+      "args": [
+        "serve"
+      ],
+      "env": {}
+    }
+  }
+}
