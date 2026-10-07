@@ -5,7 +5,7 @@ The harness is the main deliverable; the app is its test bed.
 
 ## Start of every session
 
-1. Read `PROGRESS.md` first, then `feature_list.json` once it exists.
+1. Read `PROGRESS.md` first, then `feature_list.json`.
 2. Read the docs the task needs, using the map in `README.md`.
 3. If the auto memory and the repo disagree, the repo wins. Anything durable you learn about the project goes into the repo (`AGENTS.md`, `docs/` or `PROGRESS.md`); the auto memory is only a cache.
 
@@ -23,6 +23,21 @@ The harness is the main deliverable; the app is its test bed.
 - Deployment target iOS 26.0. Any iOS 27-only API goes behind `#available` with an iOS 26 path.
 - Default actor isolation is `MainActor` in both targets. Pure domain logic is marked `nonisolated` explicitly.
 
+## Scope
+
+- Work only on the feature or subtask you were asked for.
+- If a fix outside it is needed to unblock it, keep that fix minimal and explain it.
+- Scope and non-goals are in `docs/build-brief.md`.
+
+## Features (`feature_list.json`)
+
+- It is the source of truth for feature status: `not_started`, `in_progress`, `blocked`, `passing` or `accepted`.
+- At most one feature is `in_progress`.
+- The next feature is the first in the list whose `depends_on` are all `accepted`.
+- `passing` means you verified it and recorded evidence: at least one entry with `command`, `expected`, `observed` and `context` (date, commit, Xcode, simulator), plus `not_verified`, the list of what that run does not prove (empty if nothing).
+- Never mark a feature `accepted` yourself: an independent validator (from T3) or the user does.
+- `init.sh` validates the file (`feature-list`).
+
 ## Apple documentation
 
 Before using an Apple API, and whenever a platform question comes up, query the Cupertino MCP (declared in `.mcp.json`) for the most modern API and Apple's recommended practice. If it is unavailable, search developer.apple.com on the web. Never improvise or assume how an API behaves.
@@ -30,7 +45,7 @@ Before using an Apple API, and whenever a platform question comes up, query the 
 ## The single command
 
 `./init.sh` is the only definition of "builds and passes". Run it any time without asking.
-It checks Xcode 27 and the iPhone 18 Pro / iOS 27.0 simulator, enforces the source rules (no JSONSerialization, UIKit, XCTest, third-party packages or bundled PDFs; complete Spanish translations), builds with warnings as errors, runs the tests and checks that every string the compiler extracts from the app is in the catalog.
+It checks Xcode 27 and the iPhone 18 Pro / iOS 27.0 simulator, enforces the source rules (no JSONSerialization, UIKit, XCTest, third-party packages or bundled PDFs; complete Spanish translations; a valid `feature_list.json`), builds with warnings as errors, runs the tests and checks that every string the compiler extracts from the app is in the catalog.
 The Stop hook runs it automatically at the end of each turn when the code changed.
 
 ## Tests
@@ -84,6 +99,7 @@ Speak Spanish with the user. Code, comments, files and commit messages are in En
 - [ ] `./init.sh` ends in PASS.
 - [ ] Tests cover all new logic.
 - [ ] New visible texts are in the catalog with their Spanish translation.
+- [ ] `feature_list.json` is updated with status and evidence.
 - [ ] Docs and `README.md` are up to date if what they say changed.
 - [ ] `PROGRESS.md` has an entry with what closed and what comes next.
 - [ ] Commits are made.

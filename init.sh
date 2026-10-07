@@ -14,6 +14,7 @@ XCODE_MAJOR="27"
 SOURCE_DIRS=(RuleRef RuleRefTests)
 APP_DIR="RuleRef"
 APP_TARGET="RuleRef"
+FEATURE_LIST="feature_list.json"
 
 SUMMARY=()
 FAILED=0
@@ -158,6 +159,119 @@ if [ $? -eq 0 ]; then
   pass "string-catalog"
 else
   fail "string-catalog"; RULES_OK=0
+fi
+
+python3 - "$FEATURE_LIST" <<'PY'
+import json, re, sys
+
+path = sys.argv[1]
+FIELDS = ("id", "area", "title", "user_visible_behavior", "depends_on", "status",
+          "verification", "evidence", "notes")
+STATUSES = ("not_started", "in_progress", "blocked", "passing", "accepted")
+CONTEXT_FIELDS = ("date", "commit", "xcode", "simulator")
+ID_RE = re.compile(r"f\d{2}(-[a-z0-9]+)+")
+
+try:
+    with open(path, encoding="utf-8") as f:
+        features = json.load(f)
+except (OSError, ValueError) as error:
+    print(f"{path}: {error}")
+    sys.exit(1)
+if not isinstance(features, list) or not all(isinstance(f, dict) for f in features):
+    print(f"{path}: must be a JSON array of feature objects.")
+    sys.exit(1)
+
+def filled(value):
+    return isinstance(value, str) and value.strip() != ""
+
+def complete(item):
+    if not isinstance(item, dict):
+        return False
+    context = item.get("context")
+    return (
+        all(filled(item.get(k)) for k in ("command", "expected", "observed"))
+        and isinstance(context, dict) and all(filled(context.get(k)) for k in CONTEXT_FIELDS)
+        and isinstance(item.get("not_verified"), list)
+        and all(filled(v) for v in item["not_verified"])
+    )
+
+errors = []
+by_id = {}
+for index, feature in enumerate(features):
+    fid = feature.get("id")
+    name = fid if filled(fid) else f"feature #{index}"
+    missing = [k for k in FIELDS if k not in feature]
+    if missing:
+        errors.append(f"{name}: missing {', '.join(missing)}")
+    if not isinstance(fid, str) or not ID_RE.fullmatch(fid):
+        errors.append(f"{name}: id must be fNN-lowercase-kebab")
+    elif fid in by_id:
+        errors.append(f"{name}: duplicate id")
+    else:
+        by_id[fid] = feature
+    for key in ("area", "title", "user_visible_behavior", "notes"):
+        if key in feature and not filled(feature[key]):
+            errors.append(f"{name}: {key} must be a non-empty string")
+    if "status" in feature and feature["status"] not in STATUSES:
+        errors.append(f"{name}: status {feature['status']!r} not in {', '.join(STATUSES)}")
+    for key in ("depends_on", "verification", "evidence"):
+        if key in feature and not isinstance(feature[key], list):
+            errors.append(f"{name}: {key} must be a list")
+    steps = feature.get("verification")
+    if isinstance(steps, list) and not (steps and all(filled(v) for v in steps)):
+        errors.append(f"{name}: verification must list non-empty steps")
+    evidence = feature.get("evidence") if isinstance(feature.get("evidence"), list) else []
+    for n, item in enumerate(evidence, 1):
+        if not complete(item):
+            errors.append(f"{name}: evidence #{n} needs non-empty command, expected, observed, "
+                          f"context ({', '.join(CONTEXT_FIELDS)}) and a not_verified list")
+    if feature.get("status") in ("passing", "accepted") and not any(complete(e) for e in evidence):
+        errors.append(f"{name}: {feature['status']} needs at least one complete evidence entry")
+
+in_progress = [f["id"] for f in by_id.values() if f.get("status") == "in_progress"]
+if len(in_progress) > 1:
+    errors.append(f"at most one feature may be in_progress, found {len(in_progress)}: {', '.join(in_progress)}")
+
+graph = {}
+for fid, feature in by_id.items():
+    deps = feature.get("depends_on") if isinstance(feature.get("depends_on"), list) else []
+    graph[fid] = []
+    for dep in deps:
+        if not isinstance(dep, str):
+            errors.append(f"{fid}: depends_on must hold id strings")
+        elif dep == fid:
+            errors.append(f"{fid}: depends on itself")
+        elif dep not in by_id:
+            errors.append(f"{fid}: depends on unknown id {dep!r}")
+        else:
+            graph[fid].append(dep)
+            if feature.get("status") in ("in_progress", "passing", "accepted") and by_id[dep].get("status") != "accepted":
+                errors.append(f"{fid}: is {feature['status']} but dependency {dep} is "
+                              f"{by_id[dep].get('status')}, not accepted")
+
+state = {}
+def visit(fid, path):
+    state[fid] = "visiting"
+    for dep in graph[fid]:
+        if state.get(dep) == "visiting":
+            cycle = path[path.index(dep):] + [dep]
+            errors.append("dependency cycle: " + " -> ".join(cycle))
+        elif dep not in state:
+            visit(dep, path + [dep])
+    state[fid] = "done"
+for fid in graph:
+    if fid not in state:
+        visit(fid, [fid])
+
+if errors:
+    print(f"{path}: {len(errors)} problem(s):")
+    print("\n".join(f"  {e}" for e in errors[:20]))
+sys.exit(1 if errors else 0)
+PY
+if [ $? -eq 0 ]; then
+  pass "feature-list"
+else
+  fail "feature-list"; RULES_OK=0
 fi
 
 # --- c) Build and tests --------------------------------------------------------

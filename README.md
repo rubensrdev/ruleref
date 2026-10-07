@@ -21,11 +21,12 @@ iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vis
 
 ## Build and test
 
-`./init.sh` is the only command: it checks the toolchain and simulator, enforces the source rules (no JSONSerialization, UIKit, XCTest, third-party packages or bundled PDFs; Spanish translations complete), then builds with warnings as errors, runs the tests and checks that every string the compiler extracts from the app is in the catalog (the CLI build never adds them; add each key with its Spanish translation by hand). Requires Xcode 27 and an iPhone 18 Pro simulator with iOS 27.0.
+`./init.sh` is the only command: it checks the toolchain and simulator, enforces the source rules (no JSONSerialization, UIKit, XCTest, third-party packages or bundled PDFs; Spanish translations complete; a valid `feature_list.json`), then builds with warnings as errors, runs the tests and checks that every string the compiler extracts from the app is in the catalog (the CLI build never adds them; add each key with its Spanish translation by hand). Requires Xcode 27 and an iPhone 18 Pro simulator with iOS 27.0.
 
 ## Documentation
 
 - [`AGENTS.md`](AGENTS.md): instructions for coding agents, with rules, workflow and Definition of Done. [`CLAUDE.md`](CLAUDE.md) only imports it.
+- [`feature_list.json`](feature_list.json): status of every feature, with dependencies, verification steps and evidence.
 - [`docs/idea.md`](docs/idea.md): original idea, course context and initial decisions (Spanish).
 - [`docs/build-brief.md`](docs/build-brief.md): problem, goals, non-goals and feature slices up to m4.
 - [`docs/domain-model.md`](docs/domain-model.md): core concepts and rules.

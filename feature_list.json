@@ -1,0 +1,226 @@
+[
+  {
+    "id": "f01-cli-build-and-tests",
+    "area": "harness",
+    "title": "Build and test from the CLI",
+    "user_visible_behavior": "Empty app target and test target build and run tests from the CLI.",
+    "depends_on": [],
+    "status": "in_progress",
+    "verification": [
+      "Clone the repository into an empty directory and run `./init.sh` there.",
+      "It exits 0."
+    ],
+    "evidence": [],
+    "notes": "Task: T2."
+  },
+  {
+    "id": "f02-create-game",
+    "area": "library",
+    "title": "Create a game",
+    "user_visible_behavior": "User creates a game with a name; names are trimmed, non-empty and unique case- and diacritic-insensitively.",
+    "depends_on": ["f01-cli-build-and-tests"],
+    "status": "not_started",
+    "verification": [
+      "Test: a blank name is rejected.",
+      "Test: \"Taifa\" vs \" taifa \" is rejected as a duplicate."
+    ],
+    "evidence": [],
+    "notes": "Task: T3."
+  },
+  {
+    "id": "f03-list-games",
+    "area": "library",
+    "title": "List games alphabetically",
+    "user_visible_behavior": "Library lists games alphabetically, with an empty state when there are none.",
+    "depends_on": ["f02-create-game"],
+    "status": "not_started",
+    "verification": [
+      "Test on the library query: alphabetical order.",
+      "Test on the library query: empty flag when there are no games."
+    ],
+    "evidence": [],
+    "notes": "Task: T3."
+  },
+  {
+    "id": "f04-rename-delete-game",
+    "area": "library",
+    "title": "Rename or delete a game",
+    "user_visible_behavior": "User renames or deletes a game; deleting removes its rulebook, passages and stored file.",
+    "depends_on": ["f02-create-game", "f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test: after delete, passage count and stored-file count for that rulebook ID are 0."
+    ],
+    "evidence": [],
+    "notes": "Task: after m4 (non-goal until m4)."
+  },
+  {
+    "id": "f05-rulebook-id",
+    "area": "import",
+    "title": "Rulebook ID from file bytes",
+    "user_visible_behavior": "A rulebook ID is the SHA-256 of the file bytes.",
+    "depends_on": ["f01-cli-build-and-tests"],
+    "status": "not_started",
+    "verification": [
+      "Test: same bytes give the same ID.",
+      "Test: one changed byte gives a different ID."
+    ],
+    "evidence": [],
+    "notes": "Task: T3."
+  },
+  {
+    "id": "f06-extract-passages",
+    "area": "extraction",
+    "title": "Extract ordered passages",
+    "user_visible_behavior": "Extraction turns a text-layer PDF into ordered passages, each with a valid locator.",
+    "depends_on": ["f01-cli-build-and-tests"],
+    "status": "not_started",
+    "verification": [
+      "Build a synthetic PDF in the test with PDFKit.",
+      "Test: expected texts, order and page indices.",
+      "Test: every rect is inside its page bounds."
+    ],
+    "evidence": [],
+    "notes": "Task: T3. Single-column only; multi-column is deferred to ADR-002."
+  },
+  {
+    "id": "f07-join-hyphenation",
+    "area": "extraction",
+    "title": "Join hyphenation and normalise whitespace",
+    "user_visible_behavior": "Extraction joins line-break hyphenation and normalises whitespace.",
+    "depends_on": ["f06-extract-passages"],
+    "status": "not_started",
+    "verification": [
+      "Test: a synthetic \"cons-⏎truir\" yields passage text containing \"construir\"."
+    ],
+    "evidence": [],
+    "notes": "Task: T3."
+  },
+  {
+    "id": "f08-atomic-import",
+    "area": "import",
+    "title": "Import a rulebook atomically",
+    "user_visible_behavior": "Importing into a game without a rulebook stores the file copy, the rulebook and its passages atomically.",
+    "depends_on": ["f02-create-game", "f05-rulebook-id", "f06-extract-passages"],
+    "status": "not_started",
+    "verification": [
+      "Test: after import, passage count equals extraction output and the stored file exists.",
+      "Test: the Taifa fixture imports with 16 pages."
+    ],
+    "evidence": [],
+    "notes": "Task: T3. Taifa 3.0 lives only in the test target, with its attribution file."
+  },
+  {
+    "id": "f09-reject-no-text-layer",
+    "area": "import",
+    "title": "Reject PDFs without a text layer",
+    "user_visible_behavior": "Import of a PDF with no text layer fails with an explicit error and persists nothing.",
+    "depends_on": ["f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test with an image-only synthetic PDF: error `.noTextLayer`.",
+      "Test: zero rulebooks and passages persisted."
+    ],
+    "evidence": [],
+    "notes": "Task: T3."
+  },
+  {
+    "id": "f10-reject-unreadable-file",
+    "area": "import",
+    "title": "Reject locked or unreadable files",
+    "user_visible_behavior": "Import of a locked or unreadable file fails with an explicit error and persists nothing.",
+    "depends_on": ["f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test with an encrypted file and a corrupt file: distinct errors.",
+      "Test: nothing persisted in either case."
+    ],
+    "evidence": [],
+    "notes": "Task: T3."
+  },
+  {
+    "id": "f11-reimport-same-file",
+    "area": "import",
+    "title": "Re-import of the same file",
+    "user_visible_behavior": "Re-importing the same file into the same game is a no-op; the same file into another game is refused, naming that game.",
+    "depends_on": ["f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test: locators before and after re-import are equal and counts unchanged.",
+      "Test: a second game gets `.alreadyImported(gameName)`."
+    ],
+    "evidence": [],
+    "notes": "Task: T3."
+  },
+  {
+    "id": "f12-delete-rulebook",
+    "area": "library",
+    "title": "Delete a game's rulebook",
+    "user_visible_behavior": "User deletes a game's rulebook; the game stays and can import again.",
+    "depends_on": ["f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test: the game remains.",
+      "Test: rulebook, passages and stored file are gone.",
+      "Test: import is offered again."
+    ],
+    "evidence": [],
+    "notes": "Task: after m4 (non-goal until m4)."
+  },
+  {
+    "id": "f13-text-search",
+    "area": "search",
+    "title": "Text search in a rulebook",
+    "user_visible_behavior": "Text search returns passages of the game's rulebook containing all query terms, case- and diacritic-insensitively, ranked by term frequency then reading order.",
+    "depends_on": ["f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test on a synthetic rulebook: AND semantics.",
+      "Test: \"construccion\" matches \"construcción\".",
+      "Test: ranking is stable."
+    ],
+    "evidence": [],
+    "notes": "Task: T4."
+  },
+  {
+    "id": "f14-no-match-state",
+    "area": "search",
+    "title": "Explicit no-match state",
+    "user_visible_behavior": "A query with zero matches shows the no-match state, never approximate matches.",
+    "depends_on": ["f13-text-search"],
+    "status": "not_started",
+    "verification": [
+      "Test: search state is `.noMatch` with an empty list for an absent term."
+    ],
+    "evidence": [],
+    "notes": "Task: T4."
+  },
+  {
+    "id": "f15-page-viewer-highlight",
+    "area": "page-viewer",
+    "title": "Open a match highlighted on its page",
+    "user_visible_behavior": "Opening a match shows its page in the page viewer with the passage rectangle highlighted.",
+    "depends_on": ["f13-text-search"],
+    "status": "not_started",
+    "verification": [
+      "Test: the page index and highlight bounds passed to the viewer equal the locator's."
+    ],
+    "evidence": [],
+    "notes": "Task: T4. The PDFKit viewer is the pending UIKit exception and needs its own ADR."
+  },
+  {
+    "id": "f16-baseline-eval",
+    "area": "evaluation",
+    "title": "Baseline search evaluation",
+    "user_visible_behavior": "Baseline run: the eval set (Codable JSON) is evaluated against search over the Taifa fixture and a report with hit@1, hit@3 and no-match accuracy is written, tagged with OS version.",
+    "depends_on": ["f13-text-search", "f14-no-match-state"],
+    "status": "not_started",
+    "verification": [
+      "`./init.sh` produces the report file.",
+      "Test: fails if the eval set is malformed.",
+      "Test: fails if the fixture is missing."
+    ],
+    "evidence": [],
+    "notes": "Task: after m4 (module 5, next to the AI it is compared against)."
+  }
+]
