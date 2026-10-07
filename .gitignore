@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Xcode user state (xcshareddata stays tracked)
+xcuserdata/
+
+# Build output
+DerivedData/
+build/
+.build/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.mobileprovision
+
+# Claude Code local settings (the rest of .claude/ is tracked)
+.claude/settings.local.json
