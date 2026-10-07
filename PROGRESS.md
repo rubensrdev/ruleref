@@ -31,3 +31,11 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Cupertino MCP declared in `.mcp.json` and allowed; pencil denied for this project.
 - `AGENTS.md` and `CLAUDE.md` created.
 - Next: T2.5, `feature_list.json`.
+
+## 2026-10-07 — T2.5
+- `feature_list.json` adopts the course format (harness-starter), with richer evidence: each entry has `command`, `expected`, `observed`, `context` (date, commit, Xcode, simulator) and `not_verified`.
+- The 16 features of the build brief, in order, with their dependencies: f02, f05 and f06 depend on f01; f03 on f02; f07 on f06; f08 on f02, f05 and f06; f04 on f02 and f08; f09–f13 on f08; f14 and f15 on f13; f16 on f13 and f14.
+- New `feature-list` check in `init.sh` (rules phase): fields, id format, unique ids, allowed status, at most one `in_progress`, known dependencies without self-references or cycles, dependencies `accepted` before work starts, complete evidence for `passing` and `accepted`.
+- `AGENTS.md` gains the scope and feature-list sections.
+- f01 is `passing` with evidence from a clean clone at aaf46dd, awaiting the T3 validator.
+- Next: T2.6, T2 exit criteria and tag `m3`.

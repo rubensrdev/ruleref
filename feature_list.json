@@ -5,12 +5,32 @@
     "title": "Build and test from the CLI",
     "user_visible_behavior": "Empty app target and test target build and run tests from the CLI.",
     "depends_on": [],
-    "status": "in_progress",
+    "status": "passing",
     "verification": [
       "Clone the repository into an empty directory and run `./init.sh` there.",
       "It exits 0."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh",
+        "expected": "Exit code 0 and every check in PASS.",
+        "observed": "Exit code 0. Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results (totalTestCount=1, failedTests=0, skippedTests=0, expectedFailures=0); PASS catalog-coverage; init.sh: PASS.",
+        "context": {
+          "date": "2026-10-07 12:29 CEST",
+          "commit": "aaf46dd3ee04173d90153a2bd98d0c1a63dbd8a4",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Fresh git clone of the local repository into an empty temporary directory, with its own new DerivedData."
+        },
+        "not_verified": [
+          "This Mac already had Xcode 27 and the pinned simulator; the preflight failure path and its remediation steps on a machine without them were not exercised.",
+          "Same machine and user: the shared module cache and simulator state were warm; not a fresh machine.",
+          "Cloned from the local repository before pushing; a clone from GitHub was not run.",
+          "Only the iOS 27.0 simulator: not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "The only test is a smoke test; the interface was not checked (no UI tests by design; the user validates it by hand)."
+        ]
+      }
+    ],
     "notes": "Task: T2."
   },
   {
