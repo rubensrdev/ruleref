@@ -25,6 +25,7 @@ iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vis
 
 ## Documentation
 
+- [`AGENTS.md`](AGENTS.md): instructions for coding agents, with rules, workflow and Definition of Done. [`CLAUDE.md`](CLAUDE.md) only imports it.
 - [`docs/idea.md`](docs/idea.md): original idea, course context and initial decisions (Spanish).
 - [`docs/build-brief.md`](docs/build-brief.md): problem, goals, non-goals and feature slices up to m4.
 - [`docs/domain-model.md`](docs/domain-model.md): core concepts and rules.

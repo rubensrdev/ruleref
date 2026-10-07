@@ -22,3 +22,12 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - T2.1: Xcode project created by hand with synchronized folders, shared scheme with an autocreated test plan, iPhone only in portrait, iOS 26.0, Swift 6 with complete concurrency checking, MainActor default isolation, English as development language and Spanish added.
 - T2.2: .gitignore tracked again.
 - Next: T2.3, init.sh and F01.
+
+## 2026-10-07 — T2.3–T2.4
+- `init.sh` is the single gate. Checks: Xcode 27, simulator, no JSONSerialization, no UIKit/XCTest imports, no third-party dependencies, no PDFs in the app, string catalog (exists, with Spanish translations), `xcodebuild test` with warnings as errors, test results, catalog-coverage.
+- F01 delivered: app and tests build and pass by CLI. `./init.sh` is green in a clean clone.
+- Finding: the CLI build never extracts keys into `Localizable.xcstrings`. catalog-coverage replays `xcstringstool sync` on a copy with the current build's `.stringsdata`. It fails on code strings missing from the catalog, and on stale keys used again without a translation.
+- The auto memory is kept as a cache only; the repo is the source of truth.
+- Cupertino MCP declared in `.mcp.json` and allowed; pencil denied for this project.
+- `AGENTS.md` and `CLAUDE.md` created.
+- Next: T2.5, `feature_list.json`.
