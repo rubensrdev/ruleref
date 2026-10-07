@@ -1,0 +1,12 @@
+[
+  {
+    "id": "f90-sample-open",
+    "title": "Sample open feature",
+    "status": "passing"
+  },
+  {
+    "id": "f91-sample-done",
+    "title": "Sample done feature",
+    "status": "accepted"
+  }
+]
