@@ -264,17 +264,43 @@ if result.returncode != 0:
     print("xcstringstool sync failed:", result.stderr.strip() or result.stdout.strip())
     sys.exit(1)
 
-def keys(path):
+def strings(path):
     with open(path, encoding="utf-8") as f:
-        return set(json.load(f).get("strings", {}))
+        return json.load(f).get("strings", {})
+
+def string_units(node):
+    if isinstance(node, dict):
+        if "stringUnit" in node:
+            yield node["stringUnit"]
+        for value in node.values():
+            yield from string_units(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from string_units(value)
+
+def translated(entry):
+    units = list(string_units(entry.get("localizations", {}).get("es", {})))
+    return bool(units) and all(u.get("state") == "translated" for u in units)
 
 ok = True
 for original, copy in copies:
-    missing = sorted(keys(copy) - keys(original))
+    before, after = strings(original), strings(copy)
+    missing = sorted(after.keys() - before.keys())
     if missing:
         ok = False
         print(f"{original}: {len(missing)} string(s) in code but not in the catalog (add each with its 'es' translation):")
         print("\n".join(f"  {k!r}" for k in missing[:10]))
+    # string-catalog skips stale keys; sync clears "stale" on the ones the code uses again.
+    revived = sorted(
+        k for k, entry in before.items()
+        if entry.get("extractionState") == "stale" and k in after
+        and after[k].get("extractionState") != "stale"
+        and entry.get("shouldTranslate") is not False and not translated(entry)
+    )
+    if revived:
+        ok = False
+        print(f"{original}: {len(revived)} key(s) marked stale but used in code, without a translated 'es' value:")
+        print("\n".join(f"  {k!r}" for k in revived[:10]))
 orphan_tables = sorted(tables - {os.path.splitext(os.path.basename(c))[0] for c in catalogs})
 if orphan_tables:
     ok = False
