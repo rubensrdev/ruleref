@@ -39,3 +39,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `AGENTS.md` gains the scope and feature-list sections.
 - f01 is `passing` with evidence from a clean clone at aaf46dd, awaiting the T3 validator.
 - Next: T2.6, T2 exit criteria and tag `m3`.
+
+## 2026-10-07 — T2.6, T2 closed
+- Exit criterion 1 met: a new session with the auto memory disabled (`CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`) rebuilt the project state from the repo alone. It found that the T2 exit criteria were not written down, so `AGENTS.md` now requires every "Next" line to state what comes next and its "done when" criterion.
+- Exit criterion 2 met: a `JSONSerialization` call planted in `RuleRef/GateProbe.swift` was flagged by constitution-lint on write, and the Stop hook blocked the end of the turn because `./init.sh` failed in the rules phase, before building. After the file was deleted, `./init.sh` was green.
+- Known gate limitation: after a block, Claude Code does not run the Stop hooks again in the same turn (`stop_hook_active`), so a failed fix could end that turn. The gate records green only when it runs `init.sh` itself, so the next turn checks again. Worst case: one turn of delay.
+- Tag `m3`: minimal harness.
+- Next: T3, install the loop (feature-flow skill, implementer and validator subagents, Xcode MCP integration) and run it on the T3 features. Done when: ADR-002 (multi-column extraction) exists; a write attempt by the validator is blocked; the validator accepts f01 with evidence; the loop is launched on the T3 features.

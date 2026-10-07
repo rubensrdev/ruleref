@@ -8,6 +8,7 @@ The harness is the main deliverable; the app is its test bed.
 1. Read `PROGRESS.md` first, then `feature_list.json`.
 2. Read the docs the task needs, using the map in `README.md`.
 3. If the auto memory and the repo disagree, the repo wins. Anything durable you learn about the project goes into the repo (`AGENTS.md`, `docs/` or `PROGRESS.md`); the auto memory is only a cache.
+4. The "Next" line of every `PROGRESS.md` entry always states what comes next and its "done when" criterion.
 
 ## Non-negotiable rules
 
