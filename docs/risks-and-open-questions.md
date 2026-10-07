@@ -21,6 +21,7 @@ None.
 - **Multi-column extraction (ADR-002, T3).** Geometry-based reading order vs. Vision document recognition. The MVP ships single-column only.
 - **Passage segmentation rule.** How paragraphs are cut from PDFKit lines (vertical gap threshold, indentation). Settle on Taifa pp. 3 and 12 (text wrapping images) early, before search is built on top.
 - **Ranking ties and match display.** F13 fixes the order. Whether a match shows a text excerpt or only the page number is decided in its spec.
+- **Page viewer and "no UIKit" (F15).** The viewer will use PDFKit's `PDFView` inside a `UIViewRepresentable`, the only exception to "no UIKit" (ADR-001). To be decided in its own ADR within the T4 spec (P4). Check whether `import PDFKit` is enough or that single file also needs `import UIKit`; `init.sh` currently rejects any UIKit import, so the ADR must also say how the gate allows it.
 
 ## Later (after m4)
 

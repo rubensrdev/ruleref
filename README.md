@@ -19,6 +19,10 @@ No AI before m4. On-device AI comes later as a pluggable layer.
 
 iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vision, no third-party dependencies, built and tested via `xcodebuild`. See [ADR-001](docs/adr/0001-stack-and-build-doctrine.md).
 
+## Build and test
+
+`./init.sh` is the only command: it checks the toolchain and simulator, enforces the source rules (no JSONSerialization, UIKit, XCTest, third-party packages or bundled PDFs; Spanish translations complete), then builds with warnings as errors and runs the tests. Requires Xcode 27 and an iPhone 18 Pro simulator with iOS 27.0.
+
 ## Documentation
 
 - [`docs/idea.md`](docs/idea.md): original idea, course context and initial decisions (Spanish).
