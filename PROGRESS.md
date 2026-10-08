@@ -58,3 +58,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `AGENTS.md` and `README.md` document the loop. Commits 1959d1f to 7c7c487.
 - Not run yet: `.claude/agents/` is a new folder, so the subagents load only after a session restart; the live checks belong to T3.
 - Next: P3.7b, fix the next-feature rule in `AGENTS.md` and write the specs for f01 (retroactive) and every T3 feature, reviewed in batches; then P3.8, Xcode MCP read-only integration and the ADR-001 revision. Done when: every T3 spec plus f01's exists in `docs/specs/` and carries the user's Approval line, and P3.8's tools are registered with their hook tests passing.
+
+## 2026-10-08 — P3.7b, part 1: specs for f01, f02 and f05
+- `AGENTS.md`: the next feature to start is the first `not_started` feature whose `depends_on` are all `accepted`, as in feature-flow.
+- Specs approved by the user: f01 (retroactive; the validator can only rerun `./init.sh`, so the clean-clone evidence goes to `not_verified`), f02 (minimal "New Game" sheet; uniqueness by a stored folded name key checked before insert, no `#Unique` because SwiftData upserts on collision) and f05 (CryptoKit SHA-256).
+- Decided: each feature carries its minimal interface; the user validates it by hand at the end of each phase and the validator lists it in `not_verified`. Which features own the game screen and the import action is settled in the f03 and f08 specs.
+- Decided: P3 stays on `main`. In T3, right after f01 is accepted and before f02 starts, features move to one branch and one PR each, run one at a time, merged by the user, with no issues.
+- Next: P3.7b, specs for f06, then f03, f07, f08, f09, f10 and f11 (f11 with the idempotency scenario); then P3.8, Xcode MCP read-only integration and the ADR-001 revision. Done when: every T3 spec exists in `docs/specs/` and carries the user's Approval line, and P3.8's tools are registered with their hook tests passing.
