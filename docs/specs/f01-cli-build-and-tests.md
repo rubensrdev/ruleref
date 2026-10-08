@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Build and test from the CLI
 
+Approval: approved by the user on 2026-10-08
+
 ## Source Feature
 
 - `id`: f01-cli-build-and-tests
@@ -28,7 +30,7 @@ so I can tell whether the repo builds and passes without opening Xcode.
 
 ## Users And Permissions
 
-- Agents and the user: run `./init.sh` at any time without asking. The validator may run only `./init.sh`, read-only git and `xcrun xcresulttool get` (`validator-readonly-bash.sh`).
+- Agents and the user: run `./init.sh` at any time without asking. The validator may run only `./init.sh`, read-only git, `xcrun xcresulttool get` and focused `xcodebuild test` with `-only-testing:` (`validator-readonly-bash.sh`).
 
 ## Acceptance Scenarios
 
