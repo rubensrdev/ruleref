@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Create a game
 
+Approval: approved by the user on 2026-10-08
+
 ## Source Feature
 
 - `id`: f02-create-game
@@ -58,7 +60,7 @@ Then one game exists, its name is "Taifa", and a fetch through a new `ModelConte
 
 ### Scenario 5: the sheet (manual, not automated)
 
-Given the app launched on the simulator
+Given the app launched on the iPhone 16
 When the user taps "New Game", leaves the name blank or repeats an existing one, and confirms
 Then the sheet stays open with an inline error; with a valid name it closes.
 
@@ -87,13 +89,13 @@ Then the sheet stays open with an inline error; with a valid name it closes.
 APIs, checked in the Cupertino MCP on 2026-10-08:
 
 - **Name key**: `String.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: Locale(identifier: "en_US_POSIX"))` on the trimmed name (`trimmingCharacters(in: .whitespacesAndNewlines)`). Apple recommends folding once and storing the result when strings are compared repeatedly. The fixed locale keeps the key deterministic (the docs note case folding varies by locale, e.g. Turkish "I"). Folding is not available inside `#Predicate`, so the key is stored.
-- **Uniqueness**: the creation operation fetches by key (`FetchDescriptor<Game>` with `#Predicate { $0.nameKey == key }`, `fetchCount`) and throws the duplicate-name error before inserting. `#Unique<Game>([\.nameKey])` (iOS 18+) is a store-level backstop only. Its collision behavior is not documented, so no test relies on it.
+- **Uniqueness**: the creation operation fetches by key (`FetchDescriptor<Game>` with `#Predicate { $0.nameKey == key }`, `fetchCount`) and throws the duplicate-name error before inserting. No `#Unique`: on a collision SwiftData upserts, updating the existing game instead of failing (WWDC24 "What's new in SwiftData"), which would silently rename it rather than reject the duplicate.
 
 Pieces:
 
 1. `GameName` (`nonisolated struct`, `Sendable`, `Equatable`): built from raw input, throws `GameNameError.blank`; exposes `value` (trimmed) and `key` (folded).
 2. `GameNameError` (`nonisolated enum`, `Error`, `Equatable`): `blank`, `duplicate`.
-3. `Game` (`@Model final class`): `name: String`, `nameKey: String`, `#Unique` on `nameKey`.
+3. `Game` (`@Model final class`): `name: String`, `nameKey: String`.
 4. `Library` (MainActor struct over a `ModelContext`): `createGame(named:) throws -> Game` builds a `GameName`, checks the key, inserts and saves.
 5. `NewGameSheet` (SwiftUI): a `Form` with a name `TextField`, Cancel and Create toolbar buttons, and an inline error text for `blank` and `duplicate`. It calls `Library` with the environment's `modelContext`.
 6. `ContentView`: a "New Game" button that presents `NewGameSheet`. `RuleRefApp` adds `.modelContainer(for: Game.self)`.
@@ -152,12 +154,13 @@ Pieces:
 
 - `./init.sh` summary and test-results counts, with date, commit, Xcode and simulator.
 - Names of the tests covering scenarios 1–4.
-- `not_verified`: the sheet and root screen (scenario 5), iOS 26.0 and physical device runs, `#Unique` collision behavior.
+- `not_verified`: the sheet and root screen (scenario 5), iOS 26.0 and physical device runs.
 
 ## Validator Checklist
 
 - [ ] Scenarios 1–4 are covered by passing tests on an in-memory container.
 - [ ] `GameName` and `GameNameError` are `nonisolated`; no UIKit, XCTest or JSONSerialization.
+- [ ] Uniqueness is enforced only by the pre-insert check; `Game` has no `#Unique`.
 - [ ] Every new visible text is in the catalog with a translated `es` value; "Hello, world!" is gone.
 - [ ] No list, navigation, rename, delete or import was added.
 - [ ] The interface is listed in `not_verified`.
