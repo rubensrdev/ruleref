@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Rulebook ID from file bytes
 
+Approval: approved by the user on 2026-10-08
+
 ## Source Feature
 
 - `id`: f05-rulebook-id
