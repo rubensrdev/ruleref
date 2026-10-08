@@ -34,7 +34,7 @@ The harness is the main deliverable; the app is its test bed.
 
 - It is the source of truth for feature status: `not_started`, `in_progress`, `blocked`, `passing` or `accepted`.
 - At most one feature is `in_progress`.
-- The next feature is the first in the list whose `depends_on` are all `accepted`.
+- The next feature to start is the first `not_started` feature whose `depends_on` are all `accepted`.
 - `passing` means you verified it and recorded evidence: at least one entry with `command`, `expected`, `observed` and `context` (date, commit, Xcode, simulator), plus `not_verified`, the list of what that run does not prove (empty if nothing).
 - Only the orchestrating main session sets `accepted`: after the validator returns `accept` and the user confirms it in the chat, it sets the status and commits. The implementer never sets `accepted`; the validator never edits files.
 - A feature gets at most 3 `revise` verdicts. After the third, stop: set the feature to `blocked`, add the reason to its `notes`, and leave the decision to the user.
