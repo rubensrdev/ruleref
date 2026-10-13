@@ -128,7 +128,21 @@
       "Test: the Taifa fixture imports with 16 pages."
     ],
     "evidence": [],
-    "notes": "Task: T3. Taifa 3.0 lives only in the test target, with its attribution file."
+    "notes": "Task: T3. Taifa 3.0 lives only in the test target, with its attribution file. The import action and the ready state are f17."
+  },
+  {
+    "id": "f17-import-action",
+    "area": "import",
+    "title": "Import action in the game screen",
+    "user_visible_behavior": "From a game without a rulebook, the user picks a PDF with the system file picker and imports it; the game screen then shows the rulebook as ready, with its page count.",
+    "depends_on": ["f03-list-games", "f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test: the game screen state is empty without a rulebook and ready with the rulebook's page count after an import.",
+      "Manual on the iPhone 16: import the Taifa PDF from Files; the game screen shows it as ready with 16 pages."
+    ],
+    "evidence": [],
+    "notes": "Task: T3. Split from f08 on 2026-10-13: f08 holds the import logic, f17 the action and the ready state."
   },
   {
     "id": "f09-reject-no-text-layer",
