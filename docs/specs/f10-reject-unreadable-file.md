@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Reject locked or unreadable files
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f10-reject-unreadable-file
