@@ -1,5 +1,7 @@
 # Feature Implementation Spec: List games alphabetically
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f03-list-games
@@ -95,19 +97,19 @@ APIs checked in the Cupertino MCP on 2026-10-13 (Apple docs crawled May 2026):
 - `ContentUnavailableView.init(_ title: LocalizedStringKey, systemImage: String, description: Text? = nil)` (iOS 17+). Apple recommends it for "a list without items".
 - `Text.init(_ content: some StringProtocol)` displays a stored string without localization; `navigationTitle(_:)` has a `StringProtocol` overload as well as `LocalizedStringKey`. Game names are user data and use these overloads, so they never become catalog keys.
 
-Sorting decision: sort by `\Game.nameKey`, `.forward`, with the comparator passed explicitly as `.lexical`. The key is already folded with a fixed locale (f02), so a locale-independent comparison keeps the order the same on every device and in tests. For the scenario names the keys are "abaco", "azul", "zombicide", which sort as expected under either comparator. The scenarios also tell folded and raw names apart: sorting the raw `name` lexically would give "Zombicide", "azul", "Ábaco".
+Sorting decision: sort by `\Game.nameKey`, `.forward`, with the comparator passed explicitly as `.localizedStandard` (the documented default). Numbers sort by value, so "Catan 2" comes before "Catan 10", as players expect. The key is already folded with a fixed locale (f02), so for Latin names the current locale does not change the order. For the scenario names the keys are "abaco", "azul", "zombicide". Under `.localizedStandard` the raw names would sort the same way, so the order alone does not prove the key path; the validator checks it in code (checklist).
 
 - Verified in the docs: the comparator options and their meaning, and the default.
 - **Not verified** in the docs: how SwiftData's store applies a `String.StandardComparator` to a fetch. Apple does not document how it is translated to the store. Scenario 1 checks it on the real (in-memory) store for Latin names.
-- **Not verified**: order for non-Latin names (Greek, Cyrillic, CJK) and for names starting with digits or punctuation. With `.lexical` these sort before letters.
-- Accepted consequence: names with numbers sort lexically ("Catan 10" before "Catan 2"). Diacritic folding turns "ñ" into "n", so "Ñandú" sorts among the n's, not after them as Spanish collation would.
+- **Not verified**: order for non-Latin names (Greek, Cyrillic, CJK) and for names starting with digits or punctuation.
+- Accepted consequence: diacritic folding turns "ñ" into "n", so "Ñandú" sorts among the n's, not after them as Spanish collation would.
 
 `nameKey` is unique (f02), so there are no ties and no tie-break key.
 
 Pieces:
 
 1. `Library` (extend f02's struct):
-   - `static var alphabeticalGames: FetchDescriptor<Game>`, a computed property returning `FetchDescriptor<Game>(sortBy: [SortDescriptor(\.nameKey, comparator: .lexical, order: .forward)])` with no predicate. This is the only place the order is defined.
+   - `static var alphabeticalGames: FetchDescriptor<Game>`, a computed property returning `FetchDescriptor<Game>(sortBy: [SortDescriptor(\.nameKey, comparator: .localizedStandard, order: .forward)])` with no predicate. This is the only place the order is defined.
    - `func games() throws -> [Game]`, which returns `try context.fetch(Self.alphabeticalGames)`.
 2. `ContentView` (the library screen) has a `NavigationStack`. Inside it:
    - `@Query(Library.alphabeticalGames) private var games: [Game]`.
@@ -157,7 +159,7 @@ Expected new visible texts and their `es` values (the keys are the English text)
 ## Implementation Tasks
 
 - [ ] `LibraryGamesTests`: the order for "Zombicide", "azul", "Ábaco"; an empty array on an empty library; "Catán" lands between "azul" and "Zombicide" after `createGame`. Assert on `name`, in order.
-- [ ] `Library.swift`: `alphabeticalGames` (sort on `nameKey`, `.lexical`, `.forward`) and `games()`.
+- [ ] `Library.swift`: `alphabeticalGames` (sort on `nameKey`, `.localizedStandard`, `.forward`) and `games()`.
 - [ ] `ContentView.swift`: `@Query(Library.alphabeticalGames)`, `ContentUnavailableView` when empty, `NavigationLink(value:)` rows, `navigationDestination(for: Game.self)` outside the `List`, "New Game" in the toolbar.
 - [ ] `GameView.swift`: the name as title, "No Rulebook Yet", no actions.
 - [ ] Catalog: four new keys with `es` values; no game name added as a key.
@@ -178,7 +180,7 @@ Expected new visible texts and their `es` values (the keys are the English text)
 ## Validator Checklist
 
 - [ ] Scenarios 1–3 are covered by passing tests on an in-memory container, with games created through `Library.createGame(named:)`.
-- [ ] The sort is defined once (`Library.alphabeticalGames`), on `nameKey`, forward. `Library.games()` and the view's `@Query` both use it, and no other sort is applied in the view.
+- [ ] The sort is defined once (`Library.alphabeticalGames`), on `nameKey` (not `name`), `.localizedStandard`, forward. `Library.games()` and the view's `@Query` both use it, and no other sort is applied in the view.
 - [ ] The empty state is a `ContentUnavailableView`; "New Game" stays in the navigation bar and opens f02's `NewGameSheet`.
 - [ ] Navigation is by value (`NavigationLink(value:)` + `navigationDestination(for: Game.self)`, outside the `List`). `GameView` shows the name and "No Rulebook Yet", with no actions.
 - [ ] Game names are displayed through the `StringProtocol` overloads; the four new keys have `translated` `es` values.
