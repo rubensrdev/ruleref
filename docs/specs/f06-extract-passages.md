@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Extract ordered passages
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f06-extract-passages
@@ -67,9 +69,9 @@ Then no passage has pageIndex 1, passages from pages 0 and 2 carry pageIndex 0 a
 
 ### Scenario 6: determinism
 
-Given one synthetic PDF
-When it is extracted twice
-Then both arrays are equal (`==`, exact values).
+Given the `Data` of one synthetic PDF
+When two separate `PDFDocument` instances opened from that `Data` are extracted
+Then both arrays are equal (`==`, exact values), as a delete and re-import of the same file requires.
 
 ### Scenario 7: rulebook ID
 
@@ -80,8 +82,8 @@ Then every locator carries that exact `RulebookID`.
 ### Scenario 8: cut threshold
 
 Given lines on one page with a median height of 10
-When the gap between two lines is exactly 5.0, and in another case 5.01
-Then the first stays in one passage and the second starts a new one.
+When the gap between two lines is exactly 5.0; in another case 5.01; and in a third, the next line lies above the previous one
+Then the first stays in one passage; the second and the third start a new one.
 
 ### Scenario 9: ignored lines and clipping
 
@@ -128,10 +130,10 @@ Types (all `nonisolated`):
 1. `Locator`: `enum`, `Equatable`, `Sendable`, single case `pdf(rulebookID: RulebookID, pageIndex: Int, bounds: CGRect)`. Synthesized equality: exact values. "Only extraction builds locators" is a convention: within a single module any code can call the case. **Accepted gap**; no access trick is attempted.
 2. `ExtractedPassage`: `struct`, `Equatable`, `Sendable`: `text: String`, `ordinal: Int`, `locator: Locator`.
 3. `PageLine`: `struct`, `Equatable`, `Sendable`: `text: String`, `bounds: CGRect`.
-4. `PassageSegmenter`: `enum`, pure, no PDFKit. `static let paragraphGapRatio: CGFloat = 0.5`. `static func segments(of lines: [PageLine], pageBounds: CGRect) -> [Segment]`, with `Segment` (`text`, `bounds`), in this order:
+4. `PassageSegmenter`: `enum`, pure, no PDFKit. `static let paragraphGapRatio: CGFloat = 0.5`. `static func segments(of lines: [PageLine], pageBounds: CGRect) -> [Segment]`, with the nested `Segment` (`text`, `bounds`; `nonisolated`, `Equatable`, `Sendable`), in this order:
    - drop lines whose text is empty or whitespace-only;
    - median height of the remaining lines' bounds (even count: mean of the two middle values);
-   - walk lines in order; `gap = previous.bounds.minY - current.bounds.maxY`; start a new segment when `gap > paragraphGapRatio * median` (strictly greater); a negative gap never cuts;
+   - walk lines in order; `gap = previous.bounds.minY - current.bounds.maxY`; start a new segment when `gap > paragraphGapRatio * median` (strictly greater), or when the current line lies above the previous one (`current.bounds.midY > previous.bounds.midY`), which PDFKit order can produce for headers, footers or a second column; an overlap that does not move up (negative gap) does not cut;
    - text: line texts joined with `"\n"`; bounds: union of line bounds, then `intersection(pageBounds)`; drop the segment if the result `isEmpty` (covers null).
 5. `PassageExtractor`: `enum`. `static func lines(on page: PDFPage) -> [PageLine]`: skip if `numberOfCharacters == 0`; whole-page selection by range `0..<numberOfCharacters`; `selectionsByLine()` in PDFKit order; text is `string ?? ""` with trailing `.newlines` characters removed; bounds from `bounds(for: page)`. `static func extract(from document: PDFDocument, rulebookID: RulebookID) -> [ExtractedPassage]`: for `pageIndex in 0..<pageCount` (a `nil` page yields nothing), segment with the page's crop box, then assign ordinals from 0, consecutive across the rulebook.
 
@@ -141,7 +143,7 @@ Isolation: `PassageExtractor` is `nonisolated` because PDFKit's model classes ar
 
 Accepted consequence: a heading set close to its paragraph lands in the same passage. The ratio is recalibrated on Taifa in f08 if needed.
 
-Test helper `SyntheticPDF` (in `RuleRefTests/`): builds `Data` page by page from explicit line specs (text, x, baseline y), Helvetica 12 pt via Core Text, optional filled rectangles (image stand-ins) and blank pages; returns `PDFDocument(data:)` and fails the test if it is `nil`. Spacing: within a paragraph the gap is ≤ 0.25 × line height, between paragraphs ≥ 1.0 ×. Each PDF-based test first `#require`s that precondition on the measured `PageLine` bounds, so a wrong layout fails loudly instead of passing by accident.
+Test helper `SyntheticPDF` (in `RuleRefTests/`): builds `Data` page by page from explicit line specs (text, x, baseline y), Helvetica 12 pt via Core Text, optional filled rectangles (image stand-ins) and blank pages; returns `PDFDocument(data:)` and fails the test if it is `nil`. The PDF is written with Core Graphics and read back with PDFKit; that is what the feature entry's "with PDFKit" refers to. Spacing: within a paragraph the gap is ≤ 0.25 × line height, between paragraphs ≥ 1.0 ×. Each PDF-based test first `#require`s that precondition on the measured `PageLine` bounds, so a wrong layout fails loudly instead of passing by accident.
 
 ## Expected File Changes
 
@@ -160,7 +162,7 @@ Test helper `SyntheticPDF` (in `RuleRefTests/`): builds `Data` page by page from
 
 - `ARCHITECTURE.md`, `CONSTRAINTS.md`, `DESIGN.md`: not needed — this repo has none; its rules live in `AGENTS.md` and `docs/adr/`.
 - `AGENTS.md`: not needed — no workflow change.
-- `docs/risks-and-open-questions.md`: update — the passage segmentation rule moves from open to decided (gap > 0.5 × median line height, page break always cuts; recalibration on Taifa in f08).
+- `docs/risks-and-open-questions.md`: update — the passage segmentation rule moves from open to decided (gap > 0.5 × median line height or a line above the previous one, page break always cuts; recalibration on Taifa in f08).
 - `docs/domain-model.md`: update — one line saying "only extraction builds locators" is a convention, not enforced in a single module.
 
 ## Implementation Plan
@@ -193,7 +195,8 @@ Test helper `SyntheticPDF` (in `RuleRefTests/`): builds `Data` page by page from
 
 - [ ] Scenarios 1–9 are covered by passing tests; PDFs are built in the test without UIKit.
 - [ ] `Locator` has exactly one case, `pdf(rulebookID:pageIndex:bounds:)`, `Equatable` and `Sendable`; all new types are `nonisolated`.
-- [ ] The cut uses only the vertical gap with the named 0.5 constant (strictly greater); no font or indentation rule.
+- [ ] A reader test confirms that `lines(on:)` returns one `PageLine` per drawn line, in drawing order.
+- [ ] The cut uses only vertical position: a gap strictly greater than the named 0.5 constant, or a line above the previous one; no font or indentation rule.
 - [ ] Pages with zero characters never reach `selection(for: NSRange)`.
 - [ ] Text is joined with "\n" with no hyphen joining or whitespace normalising.
 - [ ] No errors, file reading, persistence or UI were added.
