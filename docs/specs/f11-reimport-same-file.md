@@ -1,10 +1,12 @@
 # Feature Implementation Spec: Re-import of the same file
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f11-reimport-same-file
 - `area`: import
-- `depends_on`: f08-atomic-import
+- `depends_on`: f08-atomic-import, f09-reject-no-text-layer, f10-reject-unreadable-file
 - `status`: not_started
 - `source`: `feature_list.json`
 
@@ -67,7 +69,7 @@ Then the error is `.alreadyImported(gameName: "Taifa")`, not `.gameHasRulebook`;
 ### Scenario 6: simultaneous imports into two games
 
 Given games "Taifa" and "Catan" without a rulebook
-When A is imported into both at the same time from the main actor (`async let` or a task group)
+When A is imported into both at the same time, in two `Task { @MainActor in … }` started from the main actor (see Technical Approach)
 Then the context holds exactly 1 `Rulebook` and the store exactly one file (A's); exactly one import returned `.imported`, the other failed with `.alreadyImported(gameName:)` naming the winner, which is the game whose `rulebook` is non-nil; the other game's `rulebook` is nil.
 
 ### Scenario 7: simultaneous imports into the same game
@@ -102,7 +104,7 @@ Then all of them pass with their assertions unchanged.
 ### Current Gaps
 
 - f02, f05–f10 are approved but not implemented; none of the types named here exist yet. This spec relies only on what their specs promise. If an implementation differs in a name used here, f11 follows the implementation and says so in its evidence.
-- f11 depends only on f08, but it reorganises code that f09 and f10 add to. List order makes f09 and f10 start first; if f11 lands before either, that feature's check goes into the new `prepare(_:)` at the place its spec states, and its evidence records the different signature.
+- f11 reorganises code that f09 and f10 add to, so f09 and f10 were added to its `depends_on` on 2026-10-13; the feature-list rules enforce that both are accepted before f11 starts.
 - Test helpers of f08–f10 may be private; f11 writes its own.
 
 ## Technical Approach
@@ -111,7 +113,7 @@ APIs checked in the Cupertino MCP on 2026-10-13 (Apple docs crawled May 2026):
 
 - `FetchDescriptor<T>` (iOS 17+, `Sendable`): `init(predicate:sortBy:)`; `fetchLimit: Int?` ("the maximum number of models the fetch can return"; `nil` means all); `includePendingChanges` defaults to `true`. Apple's sample builds a `#Predicate` that captures a local `String`, so the hex is bound to a local constant first.
 - `TaskGroup.addTask(priority:operation:)`: `operation` is `sending @escaping @isolated(any) () async -> ChildTaskResult`, with `ChildTaskResult: Sendable`; `withThrowingTaskGroup(of:returning:isolation:body:)` takes `isolation: isolated (any Actor)? = #isolation`.
-- **Not verified**: whether a child task (`async let` or a group closure marked `@MainActor`) may capture a `Game` from the main-actor test under complete checking. The test avoids it: child closures capture only `Sendable` values (`Library`, the file URL, the store, the game name), fetch their game by name on the main actor, and return a test-private `Sendable` summary (`imported`, `alreadyPresent`, `failed(ImportError)`), because `ImportOutcome` holds a `Rulebook` and is not `Sendable`.
+- **Not verified**: whether a child task may capture a `Game` or a `Library` (it holds a `ModelContext`, which is not `Sendable`) under complete checking. The test avoids it: each import runs in its own `Task { @MainActor in … }` created on the main actor, whose closure captures only `Sendable` values (the `ModelContainer`, the file URL, the store, the game name); inside it builds a `Library` over `container.mainContext`, fetches its game by name and returns a test-private `Sendable` summary (`imported`, `alreadyPresent`, `failed(ImportError)`), because `ImportOutcome` holds a `Rulebook` and is not `Sendable`. The test awaits both tasks' values; the test's own `Library` uses the same `container.mainContext`.
 - **Not verified**: that the two imports in scenarios 6 and 7 interleave so that both pass the first checks before either stores. The test proves the outcome, not which check caught the loser.
 
 Types:
@@ -153,7 +155,7 @@ Resulting error order: `.unreadable` (bytes unreadable) → no-op or `.alreadyIm
 
 ## Implementation Plan
 
-1. Confirm f08 is accepted (and whether f09 and f10 are); otherwise stop and report.
+1. Confirm f08, f09 and f10 are accepted; otherwise stop and report.
 2. Write `ReimportTests` (scenarios 1–7); they fail to compile or fail against f08.
 3. Add `FingerprintedFile`, `ImportOutcome` and `ImportError.alreadyImported`; split `RulebookPreparer`.
 4. Rework `Library.importRulebook`; adapt the existing test calls to the new return type only.
@@ -162,7 +164,7 @@ Resulting error order: `.unreadable` (bytes unreadable) → no-op or `.alreadyIm
 ## Implementation Tasks
 
 - [ ] Preconditions checked.
-- [ ] `ReimportTests`: scenarios 1–7, own container and temporary directory each; concurrent children capture only `Sendable` values.
+- [ ] `ReimportTests`: scenarios 1–7, own container and temporary directory each; the concurrent imports run in `Task { @MainActor in … }` closures that capture only `Sendable` values.
 - [ ] `FingerprintedFile`, `ImportOutcome`, `ImportError.alreadyImported(gameName:)`.
 - [ ] `RulebookPreparer.fingerprint` and `prepare`, both `@concurrent`; checks in order.
 - [ ] `Library`: fetch by ID with `fetchLimit` 1, `check` before and after `prepare`, `ImportOutcome`.
