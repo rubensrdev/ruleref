@@ -93,7 +93,7 @@
     "area": "extraction",
     "title": "Extract ordered passages",
     "user_visible_behavior": "Extraction turns a text-layer PDF into ordered passages, each with a valid locator.",
-    "depends_on": ["f01-cli-build-and-tests"],
+    "depends_on": ["f05-rulebook-id"],
     "status": "not_started",
     "verification": [
       "Build a synthetic PDF in the test with PDFKit.",
