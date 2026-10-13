@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Import action in the game screen
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f17-import-action
