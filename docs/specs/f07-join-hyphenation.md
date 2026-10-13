@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Join hyphenation and normalise whitespace
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f07-join-hyphenation
@@ -173,7 +175,7 @@ Risks:
 
 - `./init.sh` exits 0 with every check PASS; test-results shows the new tests, 0 failed, 0 skipped.
 - Focused run: `xcodebuild test ... -only-testing:RuleRefTests/PassageTextTests -only-testing:RuleRefTests/HyphenationExtractionTests -only-testing:RuleRefTests/PassageExtractorTests -only-testing:RuleRefTests/PassageSegmenterTests`.
-- `git diff <f06 accepted commit>..HEAD -- RuleRefTests/PassageExtractorTests.swift RuleRefTests/PassageSegmenterTests.swift RuleRefTests/SyntheticPDF.swift RuleRef/PassageSegmenter.swift` shows changes only to expected text literals in `PassageExtractorTests`.
+- `git diff main...HEAD -- RuleRefTests/PassageExtractorTests.swift RuleRefTests/PassageSegmenterTests.swift RuleRefTests/SyntheticPDF.swift RuleRef/PassageSegmenter.swift` (f07 runs on its own branch from `main`, as decided for T3) shows changes only to expected text literals in `PassageExtractorTests`.
 - No UI tests and no E2E, by design (`AGENTS.md`, Tests); f07 has no interface.
 
 ## Evidence To Capture
