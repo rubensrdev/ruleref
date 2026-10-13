@@ -121,7 +121,7 @@
     "area": "import",
     "title": "Import a rulebook atomically",
     "user_visible_behavior": "Importing into a game without a rulebook stores the file copy, the rulebook and its passages atomically.",
-    "depends_on": ["f02-create-game", "f05-rulebook-id", "f06-extract-passages"],
+    "depends_on": ["f02-create-game", "f05-rulebook-id", "f06-extract-passages", "f07-join-hyphenation"],
     "status": "not_started",
     "verification": [
       "Test: after import, passage count equals extraction output and the stored file exists.",
