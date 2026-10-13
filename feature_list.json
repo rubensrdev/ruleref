@@ -177,7 +177,7 @@
     "area": "import",
     "title": "Re-import of the same file",
     "user_visible_behavior": "Re-importing the same file into the same game is a no-op; the same file into another game is refused, naming that game.",
-    "depends_on": ["f08-atomic-import"],
+    "depends_on": ["f08-atomic-import", "f09-reject-no-text-layer", "f10-reject-unreadable-file"],
     "status": "not_started",
     "verification": [
       "Test: locators before and after re-import are equal and counts unchanged.",
