@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Reject PDFs without a text layer
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f09-reject-no-text-layer
@@ -148,7 +150,7 @@ Interim consequence, accepted: until f10 adds `.locked` right after the document
 
 - `./init.sh` exits 0 with every check PASS; test-results shows the new tests, 0 failed, 0 skipped, and f08's tests still passing unchanged.
 - Focused run: `xcodebuild test ... -only-testing:RuleRefTests/NoTextLayerImportTests -only-testing:RuleRefTests/ImportTests`.
-- `git diff main...HEAD -- RuleRef/ImportError.swift RuleRef/RulebookPreparer.swift` shows only the new case, the check and its comment; `git diff --stat main...HEAD` lists no other existing file.
+- `git diff main...HEAD -- RuleRef/ImportError.swift RuleRef/RulebookPreparer.swift` shows only the new case, the check and its comment; `git diff --stat main...HEAD` lists no other existing file except `feature_list.json` and `PROGRESS.md` (the evidence commit).
 - No UI tests and no E2E, by design (`AGENTS.md`, Tests); f09 has no interface.
 
 ## Evidence To Capture
