@@ -1,10 +1,12 @@
 # Feature Implementation Spec: Import a rulebook atomically
 
+Approval: approved by the user on 2026-10-13
+
 ## Source Feature
 
 - `id`: f08-atomic-import
 - `area`: import
-- `depends_on`: f02-create-game, f05-rulebook-id, f06-extract-passages
+- `depends_on`: f02-create-game, f05-rulebook-id, f06-extract-passages, f07-join-hyphenation
 - `status`: not_started
 - `source`: `feature_list.json`
 
@@ -91,7 +93,7 @@ Then the error is `.gameHasRulebook`; the `Rulebook` and `Passage` counts and th
 ### Current Gaps
 
 - f02, f05, f06 and f07 are approved but not implemented: `Game`, `Library`, `RulebookID`, `Locator`, `ExtractedPassage`, `PassageExtractor`, `PassageText` and `SyntheticPDF` do not exist yet. This spec relies only on what their specs promise; they must be accepted before f08 starts. If an implementation differs in a name used here, f08 follows the implementation and says so in its evidence.
-- f07 is not in f08's `depends_on`, yet f08 expects normalized text. The next-feature rule starts f07 before f08 (list order); if f07 is not accepted when f08 starts, stop and report.
+- f08 stores normalized text, so f07 was added to f08's `depends_on` on 2026-10-13; the feature-list rules now enforce the order.
 - The Taifa fixture and its attribution file are not in the repo. The user adds them by hand before f08 starts; if they are missing, the implementer stops and says so.
 
 ## Technical Approach
@@ -123,7 +125,7 @@ Types:
    - `try await RulebookPreparer.prepare(fileAt:)`;
    - check `game.rulebook` again, because the main actor may have run other work during the `await`;
    - `store.write(prepared.bytes, for: id)`; failure → `.storage`, nothing inserted;
-   - build the `Rulebook` with its `Passage`s, set `game.rulebook`, `try context.save()`; failure → `context.rollback()`, `store.removeFile(for: id)`, `.storage`.
+   - build the `Rulebook` with its `Passage`s, set `game.rulebook`, `try context.save()`, with no suspension point between the first insert and the `save()`; failure → `context.rollback()`, `store.removeFile(for: id)`, `.storage`.
 10. `RuleRefApp` (declared change): `.modelContainer(for: [Game.self, Rulebook.self, Passage.self])`. No other change.
 
 Plug-in points, documented in code comments, with no behaviour in f08:
@@ -143,6 +145,7 @@ Fixture: `RuleRefTests/Fixtures/taifa-3.0.pdf` and `RuleRefTests/Fixtures/taifa-
 - `RuleRef/Game.swift` — modify (declared, f02's file); `rulebook` relationship.
 - `RuleRef/RulebookID.swift` — modify (declared, f05's file); `init?(hex:)`.
 - `RuleRef/RuleRefApp.swift` — modify; three model types.
+- Existing test containers (f02, f03 tests) — modify only if they fail once `Game` has a relationship (declared change): add `Rulebook` and `Passage` to their model types, nothing else.
 - `RuleRefTests/RulebookStoreTests.swift` — create; path, atomic write, missing-file removal, `init?(hex:)` round trip and rejects.
 - `RuleRefTests/ImportTests.swift` — create; scenarios 1, 2, 4, 5, 6.
 - `RuleRefTests/TaifaImportTests.swift` — create; scenario 3.
@@ -197,6 +200,6 @@ Fixture: `RuleRefTests/Fixtures/taifa-3.0.pdf` and `RuleRefTests/Fixtures/taifa-
 - [ ] No `@Model` type is `nonisolated`; all SwiftData work is on the main actor; no isolation escapes.
 - [ ] The file is written atomically before the single `save()`; a write failure inserts nothing; a save failure rolls back and removes the file; every failure ends in `.storage`, `.unreadable` or `.gameHasRulebook` with no rows and no file.
 - [ ] `Rulebook.passages` and `Game.rulebook` cascade; passages are read through `orderedPassages`.
-- [ ] Changes to `Game`, `RulebookID` and `RuleRefApp` are only the declared ones; no f09–f11 behaviour, deletion, search or UI was added; `paragraphGapRatio` is unchanged.
+- [ ] Changes to `Game`, `RulebookID`, `RuleRefApp` and existing test containers are only the declared ones; no f09–f11 behaviour, deletion, search or UI was added; `paragraphGapRatio` is unchanged.
 - [ ] Taifa is only under `RuleRefTests/Fixtures/`, with its attribution file.
 - [ ] `docs/domain-model.md`, `feature_list.json` and `PROGRESS.md` were updated correctly.
