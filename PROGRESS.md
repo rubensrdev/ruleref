@@ -65,3 +65,15 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Decided: each feature carries its minimal interface; the user validates it by hand at the end of each phase and the validator lists it in `not_verified`. Which features own the game screen and the import action is settled in the f03 and f08 specs.
 - Decided: P3 stays on `main`. In T3, right after f01 is accepted and before f02 starts, features move to one branch and one PR each, run one at a time, merged by the user, with no issues.
 - Next: P3.7b, specs for f06, then f03, f07, f08, f09, f10 and f11 (f11 with the idempotency scenario); then P3.8, Xcode MCP read-only integration and the ADR-001 revision. Done when: every T3 spec exists in `docs/specs/` and carries the user's Approval line, and P3.8's tools are registered with their hook tests passing.
+
+## 2026-10-13 — P3.7b, part 2: the remaining T3 specs
+- Thursday answers from the module 4 Q&A: Foundation Models with the course API as a fallback is valid; adapting the harness is fine; parallel worktrees are not required, so the loop stays sequential (ADR-003) and a worktree trial is left for after m4. The spec-approval and feature-flow questions were settled in the project: the `Approval:` line plays the role of the course planner's `block` until the spec is approved.
+- Specs approved by the user: f06 (a new passage on a vertical gap above 0.5 × the page's median line height or on a line above the previous one; a page break always cuts), f03 (sorted on `nameKey` with `.localizedStandard`; f03 owns the minimal game screen), f07 (hyphen and whitespace rules applied inside extraction), f08 (heavy work in a `@concurrent` function, one `save()` on the main actor), f09 (zero passages → `.noTextLayer`), f10 (`.locked` only when the document stays locked after opening), f11 (fingerprint, checks, prepare, checks again, store; `ImportOutcome`) and f17.
+- f08 was split: the import action, the file picker and the ready state are the new feature f17-import-action, placed after f11 so every import outcome exists.
+- Dependencies tightened in `feature_list.json`: f06 on f05, f08 on f07, f11 on f09 and f10, f17 on f03 and f11.
+- f04, f12 and f16 are `blocked` with a `deferred` note until m4, so the next-feature rule never selects them.
+- `AGENTS.md`: the Approval line is added only with the user's explicit approval; a `blocked` note can say `deferred`.
+- Found: `spec-approval-guard.sh` blocks a command that touches a spec and uses `$(…)`, as a heredoc commit message does; spec commits use an inline message.
+- Before T3: the user places `RuleRefTests/Fixtures/taifa-3.0.pdf` and `taifa-3.0-attribution.md`.
+- Commits 249c71d to 1ee6186.
+- Next: P3.8, Xcode MCP read-only integration and the ADR-001 revision. Done when: its tools are registered at project scope, the hook matchers for its write tools have passing test cases, and ADR-001 records the change.

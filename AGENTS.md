@@ -38,13 +38,13 @@ The harness is the main deliverable; the app is its test bed.
 - `passing` means you verified it and recorded evidence: at least one entry with `command`, `expected`, `observed` and `context` (date, commit, Xcode, simulator), plus `not_verified`, the list of what that run does not prove (empty if nothing).
 - Only the orchestrating main session sets `accepted`: after the validator returns `accept` and the user confirms it in the chat, it sets the status and commits. The implementer never sets `accepted`; the validator never edits files.
 - A feature gets at most 3 `revise` verdicts. After the third, stop: set the feature to `blocked`, add the reason to its `notes`, and leave the decision to the user.
-- `blocked` means the user must decide. Its note says whether it came from a `block` verdict (a missing condition) or a `stop` (the revise limit).
+- `blocked` means the user must decide. Its note says whether it came from a `block` verdict (a missing condition), a `stop` (the revise limit) or `deferred` (out of scope until a milestone, by the user's decision).
 - `init.sh` validates the file (`feature-list`).
 - Run a feature with `/feature-flow [feature-id]`. It delegates to the `feature-implementer` and `feature-validator` subagents and records each verdict in `docs/validations/<feature-id>.md`, which only the orchestrator writes.
 
 ## Specs (`docs/specs/`)
 
-- Every feature is implemented from `docs/specs/<feature-id>.md`. A spec is approved only when it contains the line `Approval: approved by the user on YYYY-MM-DD`, which only the user writes, by hand.
+- Every feature is implemented from `docs/specs/<feature-id>.md`. A spec is approved only when it contains the line `Approval: approved by the user on YYYY-MM-DD`, added only with the user's explicit approval; the user places the approved file.
 - Never add that line and never edit an approved spec; `spec-approval-guard.sh` blocks both. If an approved spec must change, ask the user to remove the line.
 
 ## Apple documentation

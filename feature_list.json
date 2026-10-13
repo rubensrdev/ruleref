@@ -67,12 +67,12 @@
     "title": "Rename or delete a game",
     "user_visible_behavior": "User renames or deletes a game; deleting removes its rulebook, passages and stored file.",
     "depends_on": ["f02-create-game", "f08-atomic-import"],
-    "status": "not_started",
+    "status": "blocked",
     "verification": [
       "Test: after delete, passage count and stored-file count for that rulebook ID are 0."
     ],
     "evidence": [],
-    "notes": "Task: after m4 (non-goal until m4)."
+    "notes": "Task: after m4 (non-goal until m4). deferred: until m4, by the user's decision (docs/build-brief.md, Non-goals)."
   },
   {
     "id": "f05-rulebook-id",
@@ -192,14 +192,14 @@
     "title": "Delete a game's rulebook",
     "user_visible_behavior": "User deletes a game's rulebook; the game stays and can import again.",
     "depends_on": ["f08-atomic-import"],
-    "status": "not_started",
+    "status": "blocked",
     "verification": [
       "Test: the game remains.",
       "Test: rulebook, passages and stored file are gone.",
       "Test: import is offered again."
     ],
     "evidence": [],
-    "notes": "Task: after m4 (non-goal until m4)."
+    "notes": "Task: after m4 (non-goal until m4). deferred: until m4, by the user's decision (docs/build-brief.md, Non-goals)."
   },
   {
     "id": "f13-text-search",
@@ -248,13 +248,13 @@
     "title": "Baseline search evaluation",
     "user_visible_behavior": "Baseline run: the eval set (Codable JSON) is evaluated against search over the Taifa fixture and a report with hit@1, hit@3 and no-match accuracy is written, tagged with OS version.",
     "depends_on": ["f13-text-search", "f14-no-match-state"],
-    "status": "not_started",
+    "status": "blocked",
     "verification": [
       "`./init.sh` produces the report file.",
       "Test: fails if the eval set is malformed.",
       "Test: fails if the fixture is missing."
     ],
     "evidence": [],
-    "notes": "Task: after m4 (module 5, next to the AI it is compared against)."
+    "notes": "Task: after m4 (module 5, next to the AI it is compared against). deferred: until m4, by the user's decision (docs/build-brief.md, Non-goals)."
   }
 ]
