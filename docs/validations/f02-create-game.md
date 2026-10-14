@@ -22,3 +22,7 @@
   - `init.sh`'s own result bundle (deleted on a green run).
   - Exact Xcode build number and time of day.
   - That the tests failed before the implementation existed.
+- User: rejected — fix F1 before accepting; sent back to the implementer as revise round 1 of 3, with F1 as the repair brief.
+- Repair brief (from the validator's findings, verbatim):
+  - [low, not blocking] F1: after a failed save, a retry wrongly reports a duplicate. In `RuleRef/Library.swift`, if `context.save()` throws, the inserted `Game` stays unsaved in the main context. Because `fetchCount` includes unsaved changes by default, tapping Create again shows "A game with this name already exists." for a game that was never saved, and autosave may store it later. Suggested follow-up: if `save()` throws, delete the inserted game (or roll back) before rethrowing, and test it if a save failure can be forced.
+  - [info] Scenarios 1–3 count games only in the store, not unsaved inserts. Counting through a fresh `ModelContext` would not see an insert that was never saved. The code throws before inserting, so the result is correct, but these tests would not catch a later regression that inserts and then throws.
