@@ -94,3 +94,35 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Validator findings (info): `init.sh` uses `python3` without a preflight check; `validator-readonly-bash.sh` blocked a compound read-only git command, which only partly covers the planned live check that a validator write is blocked.
 - Still open from the T3 done-when: a validator write attempt blocked live.
 - Next: the user merges the f01 PR; then `/feature-flow` on f02-create-game, on its own branch. Done when: f02 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-14 — T3: f02 implemented
+- f02-create-game is `passing` on branch `feat/f02-create-game` (code commit 6b0ced1): `GameName` and `GameNameError` (`nonisolated`; trimmed value, key folded for case, diacritics and width with the `en_US_POSIX` locale), `Game` (`@Model`, `name` and `nameKey`, no `#Unique`), `Library.createGame(named:)` (fetch count by key before insert, then save), `NewGameSheet`, a "New Game" button on the root screen and the app's model container.
+- `./init.sh` green: 10 tests, 0 failed, 0 skipped. Scenarios 1-4 are covered by `LibraryTests` on one in-memory container per test.
+- Beyond the spec's expected keys: the sheet shows "The game could not be saved." when `save()` throws, so a save error is never silent.
+- Left: scenario 5 (the sheet) is validated by hand at the end of T3.
+- Next: the validator reviews f02 through `/feature-flow`. Done when: f02 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-14 — T3: f02 revise round 1 stopped
+- The user rejected the validator's accept and asked to fix F1 (a retry after a failed save reports a duplicate). Round 1 of 3.
+- Done (commit 9015b3a): scenarios 1-3 now also count unsaved inserts in the library's context; a mutation that inserts before the duplicate check fails scenarios 2 and 3. `./init.sh` green, 10 tests.
+- Reproduced F1 with a real save failure: a store created on disk, then reopened with `ModelConfiguration(url:allowsSave: false)`, makes `save()` throw (Cocoa error 513). An in-memory store cannot be opened read-only.
+- Found: the brief's fix (`rollback()` after a failed save, or `delete(game)`) is not enough. After a failed save, the next `fetchCount` that includes pending changes returns a stale 1, and only the following calls return 0. `fetch`, and `fetchCount` with `includePendingChanges = false`, return 0. Without a failed save, rollback and `fetchCount` agree.
+- Two fixes pass the reproducing test, both with `rollback()`: (a) the duplicate check sets `includePendingChanges = false`; (b) it uses `fetch` with `fetchLimit = 1` instead of `fetchCount`. Both change the spec's Technical Approach, so the implementer stopped. The red test and the rollback are in git stash "f02 F1 WIP (red)"; f02 is `in_progress`.
+- Next: the user picks (a), (b) or another option, and an approved spec revision if needed; then the implementer applies the stash, adds the chosen check and finishes round 1. Done when: `failedSaveLeavesNothingBehind` passes, `./init.sh` is green and f02 is back to `passing` with new evidence.
+
+## 2026-10-14 — T3: f02 revise round 1 finished
+- The user picked fix (b) and re-approved the f02 spec (a3ab8fd): the duplicate check uses `fetch` with `fetchLimit = 1`, `createGame(named:)` calls `rollback()` when `save()` throws, and the new scenario 6 says a failed save leaves nothing behind.
+- Done (commit 327f27a): the stash "f02 F1 WIP (red)" was applied and dropped; `Library` gets the `fetch` check. `LibraryTests.failedSaveLeavesNothingBehind()` covers scenario 6 on an on-disk store reopened with `allowsSave: false`; it also checks that both attempts throw the same save error, and removes its temporary store.
+- Mutation check, not committed: with the old `fetchCount` guard, only scenario 6 fails.
+- `./init.sh` green at 327f27a: 11 tests, 0 failed, 0 skipped. f02 is `passing` again.
+- Found: when a test fails, `xcodebuild` runs `simctl diagnose`, which can take up to 600 s before the run ends.
+- Left: scenario 5 (the sheet) is validated by hand at the end of T3.
+- Next: the validator reviews f02 again through `/feature-flow` (revise round 1 of 3 used). Done when: f02 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-14 — T3: f02 accepted
+- Validation 2 at f6fb9e6 returned `accept` and the user confirmed. `./init.sh` green (11 tests, 0 failed, 0 skipped); the focused GameNameTests/LibraryTests run passed. F1 resolved. Record: `docs/validations/f02-create-game.md`.
+- Process: the user rejected validation 1's accept to fix F1 first; the repair round stopped on a spec decision, the user revised and re-approved the spec, and the next implementation passed. A spec gap is a `stop`, not a verdict.
+- Follow-up for f04: `rollback()` after a failed save discards every pending change in the shared main context; revisit when rename leaves unsaved edits.
+- Gate notes: the Stop hook's `./init.sh` failed several times while a subagent was mid-change or running its own `xcodebuild` (once with `Terminated: 15`); those runs say nothing about the result. When `xcodebuild` dies without a result bundle, test-results prints a Python traceback instead of a clean FAIL (harness fix pending on `main`).
+- Left: scenario 5 (the sheet) is validated by hand at the end of T3.
+- Next: the user merges the f02 PR; then the harness fix for the test-results traceback on `main`; then `/feature-flow` on f03-list-games. Done when: f03 is `accepted` and its PR is merged into `main`.
