@@ -1,6 +1,6 @@
 # Feature Implementation Spec: Create a game
 
-Approval: approved by the user on 2026-10-08
+Approval: approved by the user on 2026-10-14
 
 ## Source Feature
 
@@ -64,6 +64,12 @@ Given the app launched on the iPhone 16
 When the user taps "New Game", leaves the name blank or repeats an existing one, and confirms
 Then the sheet stays open with an inline error; with a valid name it closes.
 
+### Scenario 6: a failed save leaves nothing behind
+
+Given an empty library whose store cannot save
+When the user creates "Taifa" and immediately retries
+Then both attempts fail with the save error, not the duplicate-name error, and the library holds 0 games, saved or pending.
+
 ## Repository Research
 
 ### Files Inspected
@@ -89,14 +95,14 @@ Then the sheet stays open with an inline error; with a valid name it closes.
 APIs, checked in the Cupertino MCP on 2026-10-08:
 
 - **Name key**: `String.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: Locale(identifier: "en_US_POSIX"))` on the trimmed name (`trimmingCharacters(in: .whitespacesAndNewlines)`). Apple recommends folding once and storing the result when strings are compared repeatedly. The fixed locale keeps the key deterministic (the docs note case folding varies by locale, e.g. Turkish "I"). Folding is not available inside `#Predicate`, so the key is stored.
-- **Uniqueness**: the creation operation fetches by key (`FetchDescriptor<Game>` with `#Predicate { $0.nameKey == key }`, `fetchCount`) and throws the duplicate-name error before inserting. No `#Unique`: on a collision SwiftData upserts, updating the existing game instead of failing (WWDC24 "What's new in SwiftData"), which would silently rename it rather than reject the duplicate.
+- **Uniqueness**: the creation operation fetches by key (`FetchDescriptor<Game>` with `#Predicate { $0.nameKey == key }`, `fetchLimit = 1`, `fetch`; not `fetchCount`, which returns a stale count right after a failed save) and throws the duplicate-name error before inserting. No `#Unique`: on a collision SwiftData upserts, updating the existing game instead of failing (WWDC24 "What's new in SwiftData"), which would silently rename it rather than reject the duplicate.
 
 Pieces:
 
 1. `GameName` (`nonisolated struct`, `Sendable`, `Equatable`): built from raw input, throws `GameNameError.blank`; exposes `value` (trimmed) and `key` (folded).
 2. `GameNameError` (`nonisolated enum`, `Error`, `Equatable`): `blank`, `duplicate`.
 3. `Game` (`@Model final class`): `name: String`, `nameKey: String`.
-4. `Library` (MainActor struct over a `ModelContext`): `createGame(named:) throws -> Game` builds a `GameName`, checks the key, inserts and saves.
+4. `Library` (MainActor struct over a `ModelContext`): `createGame(named:) throws -> Game` builds a `GameName`, checks the key, inserts and saves; if `save()` throws, it calls `rollback()` on the context before rethrowing, so nothing unsaved is left behind.
 5. `NewGameSheet` (SwiftUI): a `Form` with a name `TextField`, Cancel and Create toolbar buttons, and an inline error text for `blank` and `duplicate`. It calls `Library` with the environment's `modelContext`.
 6. `ContentView`: a "New Game" button that presents `NewGameSheet`. `RuleRefApp` adds `.modelContainer(for: Game.self)`.
 
@@ -158,7 +164,7 @@ Pieces:
 
 ## Validator Checklist
 
-- [ ] Scenarios 1–4 are covered by passing tests on an in-memory container.
+- [ ] Scenarios 1–4 are covered by passing tests on an in-memory container, and scenario 6 by a passing test on a store that cannot save.
 - [ ] `GameName` and `GameNameError` are `nonisolated`; no UIKit, XCTest or JSONSerialization.
 - [ ] Uniqueness is enforced only by the pre-insert check; `Game` has no `#Unique`.
 - [ ] Every new visible text is in the catalog with a translated `es` value; "Hello, world!" is gone.
