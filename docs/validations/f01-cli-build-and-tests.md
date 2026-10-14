@@ -19,3 +19,4 @@
   - The gate's failure paths (preflight or rules failing; no Xcode 27, simulator or `python3`).
   - iOS 26.0 and a physical device.
   - The interface (no UI tests by design).
+- User: confirmed

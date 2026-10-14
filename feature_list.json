@@ -5,7 +5,7 @@
     "title": "Build and test from the CLI",
     "user_visible_behavior": "Empty app target and test target build and run tests from the CLI.",
     "depends_on": [],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Clone the repository into an empty directory and run `./init.sh` there.",
       "It exits 0."
@@ -27,6 +27,27 @@
           "Same machine and user: the shared module cache and simulator state were warm; not a fresh machine.",
           "Cloned from the local repository before pushing; a clone from GitHub was not run.",
           "Only the iOS 27.0 simulator: not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "The only test is a smoke test; the interface was not checked (no UI tests by design; the user validates it by hand)."
+        ]
+      },
+      {
+        "command": "./init.sh",
+        "expected": "Exit code 0; summary lists xcode-version, simulator, no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results and catalog-coverage as PASS with no FAIL or SKIP; last line `init.sh: PASS`; test-results reports totalTestCount >= 1 and failedTests=0, skippedTests=0, expectedFailures=0.",
+        "observed": "Exit code 0. Test-results line: totalTestCount=1, failedTests=0, skippedTests=0, expectedFailures=0. Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Independent validator run (feature-validator); since aaf46dd the only change to RuleRef/, RuleRefTests/ or init.sh is the test-only Taifa fixture (ebde3ec).",
+        "context": {
+          "date": "2026-10-14",
+          "commit": "a687994162d07b7f71ff667431f7468d31235e1c",
+          "xcode": "Xcode 27.0 (as reported by init.sh; build number not checked)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (as reported by init.sh; runtime build not checked)",
+          "workspace": "Existing working checkout on branch feat/f01-cli-build-and-tests (identical to main), clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The clean-clone run at aaf46dd recorded in the earlier evidence entry was not re-run; the validator can run only ./init.sh, read-only git, xcresulttool and focused xcodebuild test, so this run used the existing checkout.",
+          "Exact Xcode build and simulator runtime build: init.sh prints only the marketing versions, and the validator cannot run xcodebuild -version or simctl.",
+          "Time of day of the run: the validator cannot run date.",
+          "The result bundle was not inspected with xcresulttool: init.sh deletes it on a green run; the counts come from init.sh's own output.",
+          "Failure paths of the gate (preflight or rules failing; a machine without Xcode 27, the pinned simulator or python3) were not exercised in this run.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "The only test is a smoke test; the interface was not checked (no UI tests by design; the user validates it by hand)."
         ]
       }
