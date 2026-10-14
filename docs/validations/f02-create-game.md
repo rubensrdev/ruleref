@@ -26,3 +26,31 @@
 - Repair brief (from the validator's findings, verbatim):
   - [low, not blocking] F1: after a failed save, a retry wrongly reports a duplicate. In `RuleRef/Library.swift`, if `context.save()` throws, the inserted `Game` stays unsaved in the main context. Because `fetchCount` includes unsaved changes by default, tapping Create again shows "A game with this name already exists." for a game that was never saved, and autosave may store it later. Suggested follow-up: if `save()` throws, delete the inserted game (or roll back) before rethrowing, and test it if a save failure can be forced.
   - [info] Scenarios 1–3 count games only in the store, not unsaved inserts. Counting through a fresh `ModelContext` would not see an insert that was never saved. The code throws before inserting, so the result is correct, but these tests would not catch a later regression that inserts and then throws.
+- Round outcome: the implementer stopped revise round 1 for a spec decision (the brief's `rollback()` was not enough; a `fetchCount` right after a failed save was stale). The user chose `fetch` with `fetchLimit = 1`; the spec was revised and re-approved on 2026-10-14 (a3ab8fd), which resets the revise count.
+
+## Validation 2 — accept — 2026-10-14
+- Commit validated: f6fb9e6340836a8093b8f66b6f729ee0cf9bc83f
+- Checks rerun:
+  - `./init.sh`: exit 0, no retry; all 11 checks PASS; `init.sh: PASS`; test-results `totalTestCount=11, failedTests=0, skippedTests=0, expectedFailures=0`.
+  - `xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination "platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0" -only-testing:RuleRefTests/GameNameTests -only-testing:RuleRefTests/LibraryTests`: exit 0, `** TEST SUCCEEDED **`; `failedSaveLeavesNothingBehind()` and the scenario 1–4 tests passed.
+  - `xcrun xcresulttool get test-results summary` on the focused run's bundle: Passed; totalTestCount 10, 13 test runs passed, 0 failed, 0 skipped, 0 expected failures, no runtime warnings; iPhone 18 Pro, iOS 27.0 (24A434).
+  - `xcrun xcresulttool get log --type console` on the same bundle: exit 1, "No console log available".
+  - Diff `0fa26f4..f6fb9e6` reviewed: code changes only in `Library.swift` and `LibraryTests.swift`; no project or catalog changes. Cupertino MCP checked for `ModelContext.rollback()` and `ModelConfiguration(url:allowsSave:)`: current, not deprecated.
+- Findings:
+  - Resolved: F1 from Validation 1; `rollback()` clears the pending insert and the `fetch` check no longer reports a duplicate on retry; scenario 6 passes.
+  - Resolved: scenarios 1–3 now count saved and pending games and expect both to agree.
+  - Info: `rollback()` discards every pending change in the shared main context, not only this insert; correct for f02, but features that leave unsaved edits in the main context (e.g. f04 rename) should revisit it.
+  - Info: the stale-`fetchCount` claim in `Library.swift`'s comment comes from the implementer's experiment; the validator could not reproduce it, and the `fetch` check is correct either way.
+  - Info: no security issues in scope.
+- Not verified:
+  - Scenario 5: root screen and sheet (manual by design).
+  - The sheet's save-failure message (scenario 6 tests `Library` only).
+  - Save failures other than a read-only store.
+  - The implementer's mutation results (old `fetchCount` guard fails scenario 6; stale `fetchCount`).
+  - Test-host console output during scenario 6.
+  - `init.sh`'s own result bundle (deleted on a green run).
+  - Spanish rendering on screen.
+  - Persistence across launches with the app's own on-disk store.
+  - iOS 26.0 and a physical device.
+  - A fresh clone or clean DerivedData.
+  - Exact Xcode build number.
