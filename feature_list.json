@@ -60,7 +60,7 @@
     "title": "Create a game",
     "user_visible_behavior": "User creates a game with a name; names are trimmed, non-empty and unique case- and diacritic-insensitively.",
     "depends_on": ["f01-cli-build-and-tests"],
-    "status": "in_progress",
+    "status": "passing",
     "verification": [
       "Test: a blank name is rejected.",
       "Test: \"Taifa\" vs \" taifa \" is rejected as a duplicate."
@@ -104,9 +104,29 @@
           "Persistence across app launches with the on-disk store was not exercised by the scenario tests; they use in-memory containers.",
           "Not run on iOS 26.0 (the deployment target) nor on a physical device."
         ]
+      },
+      {
+        "command": "./init.sh",
+        "expected": "Exit code 0; every check PASS; test-results failedTests=0 and skippedTests=0; scenarios 1-4 covered by passing tests on an in-memory container and scenario 6 by a passing test on a store that cannot save (re-approved spec, 2026-10-14).",
+        "observed": "Exit code 0, no retry. Test-results line: totalTestCount=11, failedTests=0, skippedTests=0, expectedFailures=0. Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Fix for F1 (revise round 1): Library.createGame(named:) checks the key with fetch and fetchLimit = 1 instead of fetchCount, and calls rollback() on the context when save() throws, before rethrowing. Scenario tests: scenario 1 LibraryTests/blankNameIsRejected(raw:) for \"\" and \"   \"; scenario 2 LibraryTests/surroundingSpacesAndCaseDoNotMakeANewName(); scenario 3 LibraryTests/diacriticsDoNotMakeANewName() (1-3 also count unsaved inserts in the library's context); scenario 4 LibraryTests/validNameCreatesAPersistedTrimmedGame(); scenario 6 LibraryTests/failedSaveLeavesNothingBehind() (an on-disk store reopened with ModelConfiguration(url:allowsSave: false); creates \"Taifa\" and retries back to back; both throw the same non-GameNameError save error; afterwards the context has no changes, its fetch is empty and a new ModelContext counts 0; the temporary store directory is removed in a defer). Mutation check, not committed: with the old fetchCount guard and the rollback kept, ./init.sh failed with totalTestCount=11, failedTests=1, the only failure being LibraryTests/failedSaveLeavesNothingBehind().",
+        "context": {
+          "date": "2026-10-14 14:02 CEST",
+          "commit": "327f27a33944c63d21e68578dedb2750c610d2dd",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f02-create-game, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Scenario 5: the root screen and the New Game sheet (blank and duplicate inline errors, closing on a valid name) were not exercised; no UI tests by design, the user validates them by hand on the iPhone 16.",
+          "The sheet's save-failure message is not exercised: scenario 6 tests Library only, not NewGameSheet.",
+          "Scenario 6 forces the save error with a read-only store (allowsSave: false); other save failures (disk full, a migration or validation error) were not exercised.",
+          "Spanish rendering of the new strings was not checked on screen; only the catalog check ran.",
+          "Persistence across app launches with the app's own on-disk store was not exercised.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device."
+        ]
       }
     ],
-    "notes": "Task: T3. Revise round 1 stopped on 2026-10-14 for a user decision: the brief's fix for F1 (rollback() after a failed save) is necessary but not sufficient, because after a failed save the next fetchCount that includes pending changes returns a stale 1, so the retry still reports a duplicate. Both verified fixes change the spec's duplicate check: (a) includePendingChanges = false on the fetchCount, or (b) fetch with fetchLimit 1 instead of fetchCount."
+    "notes": "Task: T3. Revise round 1 (F1, a retry after a failed save reported a duplicate) was stopped on 2026-10-14 for a spec decision; the user re-approved the spec the same day with fix (b), fetch with fetchLimit = 1 plus rollback() on a failed save, and scenario 6. Implemented in 327f27a; awaiting validation."
   },
   {
     "id": "f03-list-games",

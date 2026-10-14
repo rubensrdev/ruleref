@@ -109,3 +109,12 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Found: the brief's fix (`rollback()` after a failed save, or `delete(game)`) is not enough. After a failed save, the next `fetchCount` that includes pending changes returns a stale 1, and only the following calls return 0. `fetch`, and `fetchCount` with `includePendingChanges = false`, return 0. Without a failed save, rollback and `fetchCount` agree.
 - Two fixes pass the reproducing test, both with `rollback()`: (a) the duplicate check sets `includePendingChanges = false`; (b) it uses `fetch` with `fetchLimit = 1` instead of `fetchCount`. Both change the spec's Technical Approach, so the implementer stopped. The red test and the rollback are in git stash "f02 F1 WIP (red)"; f02 is `in_progress`.
 - Next: the user picks (a), (b) or another option, and an approved spec revision if needed; then the implementer applies the stash, adds the chosen check and finishes round 1. Done when: `failedSaveLeavesNothingBehind` passes, `./init.sh` is green and f02 is back to `passing` with new evidence.
+
+## 2026-10-14 — T3: f02 revise round 1 finished
+- The user picked fix (b) and re-approved the f02 spec (a3ab8fd): the duplicate check uses `fetch` with `fetchLimit = 1`, `createGame(named:)` calls `rollback()` when `save()` throws, and the new scenario 6 says a failed save leaves nothing behind.
+- Done (commit 327f27a): the stash "f02 F1 WIP (red)" was applied and dropped; `Library` gets the `fetch` check. `LibraryTests.failedSaveLeavesNothingBehind()` covers scenario 6 on an on-disk store reopened with `allowsSave: false`; it also checks that both attempts throw the same save error, and removes its temporary store.
+- Mutation check, not committed: with the old `fetchCount` guard, only scenario 6 fails.
+- `./init.sh` green at 327f27a: 11 tests, 0 failed, 0 skipped. f02 is `passing` again.
+- Found: when a test fails, `xcodebuild` runs `simctl diagnose`, which can take up to 600 s before the run ends.
+- Left: scenario 5 (the sheet) is validated by hand at the end of T3.
+- Next: the validator reviews f02 again through `/feature-flow` (revise round 1 of 3 used). Done when: f02 is `accepted` and its PR is merged into `main`.
