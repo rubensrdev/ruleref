@@ -30,3 +30,15 @@ Solo developer, three weeks to a graded harness, recorded as a video. Agents mus
 - Changed: the deployment target drops from iOS 27 to iOS 26.0; the app is still built with Xcode 27 and the iOS 27 SDK. The app is declared iPhone only and portrait only, and default actor isolation is MainActor in both targets.
 - Why: App Store reach. Requiring iOS 27 would exclude every device still on iOS 26 at release time; iOS 26.0 covers them at no cost to the MVP.
 - Consequence: any API that exists only in iOS 27 must be guarded with `#available` and have an iOS 26 path.
+
+## Revision 2026-10-14
+- Changed: the Xcode 27 MCP server is registered at project scope (`xcode` in `.mcp.json`, `xcrun mcpbridge`) as an interactive aid for the main session: reading, diagnostics, previews and docs. Xcode 27 serves it headless (`xcrun mcp-server`), so no Xcode window is needed.
+- The gate does not move: `./init.sh` stays the only definition of "builds and passes". The Alternatives line above rejected Xcode-driven builds because they need Xcode in the foreground; headless mode removes that reason, not these:
+  - its build and test tools skip the source rules, `feature-list`, `xcresulttool` and `catalog-coverage` checks;
+  - they use the workspace's active scheme and run destination, not the pinned simulator;
+  - they depend on a permitted agent and folder granted with `sudo` on each machine, which a Stop hook, a validator rerun or CI cannot rely on;
+  - one test tool reported cached results as passing on Xcode 26.3, by a secondary source.
+- Permissions: all 54 tools are classified in `.claude/settings.json`: 19 allowed (read only, diagnostics, workspace, docs), 22 ask (build, test, previews, run, debug, simulator, IDE state, String Catalog reads, App Store data) and 13 denied (every tool that writes files or changes the project, targets, Info.plist, entitlements or localizations). `xcode-mcp-write-guard.sh` blocks the 13 again by name, because they take Xcode project paths that the file hooks cannot match. Live check on 2026-10-14: none of the 13 is visible to the agent, so the hook's evidence is its test cases.
+- Scope: the implementer has none of its tools (`disallowedTools: mcp__xcode`) and the validator has none (explicit `tools` list). `RenderPreview` is not validation evidence: the user validates the interface by hand.
+- Consequences: the server's tool list drifts (53 tools in the morning and 54 in the afternoon of 2026-10-14), so it is listed again after every Xcode update and each new tool is classified. Machine setup (headless mode, permitted agent, permitted folder) is done by the user, by hand. Auto mode refused an agent edit that widened its own allow list; permission widenings are made in Manual mode with the user's approval.
+- How to use it: the `xcode-mcp` skill.

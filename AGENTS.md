@@ -51,6 +51,8 @@ The harness is the main deliverable; the app is its test bed.
 
 Before using an Apple API, and whenever a platform question comes up, query the Cupertino MCP (declared in `.mcp.json`) for the most modern API and Apple's recommended practice. If it is unavailable, search developer.apple.com on the web. Never improvise or assume how an API behaves.
 
+The Xcode MCP server (`xcode` in `.mcp.json`) is for the main session only: reading, diagnostics, previews and docs. Load the `xcode-mcp` skill before calling any of its tools. It never replaces `./init.sh`.
+
 ## The single command
 
 `./init.sh` is the only definition of "builds and passes". Run it any time without asking.
@@ -97,15 +99,7 @@ Speak Spanish with the user. Code, comments, files and commit messages are in En
 
 ## Hooks (`.claude/hooks/`)
 
-- `protect-files.sh` (before Write/Edit): blocks edits to the Xcode project, secrets and credentials, `.git` internals, and DerivedData or `.build`.
-- `block-dangerous-commands.sh` (before Bash): blocks `rm -rf`, `find -delete`, `chmod 777`, force push, `reset --hard`, `git clean -f`, writes to `.env`, piping downloads into a shell, and any write, copy, move or restore whose command text mentions `pbxproj` or `.xcodeproj`.
-- `secrets-commit-guard.sh` (before Bash): on `git commit`, blocks staged secret files and diffs that look like keys or passwords.
-- `constitution-lint.sh` (after Write/Edit of `.swift`): warns about `try!`, `as!`, unsafe isolation escapes, GCD, legacy Observation, `NavigationView`, `AnyView`, `JSONSerialization`, UIKit/XCTest, `print()` outside tests and two Xcode 27 pitfalls.
-- `stop-build-gate.sh` (on Stop): runs `./init.sh` when non-Markdown files changed since the last green run, and keeps the turn going if it fails.
-- `spec-approval-guard.sh` (before Write/Edit and Bash): blocks any agent from approving a spec or editing an approved one.
-- `validator-readonly-bash.sh` (validator subagent only, before Bash): allows only `./init.sh`, read-only git, `xcrun xcresulttool get` and focused `xcodebuild test`.
-- `implementer-no-accept.sh` (implementer subagent only, before Write/Edit and Bash): blocks setting any feature to `accepted`.
-- Hook tests: `.claude/hooks/tests/run-cases.sh <hook> <cases.json>`, one cases file per hook; run them after changing a hook.
+What each hook blocks and how to test it: `.claude/hooks/README.md`. Run the hook test cases after changing a hook.
 
 ## Definition of Done
 
