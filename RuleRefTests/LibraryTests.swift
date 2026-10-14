@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 import Testing
 @testable import RuleRef
@@ -61,6 +62,36 @@ struct LibraryTests {
         #expect(fetched.count == 1)
         #expect(fetched.first?.name == "Taifa")
         #expect(fetched.first?.nameKey == (try GameName("Taifa").key))
+    }
+
+    // Scenario 6: after a failed save, a retry must not report a duplicate and nothing may be left to autosave.
+    @Test func failedSaveLeavesNothingBehind() throws {
+        // A read-only store makes save() throw. It must be on disk: an in-memory store cannot open read-only.
+        let directory = URL.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appending(path: "library.store")
+        _ = try ModelContainer(for: Game.self, configurations: ModelConfiguration(url: url))
+        let readOnly = try ModelContainer(
+            for: Game.self,
+            configurations: ModelConfiguration(url: url, allowsSave: false)
+        )
+        let library = Library(context: readOnly.mainContext)
+
+        // Back to back, as when the user taps Create again: no fetch in between, since a fetch hides the bug.
+        let first = #expect(throws: (any Error).self) { try library.createGame(named: "Taifa") }
+        let retry = #expect(throws: (any Error).self) { try library.createGame(named: "Taifa") }
+        #expect(!(first is GameNameError))
+        #expect(!(retry is GameNameError))
+        // Both are the same save error.
+        let firstError = try #require(first) as NSError
+        let retryError = try #require(retry) as NSError
+        #expect(retryError.domain == firstError.domain)
+        #expect(retryError.code == firstError.code)
+
+        #expect(!library.context.hasChanges)
+        #expect(try library.context.fetch(FetchDescriptor<Game>()).isEmpty)
+        #expect(try ModelContext(readOnly).fetchCount(FetchDescriptor<Game>()) == 0)
     }
 
 }
