@@ -16,8 +16,13 @@ struct LibraryTests {
         library = Library(context: container.mainContext)
     }
 
+    // Counts saved games and, through the library's own context, unsaved inserts too;
+    // both must agree, so an insert left behind by a throwing call is caught.
     private func gameCount() throws -> Int {
-        try ModelContext(container).fetchCount(FetchDescriptor<Game>())
+        let saved = try ModelContext(container).fetchCount(FetchDescriptor<Game>())
+        let savedAndPending = try library.context.fetchCount(FetchDescriptor<Game>())
+        #expect(savedAndPending == saved)
+        return savedAndPending
     }
 
     // Scenario 1
