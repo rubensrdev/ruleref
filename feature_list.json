@@ -60,7 +60,7 @@
     "title": "Create a game",
     "user_visible_behavior": "User creates a game with a name; names are trimmed, non-empty and unique case- and diacritic-insensitively.",
     "depends_on": ["f01-cli-build-and-tests"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test: a blank name is rejected.",
       "Test: \"Taifa\" vs \" taifa \" is rejected as a duplicate."
@@ -124,9 +124,34 @@
           "Persistence across app launches with the app's own on-disk store was not exercised.",
           "Not run on iOS 26.0 (the deployment target) nor on a physical device."
         ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/GameNameTests -only-testing:RuleRefTests/LibraryTests; xcrun xcresulttool get test-results summary --path <focused run bundle>",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0; scenarios 1-4 covered by passing tests on in-memory containers and scenario 6 by a passing test on a store that cannot save; F1 from validation 1 fixed (rollback() on a failed save, duplicate check with fetch and fetchLimit = 1).",
+        "observed": "Independent validator run (validation 2, verdict accept). ./init.sh exit 0, no retry; all 11 checks PASS (xcode-version Xcode 27.0, simulator iPhone 18 Pro iOS 27.0, no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage); init.sh: PASS; totalTestCount=11, failedTests=0, skippedTests=0, expectedFailures=0. Focused run: TEST SUCCEEDED; xcresulttool summary Passed, totalTestCount 10, 13 test runs passed, 0 failed, 0 skipped, 0 expected failures, no runtime warnings. Scenario tests: 1 LibraryTests/blankNameIsRejected(raw:), 2 LibraryTests/surroundingSpacesAndCaseDoNotMakeANewName(), 3 LibraryTests/diacriticsDoNotMakeANewName() (1-3 also count pending inserts), 4 LibraryTests/validNameCreatesAPersistedTrimmedGame(), 6 LibraryTests/failedSaveLeavesNothingBehind() (on-disk store reopened with allowsSave: false; both attempts throw the same non-GameNameError error; context has no changes and holds 0 games; temporary directory removed in a defer). Diff 0fa26f4..f6fb9e6 reviewed: code changes only in Library.swift and LibraryTests.swift, matching the spec approved on 2026-10-14; no project or catalog changes. Cupertino MCP: ModelContext.rollback() and ModelConfiguration(url:allowsSave:) are current, not deprecated.",
+        "context": {
+          "date": "2026-10-14 14:06 CEST",
+          "commit": "f6fb9e6340836a8093b8f66b6f729ee0cf9bc83f",
+          "xcode": "Xcode 27.0 (as reported by init.sh; build number not checked)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Existing working checkout on branch feat/f02-create-game, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Scenario 5: the root screen and the New Game sheet were not exercised; no UI tests by design, the user validates them by hand on the iPhone 16.",
+          "The sheet's save-failure message: scenario 6 tests Library only, not NewGameSheet.",
+          "Save failures other than a read-only store (disk full, migration or validation errors).",
+          "The implementer's mutation results (the old fetchCount guard fails scenario 6; fetchCount is stale after a failed save) were not reproduced: the validator cannot change code.",
+          "The test host's console output during scenario 6: the result bundle has no console log.",
+          "init.sh's own result bundle was not inspected: it is deleted on a green run; its counts come from init.sh's output.",
+          "Spanish rendering of the strings on screen.",
+          "Persistence across app launches with the app's own on-disk store.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "Not run from a fresh clone or with clean DerivedData.",
+          "Exact Xcode build number: the validator cannot run xcodebuild -version."
+        ]
       }
     ],
-    "notes": "Task: T3. Revise round 1 (F1, a retry after a failed save reported a duplicate) was stopped on 2026-10-14 for a spec decision; the user re-approved the spec the same day with fix (b), fetch with fetchLimit = 1 plus rollback() on a failed save, and scenario 6. Implemented in 327f27a; awaiting validation."
+    "notes": "Task: T3. Revise round 1 (F1, a retry after a failed save reported a duplicate) was stopped on 2026-10-14 for a spec decision; the user re-approved the spec the same day with fix (b), fetch with fetchLimit = 1 plus rollback() on a failed save, and scenario 6. Implemented in 327f27a; accepted after validation 2 on 2026-10-14. Follow-up for f04: rollback() discards every pending change in the shared main context."
   },
   {
     "id": "f03-list-games",

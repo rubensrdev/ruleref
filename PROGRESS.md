@@ -118,3 +118,11 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Found: when a test fails, `xcodebuild` runs `simctl diagnose`, which can take up to 600 s before the run ends.
 - Left: scenario 5 (the sheet) is validated by hand at the end of T3.
 - Next: the validator reviews f02 again through `/feature-flow` (revise round 1 of 3 used). Done when: f02 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-14 — T3: f02 accepted
+- Validation 2 at f6fb9e6 returned `accept` and the user confirmed. `./init.sh` green (11 tests, 0 failed, 0 skipped); the focused GameNameTests/LibraryTests run passed. F1 resolved. Record: `docs/validations/f02-create-game.md`.
+- Process: the user rejected validation 1's accept to fix F1 first; the repair round stopped on a spec decision, the user revised and re-approved the spec, and the next implementation passed. A spec gap is a `stop`, not a verdict.
+- Follow-up for f04: `rollback()` after a failed save discards every pending change in the shared main context; revisit when rename leaves unsaved edits.
+- Gate notes: the Stop hook's `./init.sh` failed several times while a subagent was mid-change or running its own `xcodebuild` (once with `Terminated: 15`); those runs say nothing about the result. When `xcodebuild` dies without a result bundle, test-results prints a Python traceback instead of a clean FAIL (harness fix pending on `main`).
+- Left: scenario 5 (the sheet) is validated by hand at the end of T3.
+- Next: the user merges the f02 PR; then the harness fix for the test-results traceback on `main`; then `/feature-flow` on f03-list-games. Done when: f03 is `accepted` and its PR is merged into `main`.

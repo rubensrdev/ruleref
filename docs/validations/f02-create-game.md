@@ -54,3 +54,4 @@
   - iOS 26.0 and a physical device.
   - A fresh clone or clean DerivedData.
   - Exact Xcode build number.
+- User: confirmed
