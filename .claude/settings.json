@@ -33,7 +33,8 @@
       "mcp__xcode__GetBuildLog",
       "mcp__xcode__GetTestList",
       "mcp__xcode__GetConsoleOutput",
-      "mcp__xcode__XcodeRefreshCodeIssuesInFile"
+      "mcp__xcode__XcodeRefreshCodeIssuesInFile",
+      "mcp__xcode__DocumentationSearch"
     ],
     "ask": [
       "Bash(git push *)",
