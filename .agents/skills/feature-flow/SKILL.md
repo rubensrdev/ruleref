@@ -16,6 +16,7 @@ You are the orchestrator in the main session. You select one feature, delegate, 
 - At most 3 `revise` verdicts per approved spec. After the third: stop, set the feature to `blocked`, add `stop: revise limit` to its `notes` and hand the decision to the user.
 - `block` is a verdict: a condition is missing. `stop` is a limit: revise rounds, a subagent's turn limit, a permission, the environment. Always name which one ended the run.
 - Run interactively only: in `-p` sessions the subagents' frontmatter hooks may not run.
+- One branch and one pull request per feature: `feat/<feature-id>`, from an up-to-date `main`. Never merge: the user merges on GitHub.
 
 ## Select the feature
 From `feature_list.json`, in this order:
@@ -24,6 +25,12 @@ From `feature_list.json`, in this order:
 3. A feature `passing`: validate it.
 4. The first `not_started` feature whose `depends_on` are all `accepted`.
 Then open `docs/specs/<feature-id>.md`. No file, or no Approval line: stop and ask the user for an approved spec.
+
+## Branch
+Before the loop:
+1. Already on `feat/<feature-id>`: continue there.
+2. Otherwise switch to `main` and run `git pull`. The tree must be clean; if it is not, stop and report. If `gh pr list --state open` shows another `feat/` pull request, stop: the user merges it first.
+3. `git switch feat/<feature-id>` if the branch exists, else `git switch -c feat/<feature-id>`. Every commit of this run goes on it.
 
 ## Count the rounds
 Read `docs/validations/<feature-id>.md` if it exists. The revise count is the number of `revise` sections dated on or after the spec's Approval date. Re-approving the spec resets it; nothing else does.
@@ -36,7 +43,13 @@ Read `docs/validations/<feature-id>.md` if it exists. The revise count is the nu
    - `revise`: if it is the third, stop as the critical rules say. Otherwise go back to step 1.
    - `block`: set the feature to `blocked`, add `block: <reason>` to its `notes`, commit and report.
    - `accept`: show the user the summary below and ask for confirmation. Wait.
-5. Close. If the user confirms: append the validator's evidence entry to the feature's `evidence`, set it to `accepted`, add a `PROGRESS.md` entry whose Next line states the next step and its done-when criterion, add `User: confirmed` to the validation section, commit (`docs: accept <feature-id>`) and push; `git push` asks the user. If the user rejects: add `User: rejected — <reason>`, keep the feature `passing` and ask how to proceed.
+5. Close. If the user confirms: append the validator's evidence entry to the feature's `evidence`, set it to `accepted`, add a `PROGRESS.md` entry whose Next line states the next step and its done-when criterion, add `User: confirmed` to the validation section, commit (`docs: accept <feature-id>`), push the branch (`git push -u origin feat/<feature-id>`; it asks the user) and open the pull request (below). If the user rejects: add `User: rejected — <reason>`, keep the feature `passing` and ask how to proceed.
+
+## Pull request
+- If `gh pr list --head feat/<feature-id>` already shows one, do not open another: report its URL.
+- Otherwise write the body to `/tmp/ruleref-pr-<feature-id>.md`, never inside the repo, and run `gh pr create --base main --head feat/<feature-id> --title "feat: <feature title>" --body-file /tmp/ruleref-pr-<feature-id>.md`.
+- Body: what the feature adds, in one or two lines; Not verified; the checks the validator reran and their results; the validation record `docs/validations/<feature-id>.md`; the evidence entry.
+- Never merge. Report the URL and tell the user to merge it on GitHub and then run `/feature-flow` again.
 
 ## Validation record
     ## Validation <n> — <verdict> — <YYYY-MM-DD>
@@ -48,4 +61,4 @@ Read `docs/validations/<feature-id>.md` if it exists. The revise count is the nu
     - User: <confirmed | rejected — reason; accept only>
 
 ## Summary for the user
-Before asking to confirm an accept, and at the end of every run. Lead with what was not verified. Then: feature id and outcome (waiting for confirmation, accepted, block, or stop and which limit), revise rounds used of 3, the checks the validator reran and their results, commits, and the next step.
+Before asking to confirm an accept, and at the end of every run. Lead with what was not verified. Then: feature id and outcome (waiting for confirmation, accepted, block, or stop and which limit), revise rounds used of 3, the checks the validator reran and their results, commits, the pull request URL, and the next step.

@@ -86,7 +86,8 @@ Speak Spanish with the user. Code, comments, files and commit messages are in En
 ## Git
 
 - The agent does all git operations.
-- Conventional Commits; one commit per subtask, on `main`.
+- Conventional Commits; one commit per subtask.
+- Each feature runs on its own branch, `feat/<feature-id>`, and reaches `main` through one pull request that the user merges (`feature-flow`). Harness, docs and spec work outside a feature runs on `main`.
 - Push asks for permission.
 - No attribution lines.
 - Never force push or `reset --hard`.
