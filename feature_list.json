@@ -60,7 +60,7 @@
     "title": "Create a game",
     "user_visible_behavior": "User creates a game with a name; names are trimmed, non-empty and unique case- and diacritic-insensitively.",
     "depends_on": ["f01-cli-build-and-tests"],
-    "status": "not_started",
+    "status": "in_progress",
     "verification": [
       "Test: a blank name is rejected.",
       "Test: \"Taifa\" vs \" taifa \" is rejected as a duplicate."

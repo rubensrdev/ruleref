@@ -5,6 +5,7 @@
 //  Created by Rubén Segura Romo on 07/10/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 @main
@@ -13,5 +14,6 @@ struct RuleRefApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Game.self)
     }
 }
