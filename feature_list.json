@@ -60,12 +60,33 @@
     "title": "Create a game",
     "user_visible_behavior": "User creates a game with a name; names are trimmed, non-empty and unique case- and diacritic-insensitively.",
     "depends_on": ["f01-cli-build-and-tests"],
-    "status": "in_progress",
+    "status": "passing",
     "verification": [
       "Test: a blank name is rejected.",
       "Test: \"Taifa\" vs \" taifa \" is rejected as a duplicate."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh",
+        "expected": "Exit code 0; every check PASS; test-results shows the new GameNameTests and LibraryTests with failedTests=0 and skippedTests=0; scenarios 1-4 covered by passing tests on an in-memory container.",
+        "observed": "Exit code 0, no retry. Test-results line: totalTestCount=10, failedTests=0, skippedTests=0, expectedFailures=0. Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Scenario tests (each with its own in-memory ModelContainer): scenario 1 LibraryTests/blankNameIsRejected(raw:) for \"\" and \"   \"; scenario 2 LibraryTests/surroundingSpacesAndCaseDoNotMakeANewName(); scenario 3 LibraryTests/diacriticsDoNotMakeANewName(); scenario 4 LibraryTests/validNameCreatesAPersistedTrimmedGame() (fetch through a new ModelContext on the same container). Name rule: GameNameTests (blankNameThrowsBlank, valueIsTrimmed, surroundingSpacesAndCaseGiveTheSameKey, diacriticsGiveTheSameKey, differentNamesGiveDifferentKeys). The focused run `xcodebuild test -only-testing:RuleRefTests/GameNameTests -only-testing:RuleRefTests/LibraryTests` also ended in TEST SUCCEEDED with every case passed.",
+        "context": {
+          "date": "2026-10-14 12:59 CEST",
+          "commit": "6b0ced1fcdeeb2481208a923d8f475072758d157",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f02-create-game, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Scenario 5: the root screen and the New Game sheet (blank and duplicate inline errors, closing on a valid name) were not exercised; no UI tests by design, the user validates them by hand on the iPhone 16.",
+          "The sheet's save-failure message is not covered by a test: no test forces ModelContext.save() to fail.",
+          "Spanish rendering of the new strings was not checked on screen; only the catalog check ran.",
+          "Persistence across app launches with the on-disk store was not exercised; tests use in-memory containers only.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "The tests were not run red before the implementation: they did not compile until the types existed."
+        ]
+      }
+    ],
     "notes": "Task: T3."
   },
   {

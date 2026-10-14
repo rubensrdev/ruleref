@@ -94,3 +94,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Validator findings (info): `init.sh` uses `python3` without a preflight check; `validator-readonly-bash.sh` blocked a compound read-only git command, which only partly covers the planned live check that a validator write is blocked.
 - Still open from the T3 done-when: a validator write attempt blocked live.
 - Next: the user merges the f01 PR; then `/feature-flow` on f02-create-game, on its own branch. Done when: f02 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-14 — T3: f02 implemented
+- f02-create-game is `passing` on branch `feat/f02-create-game` (code commit 6b0ced1): `GameName` and `GameNameError` (`nonisolated`; trimmed value, key folded for case, diacritics and width with the `en_US_POSIX` locale), `Game` (`@Model`, `name` and `nameKey`, no `#Unique`), `Library.createGame(named:)` (fetch count by key before insert, then save), `NewGameSheet`, a "New Game" button on the root screen and the app's model container.
+- `./init.sh` green: 10 tests, 0 failed, 0 skipped. Scenarios 1-4 are covered by `LibraryTests` on one in-memory container per test.
+- Beyond the spec's expected keys: the sheet shows "The game could not be saved." when `save()` throws, so a save error is never silent.
+- Left: scenario 5 (the sheet) is validated by hand at the end of T3.
+- Next: the validator reviews f02 through `/feature-flow`. Done when: f02 is `accepted` and its PR is merged into `main`.
