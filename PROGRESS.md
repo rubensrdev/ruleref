@@ -87,3 +87,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Planning assumption: delivery on 2026-10-22, to be confirmed. The 8 Oct git decision stands: from f02 on, one branch and one PR per feature, run one at a time, merged by the user, with no issues and no worktrees (ADR-003). T4 specs are written and reviewed in one round.
 - Commits 1a86988 to 7a485f2, plus this one.
 - Next: T3. The user places `RuleRefTests/Fixtures/taifa-3.0.pdf` and `taifa-3.0-attribution.md`; a new session loads the subagents; live checks (a validator write is blocked, the implementer cannot set `accepted`); `/feature-flow` on f01 on `main`; then the branch-and-PR step is added to the loop, and each later T3 feature runs on its own branch. Done when: ADR-002 records the multi-column extraction decision after a ~10-minute layout check of the fixture, a validator write attempt is blocked live, f01 is `accepted` with evidence, and every later T3 feature reaches `main` through a PR the user merged.
+
+## 2026-10-14 — T3: f01 accepted
+- First live `/feature-flow` run, on branch `feat/f01-cli-build-and-tests`. The validator reran `./init.sh` at a687994 (exit 0, 11 checks PASS, 1 test, none failed or skipped) and returned `accept`; the user confirmed. Record: `docs/validations/f01-cli-build-and-tests.md`. 0 of 3 revise rounds used.
+- The validator's evidence entry is appended to f01 in `feature_list.json`; the clean-clone run at aaf46dd stays the only fresh-clone evidence.
+- Validator findings (info): `init.sh` uses `python3` without a preflight check; `validator-readonly-bash.sh` blocked a compound read-only git command, which only partly covers the planned live check that a validator write is blocked.
+- Still open from the T3 done-when: a validator write attempt blocked live.
+- Next: the user merges the f01 PR; then `/feature-flow` on f02-create-game, on its own branch. Done when: f02 is `accepted` and its PR is merged into `main`.
