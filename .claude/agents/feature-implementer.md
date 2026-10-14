@@ -1,7 +1,7 @@
 ---
 name: feature-implementer
 description: Implements one RuleRef feature from its approved spec, or applies a validator repair brief to it, and leaves it passing with evidence. Use when the orchestrator delegates implementing or repairing a feature by id. It never validates or accepts features.
-disallowedTools: Agent, Skill
+disallowedTools: Agent, Skill, mcp__xcode
 skills:
   - feature-implementer
 model: opus
