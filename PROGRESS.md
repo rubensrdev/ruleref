@@ -101,3 +101,11 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Beyond the spec's expected keys: the sheet shows "The game could not be saved." when `save()` throws, so a save error is never silent.
 - Left: scenario 5 (the sheet) is validated by hand at the end of T3.
 - Next: the validator reviews f02 through `/feature-flow`. Done when: f02 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-14 — T3: f02 revise round 1 stopped
+- The user rejected the validator's accept and asked to fix F1 (a retry after a failed save reports a duplicate). Round 1 of 3.
+- Done (commit 9015b3a): scenarios 1-3 now also count unsaved inserts in the library's context; a mutation that inserts before the duplicate check fails scenarios 2 and 3. `./init.sh` green, 10 tests.
+- Reproduced F1 with a real save failure: a store created on disk, then reopened with `ModelConfiguration(url:allowsSave: false)`, makes `save()` throw (Cocoa error 513). An in-memory store cannot be opened read-only.
+- Found: the brief's fix (`rollback()` after a failed save, or `delete(game)`) is not enough. After a failed save, the next `fetchCount` that includes pending changes returns a stale 1, and only the following calls return 0. `fetch`, and `fetchCount` with `includePendingChanges = false`, return 0. Without a failed save, rollback and `fetchCount` agree.
+- Two fixes pass the reproducing test, both with `rollback()`: (a) the duplicate check sets `includePendingChanges = false`; (b) it uses `fetch` with `fetchLimit = 1` instead of `fetchCount`. Both change the spec's Technical Approach, so the implementer stopped. The red test and the rollback are in git stash "f02 F1 WIP (red)"; f02 is `in_progress`.
+- Next: the user picks (a), (b) or another option, and an approved spec revision if needed; then the implementer applies the stash, adds the chosen check and finishes round 1. Done when: `failedSaveLeavesNothingBehind` passes, `./init.sh` is green and f02 is back to `passing` with new evidence.

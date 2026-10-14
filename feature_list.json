@@ -60,7 +60,7 @@
     "title": "Create a game",
     "user_visible_behavior": "User creates a game with a name; names are trimmed, non-empty and unique case- and diacritic-insensitively.",
     "depends_on": ["f01-cli-build-and-tests"],
-    "status": "passing",
+    "status": "in_progress",
     "verification": [
       "Test: a blank name is rejected.",
       "Test: \"Taifa\" vs \" taifa \" is rejected as a duplicate."
@@ -85,9 +85,28 @@
           "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "The tests were not run red before the implementation: they did not compile until the types existed."
         ]
+      },
+      {
+        "command": "./init.sh",
+        "expected": "Exit code 0; every check PASS; test-results failedTests=0 and skippedTests=0; scenarios 1-3 now also count unsaved inserts in the library's own context.",
+        "observed": "Exit code 0, no retry. Test-results line: totalTestCount=10, failedTests=0, skippedTests=0, expectedFailures=0. Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Revise round 1 (repair brief F1 and its info finding): LibraryTests.gameCount() now counts through a fresh ModelContext (saved) and through library.context (saved plus pending) and expects both to agree. Mutation check, not committed: inserting the game before the duplicate guard made surroundingSpacesAndCaseDoNotMakeANewName() and diacriticsDoNotMakeANewName() fail (count 2, saved 1); blankNameIsRejected(raw:) cannot reach an insert. F1 itself is not fixed in this commit; see notes.",
+        "context": {
+          "date": "2026-10-14 13:41 CEST",
+          "commit": "9015b3a9f7e3d4ddc6bdcc08c3a1a2e4a026c1bc",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f02-create-game, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "F1 is open: after a failed save, an immediate retry still reports a duplicate. The reproducing test (LibraryTests.failedSaveLeavesNothingBehind, read-only on-disk store) and the brief's rollback are kept in git stash 'f02 F1 WIP (red)', not committed.",
+          "Scenario 5: the root screen and the New Game sheet were not exercised; no UI tests by design, the user validates them by hand on the iPhone 16.",
+          "Spanish rendering of the new strings was not checked on screen; only the catalog check ran.",
+          "Persistence across app launches with the on-disk store was not exercised by the scenario tests; they use in-memory containers.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device."
+        ]
       }
     ],
-    "notes": "Task: T3."
+    "notes": "Task: T3. Revise round 1 stopped on 2026-10-14 for a user decision: the brief's fix for F1 (rollback() after a failed save) is necessary but not sufficient, because after a failed save the next fetchCount that includes pending changes returns a stale 1, so the retry still reports a duplicate. Both verified fixes change the spec's duplicate check: (a) includePendingChanges = false on the fetchCount, or (b) fetch with fetchLimit 1 instead of fetchCount."
   },
   {
     "id": "f03-list-games",
