@@ -283,14 +283,27 @@ if [ "$PREFLIGHT_OK" -eq 1 ] && [ "$RULES_OK" -eq 1 ]; then
   RESULT_BUNDLE="$WORK_DIR/Test.xcresult"
   LOG="$WORK_DIR/xcodebuild.log"
 
-  xcodebuild test \
-    -project "$PROJECT" \
-    -scheme "$SCHEME" \
-    -destination "$DESTINATION" \
-    -resultBundlePath "$RESULT_BUNDLE" \
-    SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
-    > "$LOG" 2>&1
+  run_tests() {
+    xcodebuild test \
+      -project "$PROJECT" \
+      -scheme "$SCHEME" \
+      -destination "$DESTINATION" \
+      -resultBundlePath "$RESULT_BUNDLE" \
+      SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+      > "$LOG" 2>&1
+  }
+  run_tests
   BUILD_STATUS=$?
+  # One retry, only when the simulator failed to launch the test host. A compiler error or a
+  # failing test always cites a .swift location, so it is never retried.
+  LAUNCH_FAILURE='Simulator device failed to launch|Failed to create a bundle instance representing|did not return a process handle'
+  if [ "$BUILD_STATUS" -ne 0 ] && grep -qE "$LAUNCH_FAILURE" "$LOG" && ! grep -qE '\.swift:[0-9]+:[0-9]+' "$LOG"; then
+    mv "$LOG" "$WORK_DIR/xcodebuild-launch-failure.log"
+    echo "The simulator failed to launch the test host; retrying once (first log: $WORK_DIR/xcodebuild-launch-failure.log)."
+    RESULT_BUNDLE="$WORK_DIR/Test-retry.xcresult"
+    run_tests
+    BUILD_STATUS=$?
+  fi
   if [ "$BUILD_STATUS" -eq 0 ]; then
     pass "xcodebuild-test"
   else
