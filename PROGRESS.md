@@ -77,3 +77,13 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Before T3: the user places `RuleRefTests/Fixtures/taifa-3.0.pdf` and `taifa-3.0-attribution.md`.
 - Commits 249c71d to 1ee6186.
 - Next: P3.8, Xcode MCP read-only integration and the ADR-001 revision. Done when: its tools are registered at project scope, the hook matchers for its write tools have passing test cases, and ADR-001 records the change.
+
+## 2026-10-14 — P3.8: Xcode MCP, read-only integration
+- Xcode 27 serves its MCP server headless (`xcrun mcp-server`; `xcrun mcpbridge` is the stdio bridge). Registered at project scope in `.mcp.json`. The user enabled headless mode and permitted only this repo's folder, by hand.
+- The server exposes 54 tools. `.claude/settings.json` classifies all of them: 19 allowed, 22 ask, 13 denied. `xcode-mcp-write-guard.sh` blocks the 13 write tools again, with 25 test cases. Live check: the 13 are not visible to the agent; opening, listing and closing the workspace work without a window.
+- The implementer has no Xcode MCP tools; the validator has none. `RenderPreview` is not validation evidence.
+- `xcode-mcp` skill added. ADR-001 revised: the gate stays in `./init.sh`. The hook list moved from `AGENTS.md` to `.claude/hooks/README.md`.
+- Hook tests: 100 cases (37 + 17 + 21 + 25), all passing.
+- Planning assumption: delivery on 2026-10-22, to be confirmed. The 8 Oct git decision stands: from f02 on, one branch and one PR per feature, run one at a time, merged by the user, with no issues and no worktrees (ADR-003). T4 specs are written and reviewed in one round.
+- Commits 1a86988 to 7a485f2, plus this one.
+- Next: T3. The user places `RuleRefTests/Fixtures/taifa-3.0.pdf` and `taifa-3.0-attribution.md`; a new session loads the subagents; live checks (a validator write is blocked, the implementer cannot set `accepted`); `/feature-flow` on f01 on `main`; then the branch-and-PR step is added to the loop, and each later T3 feature runs on its own branch. Done when: ADR-002 records the multi-column extraction decision after a ~10-minute layout check of the fixture, a validator write attempt is blocked live, f01 is `accepted` with evidence, and every later T3 feature reaches `main` through a PR the user merged.
