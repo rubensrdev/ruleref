@@ -205,3 +205,15 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Carry into f11: with the same PDF in two games, a failed save's `removeFile` deletes the file the first game uses; f11 must refuse with `.alreadyImported` before `store.write`.
 - Open for the user: Taifa's coarse segmentation (40 passages for 16 pages) should be decided before f13 (ADR-002 finding). Align `ContentView`'s `#Preview` container in f17.
 - Next: the user merges the f08 PR; then `/feature-flow` on the next dependency-ready feature, f09-reject-no-text-layer. Done when: f09 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f09 implemented
+- f09-reject-no-text-layer is `passing` on branch `feat/f09-reject-no-text-layer` (code commit 01f9afc): `ImportError.noTextLayer`, thrown by `RulebookPreparer.prepare(fileAt:)` when extraction yields zero passages, before anything is written or inserted. A document with at least one passage imports, even with pages that have no text.
+- `NoTextLayerImportTests` covers scenarios 1-4 (image-only, blank pages, mixed PDF imports, the game imports after a rejection). Red first: without the check, scenarios 1, 2 and 4 failed and 3 passed. PDFKit reports 0 characters for synthetic pages holding only a filled rectangle or nothing.
+- `./init.sh` green: 66 tests, 0 failed, 0 skipped; the focused NoTextLayerImportTests/ImportTests run passed (11). No existing test imported a zero-passage PDF.
+- Left: real scanned PDFs (an invisible OCR layer would import); encrypted PDFs may fail as `.noTextLayer` until f10; the error's presentation (f17).
+- Next: the validator reviews f09 through `/feature-flow`. Done when: f09 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f09 accepted
+- Validation 1 at cdc33ad returned `accept` and the user confirmed. `./init.sh` green (66 tests, 0 failed, 0 skipped); the focused NoTextLayerImportTests/ImportTests run passed (11). Record: `docs/validations/f09-reject-no-text-layer.md`.
+- The doc comment on `case noTextLayer` was judged acceptable despite the spec's "Nothing else changes".
+- Next: the user merges the f09 PR; then `/feature-flow` on the next dependency-ready feature, f10-reject-unreadable-file. Done when: f10 is `accepted` and its PR is merged into `main`.

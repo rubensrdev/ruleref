@@ -21,7 +21,8 @@ nonisolated enum RulebookPreparer {
         // f10 plugs in here: an encrypted document that stays locked → .locked, told apart from .unreadable.
 
         let passages = PassageExtractor.extract(from: document, rulebookID: rulebookID)
-        // f09 plugs in here: zero passages → .noTextLayer. In f08 such a PDF still imports.
+        // No passages in the whole document means no usable text layer; pages without text alone do not reject.
+        if passages.isEmpty { throw ImportError.noTextLayer }
 
         return PreparedRulebook(rulebookID: rulebookID, pageCount: document.pageCount, bytes: bytes, passages: passages)
     }
