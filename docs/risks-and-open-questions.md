@@ -20,6 +20,7 @@ None.
 ## Implementation-time
 
 - **Multi-column extraction (ADR-002, T3).** Geometry-based reading order vs. Vision document recognition. The MVP ships single-column only.
+- **Taifa segmentation finding for ADR-002 (f08, 2026-10-15).** With the 0.5 ratio unchanged, Taifa imports as 16 pages and 40 passages, mostly 2 per page: the body of each page is one passage of up to about 2,000 characters (23 of 40 are over 500), because its paragraph gaps are not above 0.5 × the median line height. The printed page number is its own passage on every page. No line-break hyphen is left inside a passage; a word split across a page break ("utiliza-" / "do).") stays split, since a passage never spans two pages. Search still finds the right page, but a match is a whole page and the highlight covers most of it. Decide in ADR-002 or a later spec whether to recalibrate (a smaller ratio, a heading or font rule) and whether to drop page-number passages; measure it with the f16 baseline.
 - **Ranking ties and match display.** F13 fixes the order. Whether a match shows a text excerpt or only the page number is decided in its spec.
 - **Page viewer and "no UIKit" (F15).** The viewer will use PDFKit's `PDFView` inside a `UIViewRepresentable`, the only exception to "no UIKit" (ADR-001). To be decided in its own ADR within the T4 spec (P4). Check whether `import PDFKit` is enough or that single file also needs `import UIKit`; `init.sh` currently rejects any UIKit import, so the ADR must also say how the gate allows it.
 
