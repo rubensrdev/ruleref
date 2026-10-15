@@ -23,3 +23,4 @@
   - Imports from a second `ModelContext` or container over the same store (uniqueness relies on main-actor serialization over one context).
   - A persistent on-disk store across launches; a real file picked twice (f17).
   - iOS 26.0, a physical device, a fresh clone or clean DerivedData; the Xcode build number.
+- User: confirmed

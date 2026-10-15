@@ -239,3 +239,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Change from f08-f10: `.gameHasRulebook` no longer comes before reading; a game with a rulebook given unreadable bytes now gets `.unreadable`.
 - Left: what the user sees for each outcome (f17).
 - Next: the validator reviews f11 through `/feature-flow`. Done when: f11 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f11 accepted
+- Validation 1 at 7b13355 returned `accept` and the user confirmed. `./init.sh` green (78 tests, 0 failed, 0 skipped); the focused Reimport/Import/NoTextLayer/UnreadableFile/Taifa run passed (24); the two concurrent scenarios passed 50 of 50 with `-test-iterations 25`. Record: `docs/validations/f11-reimport-same-file.md`.
+- The f08 carry-over is closed: no path writes or removes the file of a rulebook another game holds.
+- Uniqueness relies on main-actor serialization over one `ModelContext`; imports from a second context or container are not covered.
+- Next: the user merges the f11 PR; then `/feature-flow` on the next dependency-ready feature, f17-import-action (spec approved 2026-10-13; it shows each `ImportOutcome` and `ImportError` and aligns `ContentView`'s `#Preview` container). Done when: f17 is `accepted` and its PR is merged into `main`.

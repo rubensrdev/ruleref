@@ -576,7 +576,7 @@
     "title": "Re-import of the same file",
     "user_visible_behavior": "Re-importing the same file into the same game is a no-op; the same file into another game is refused, naming that game.",
     "depends_on": ["f08-atomic-import", "f09-reject-no-text-layer", "f10-reject-unreadable-file"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test: locators before and after re-import are equal and counts unchanged.",
       "Test: a second game gets `.alreadyImported(gameName)`."
@@ -603,6 +603,29 @@
           "The tests were not run red against f08's code: they did not compile until ImportOutcome existed; the step-(d) mutation stands in for scenarios 6 and 7 only.",
           "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/ReimportTests -only-testing:RuleRefTests/ImportTests -only-testing:RuleRefTests/NoTextLayerImportTests -only-testing:RuleRefTests/UnreadableFileImportTests -only-testing:RuleRefTests/TaifaImportTests; xcodebuild test (same project, scheme, destination) \"-only-testing:RuleRefTests/ReimportTests/simultaneousImportsIntoTwoGames()\" \"-only-testing:RuleRefTests/ReimportTests/simultaneousImportsIntoTheSameGame()\" -test-iterations 25; git diff 0c417ea..7b13355",
+        "expected": "init.sh PASS with 0 failed and 0 skipped; the focused import suites all pass; the concurrent scenarios 6 and 7 never fail across repeated runs; existing test files change only at call sites; store.write and removeFile are unreachable when another game holds the same rulebook ID.",
+        "observed": "Independent validator rerun. init.sh exit 0, all 11 checks PASS, totalTestCount=78, failedTests=0, skippedTests=0, expectedFailures=0. Focused run: TEST SUCCEEDED, 24 of 24 passed (Reimport 7, Import 7, NoTextLayer 4, Unreadable 5, Taifa 1). Repetition run: TEST SUCCEEDED, 50 of 50 executions passed (25 per concurrent test); 27 green runs each in total, including the init.sh and focused runs. The diff confirms exactly 3 existing call sites changed (ImportTests.swift:94 and :113, TaifaImportTests.swift:30, each appending .rulebook) and no #expect or #require changed. Code review: fingerprint and prepare are both @concurrent, with one read and one hash; the look-up is FetchDescriptor<Rulebook> on rulebookID with fetchLimit 1 and no #Unique; check runs before and after prepare, in the order no-op / .alreadyImported(stored name) / .storage / .gameHasRulebook; nothing awaits between the step-(d) check and save(); store.write runs only after step (d) finds no rulebook with this ID, and removeFile only after this call's own failed save. The f08 carry-over is closed. Disclosed deviations accepted: the gameHasRulebook doc comment, the PersistentIdentifier in the test Summary, and names following the implementation.",
+        "context": {
+          "date": "2026-10-15 13:14 CEST",
+          "commit": "7b133555a6e36d9c2f60592ac190ebe9b3bb4d43",
+          "xcode": "Xcode 27.0 (as reported by init.sh)",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Validator rerun on a clean checkout of feat/f11-reimport-same-file, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The implementer's step-(d) mutation run; the validator is read-only.",
+          "Which check (step b or step d) caught the loser in scenarios 6 and 7 in the validator's 27 runs each.",
+          "That every atomic rewrite changes the stored file's modification date (scenario 1's date check).",
+          "The fetch-error -> .storage and rulebook-without-game -> .storage paths; no test provokes them.",
+          "Imports from a second ModelContext or container over the same store; uniqueness relies on main-actor serialization over one context.",
+          "A persistent on-disk store across launches; a real file picked twice (f17).",
+          "iOS 26.0 (the deployment target) and a physical device.",
+          "A fresh clone with clean DerivedData.",
+          "The exact Xcode build number; xcodebuild -version is not an allowed validator command."
         ]
       }
     ],
