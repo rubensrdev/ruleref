@@ -283,7 +283,7 @@
     "title": "Extract ordered passages",
     "user_visible_behavior": "Extraction turns a text-layer PDF into ordered passages, each with a valid locator.",
     "depends_on": ["f05-rulebook-id"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Build a synthetic PDF in the test with PDFKit.",
       "Test: expected texts, order and page indices.",
@@ -309,6 +309,28 @@
           "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "The tests were not run red before the implementation: they did not compile until the types existed; the mutation check stands in for the threshold only.",
           "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/PassageSegmenterTests -only-testing:RuleRefTests/PassageExtractorTests; xcrun xcresulttool get test-results summary --path <focused run .xcresult>",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0; the focused run passes all PassageSegmenterTests and PassageExtractorTests with 0 failed and 0 skipped; every Validator Checklist item of docs/specs/f06-extract-passages.md holds in code and tests.",
+        "observed": "Independent validation 1, no fixes made. init.sh exit 0: totalTestCount=37, failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.0), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED; xcresult summary result=Passed, totalTestCount=18, passedTests=18, failedTests=0, skippedTests=0, no runtime warnings. Code review: Locator has a single case pdf(rulebookID:pageIndex:bounds:), Equatable and Sendable; all six domain types are nonisolated; the cut is gap > 0.5 x median (strict) or midY above the previous line, with no font or indent rule; the count > 0 guard comes before selection(for: NSRange(0, count)), and the Cupertino docs confirm the exception on zero or out-of-range lengths; lines are joined with \\n with no normalising. Scenario 3's layout was reviewed and is a faithful wrap: narrow lines shifted right beside a filled rect, same 14 pt step, and the shift and narrowing are #required on PDFKit-measured bounds. Docs updated as the spec requires.",
+        "context": {
+          "date": "2026-10-15 11:12 CEST",
+          "commit": "6669268f02618bde46e57c8f779c22210d6f9acc",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on feat/f06-extract-passages, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Real rulebooks and the Taifa calibration of the 0.5 ratio (pp. 3 and 12): f08.",
+          "Text wrapping where the full-width lines do not span the narrow lines' x range: PDFKit reads it as two columns and splits it (implementer's finding); not reproduced by the validator.",
+          "Multi-column layouts (ADR-002 accepts the degradation).",
+          "Rotated pages, and pages whose crop box differs from the media box.",
+          "iOS 26 SDK isolation of PDFDocument, PDFPage and PDFSelection: only the iOS 27.0 SDK is installed.",
+          "Runs on iOS 26.0 (the deployment target) and on a physical device.",
+          "The implementer's uncommitted >= mutation check: not rerun because the validator is read-only; only checked analytically.",
+          "Runs from a fresh clone or with clean DerivedData."
         ]
       }
     ],

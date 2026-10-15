@@ -165,3 +165,8 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Docs: the segmentation rule is decided in `docs/risks-and-open-questions.md`; `docs/domain-model.md` says "only extraction builds locators" is a convention.
 - Left: Taifa calibration (f08); iOS 26 SDK isolation of PDFKit classes not checked.
 - Next: the validator reviews f06 through `/feature-flow`. Done when: f06 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f06 accepted
+- Validation 1 at 6669268 returned `accept` and the user confirmed. `./init.sh` green (37 tests, 0 failed, 0 skipped); the focused PassageSegmenterTests/PassageExtractorTests run passed (18). Record: `docs/validations/f06-extract-passages.md`.
+- Open for the user: `docs/risks-and-open-questions.md` still lists multi-column extraction as deferred and geometry vs. Vision reading order as open, although ADR-002 is Accepted (docs follow-up on `main`); the approved f06 spec says ADR-002 is not written yet (wording only, no conflict).
+- Next: the user merges the f06 PR; then `/feature-flow` on the next dependency-ready feature, f07-join-hyphenation. Done when: f07 is `accepted` and its PR is merged into `main`.

@@ -19,3 +19,4 @@
   - iOS 26 SDK isolation of `PDFDocument`, `PDFPage`, `PDFSelection`.
   - iOS 26.0, a physical device, a fresh clone or clean DerivedData.
   - The `>=` mutation check (analytical only).
+- User: confirmed
