@@ -217,3 +217,11 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Validation 1 at cdc33ad returned `accept` and the user confirmed. `./init.sh` green (66 tests, 0 failed, 0 skipped); the focused NoTextLayerImportTests/ImportTests run passed (11). Record: `docs/validations/f09-reject-no-text-layer.md`.
 - The doc comment on `case noTextLayer` was judged acceptable despite the spec's "Nothing else changes".
 - Next: the user merges the f09 PR; then `/feature-flow` on the next dependency-ready feature, f10-reject-unreadable-file. Done when: f10 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f10 implemented
+- f10-reject-unreadable-file is `passing` on branch `feat/f10-reject-unreadable-file` (code commit a45587c): `ImportError.locked`, thrown by `RulebookPreparer.prepare(fileAt:)` when the opened `PDFDocument` is locked, after opening and before extraction. An encrypted PDF that opens unlocked (owner password only) imports normally; bytes PDFKit cannot open stay `.unreadable`. `docs/domain-model.md` now says "locked (needs a password to open)".
+- `SyntheticPDF.data(pages:encryption:)` gains an optional `Encryption` (owner password, optional user password) passed through Core Graphics' auxiliary dictionary; existing calls are unchanged.
+- `UnreadableFileImportTests` covers scenarios 1-5. All PDFKit preconditions held on the iOS 27.0 simulator: a user-password PDF opens locked, an owner-only PDF opens unlocked and extracts its text, the corrupt bytes give `nil`. Red first: without the check, scenarios 1, 4 and 5 failed with `.noTextLayer`; 2 and 3 passed.
+- `./init.sh` green: 71 tests, 0 failed, 0 skipped; the focused run (UnreadableFileImportTests, ImportTests, PassageExtractorTests, NoTextLayerImportTests) passed (24).
+- Left: real encrypted or damaged rulebooks, other key lengths and permission sets; the error's presentation (f17).
+- Next: the validator reviews f10 through `/feature-flow`. Done when: f10 is `accepted` and its PR is merged into `main`.
