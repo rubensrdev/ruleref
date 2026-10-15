@@ -225,3 +225,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green: 71 tests, 0 failed, 0 skipped; the focused run (UnreadableFileImportTests, ImportTests, PassageExtractorTests, NoTextLayerImportTests) passed (24).
 - Left: real encrypted or damaged rulebooks, other key lengths and permission sets; the error's presentation (f17).
 - Next: the validator reviews f10 through `/feature-flow`. Done when: f10 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f10 accepted
+- Validation 1 at 973726d returned `accept` and the user confirmed. `./init.sh` green (71 tests, 0 failed, 0 skipped); the focused UnreadableFileImportTests/ImportTests/PassageExtractorTests/NoTextLayerImportTests run passed (24). Record: `docs/validations/f10-reject-unreadable-file.md`.
+- f09's interim consequence is resolved: a locked PDF now fails as `.locked` and never reaches extraction.
+- The doc comment on `case locked` was judged acceptable, as in f09. The red-first claim was not reproduced by the read-only validator.
+- Next: the user merges the f10 PR; then `/feature-flow` on the next dependency-ready feature, f11-reimport-same-file (it must refuse `.alreadyImported` before `store.write`). Done when: f11 is `accepted` and its PR is merged into `main`.

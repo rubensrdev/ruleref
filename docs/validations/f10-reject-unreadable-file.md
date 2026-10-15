@@ -21,3 +21,4 @@
   - PDFs with restrictive permissions beyond owner-only encryption.
   - How the error reaches the user (f17).
   - iOS 26.0, a physical device, a fresh clone or clean DerivedData.
+- User: confirmed
