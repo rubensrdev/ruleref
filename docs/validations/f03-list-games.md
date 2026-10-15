@@ -18,3 +18,4 @@
   - Spanish rendering on screen.
   - `init.sh`'s own result bundle (deleted on a green run); exact Xcode build number.
   - iOS 26.0, a physical device, a fresh clone or clean DerivedData.
+- User: confirmed

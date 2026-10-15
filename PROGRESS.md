@@ -139,3 +139,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - f03 owns the minimal game screen; the import action and the ready state stay with f17.
 - Left: scenario 4 (list, empty state, game screen) is validated by hand at the end of T3.
 - Next: the validator reviews f03 through `/feature-flow`. Done when: f03 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f03 accepted
+- Validation 1 at dc7809d returned `accept` and the user confirmed. `./init.sh` green (14 tests, 0 failed, 0 skipped); the focused LibraryGamesTests run passed. Record: `docs/validations/f03-list-games.md`.
+- Spec drift for the user: the approved spec's Non-Goals give import and the `ready` state to f08; since the 2026-10-13 split they belong to f17. Behavior is unaffected; only the user can update the spec.
+- Left: scenario 4 (list, empty state, game screen) is validated by hand at the end of T3.
+- Next: the user merges the f03 PR; then `/feature-flow` on the next dependency-ready feature, f05-rulebook-id. Done when: f05 is `accepted` and its PR is merged into `main`.
