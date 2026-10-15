@@ -258,3 +258,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Open item for the user: `ContentView`'s and `NewGameSheet`'s `#Preview` containers list only `Game.self`; outside f17's spec. Align them in a small chore on `main` or a later spec.
 - Left: scenario 4 (the screen, picker, alert; Taifa shows 16 pages) is checked by hand on the iPhone 16 at the end of T3.
 - Next: the user merges the f17 PR; then the next dependency-ready feature, f13-text-search, which has no spec yet: write it with `feature-spec` and get the user's approval, then `/feature-flow`. Done when: f13's spec carries the Approval line and f13 is `accepted` with its PR merged into `main`.
+
+## 2026-10-15 — T3 closed: manual checks on the iPhone 16
+- f03 (checked 2026-10-15, main at 0c417ea): empty state (`books.vertical`), "Nuevo juego" toolbar button and sheet, list order "7 Wonders, Ábaco, Catan, Taifa", duplicate refused for "abaco", games persist after killing the app, game screen (`book.closed`) and back, Spanish texts. Also covers f02 scenario 5.
+- f17 (checked 2026-10-15, main at 42a9793, PR #11 merged): picker limited to PDF; Taifa imports and shows "Páginas 16"; the ready state offers no import button (re-import needs f12); the same file into another game is refused naming "Taifa"; an image-only PDF is refused as having no selectable text; a user-password PDF is refused as asking for a password; cancelling the picker leaves the game untouched; the rulebook survives killing the app; all texts in Spanish. "Importando…" was not observed (import finished at once); not a failure.
+- T3 closed: f02, f03, f05–f11 and f17 accepted and merged; 84 tests on main. f04 and f12 stay deferred (ADR-003).
+- Next: B4 spec round on `main`: f13, f14, f15, f16 and the new f18 (paragraph-cut calibration) written with `feature-spec`, plus ADR-004 (page viewer) and the docs alignment patch; each spec needs the user's Approval line before `/feature-flow`.
