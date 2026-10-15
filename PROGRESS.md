@@ -252,3 +252,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Not done: `ContentView`'s `#Preview` container still lists only `Game.self`; the spec does not declare that file and the build does not need it.
 - Left: scenario 4 (the screen, the picker, the alert; Taifa shows 16 pages) is validated by hand on the iPhone 16 at the end of T3.
 - Next: the validator reviews f17 through `/feature-flow`. Done when: f17 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f17 accepted
+- Validation 1 at aacf0e1 returned `accept` and the user confirmed. `./init.sh` green (84 tests, 0 failed, 0 skipped); the focused GameScreenStateTests/ImportErrorMessageTests run passed (6 tests, 11 runs). Record: `docs/validations/f17-import-action.md`.
+- Open item for the user: `ContentView`'s and `NewGameSheet`'s `#Preview` containers list only `Game.self`; outside f17's spec. Align them in a small chore on `main` or a later spec.
+- Left: scenario 4 (the screen, picker, alert; Taifa shows 16 pages) is checked by hand on the iPhone 16 at the end of T3.
+- Next: the user merges the f17 PR; then the next dependency-ready feature, f13-text-search, which has no spec yet: write it with `feature-spec` and get the user's approval, then `/feature-flow`. Done when: f13's spec carries the Approval line and f13 is `accepted` with its PR merged into `main`.

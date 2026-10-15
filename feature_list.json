@@ -637,7 +637,7 @@
     "title": "Import action in the game screen",
     "user_visible_behavior": "From a game without a rulebook, the user picks a PDF with the system file picker and imports it; the game screen then shows the rulebook as ready, with its page count.",
     "depends_on": ["f03-list-games", "f11-reimport-same-file"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test: the game screen state is empty without a rulebook and ready with the rulebook's page count after an import.",
       "Manual on the iPhone 16: import the Taifa PDF from Files; the game screen shows it as ready with 16 pages."
@@ -664,6 +664,26 @@
           "The tests were not run red before the implementation: they did not compile until the types existed.",
           "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/GameScreenStateTests -only-testing:RuleRefTests/ImportErrorMessageTests; git diff fec0249..aacf0e1",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0; the focused run passes scenarios 1-3; the diff matches the spec's Expected File Changes and Validator Checklist.",
+        "observed": "Independent validator run (feature-validator, validation 1). init.sh exit 0: PASS xcode-version (Xcode 27.0), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results (totalTestCount=84, failedTests=0, skippedTests=0, expectedFailures=0), catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED, 6 tests / 11 runs passed (GameScreenStateTests/screenStateFromEmptyToReady; ImportErrorMessageTests: keysAreDistinct, alreadyImportedKeyIsExact, gameNameIsAnArgument, successfulOutcomesProduceNoMessage, failureMatchesTheError x6). Diff reviewed in full: only declared files changed; GameView switches only on GameScreenState; fileImporter single PDF; security-scoped access balanced by defer only when started; one Import Failed alert with OK; 11 catalog keys with translated es values matching the spec. ContentView's #Preview container (Game.self) is outside the spec and left unchanged.",
+        "context": {
+          "date": "2026-10-15 16:28 +0200",
+          "commit": "aacf0e1dece2e1c08a77623f24699b1db0be7a64",
+          "xcode": "Xcode 27.0 (27A266a, from the build log)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (as reported by init.sh; runtime build not checked)",
+          "workspace": "Existing checkout on branch feat/f17-import-action, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Scenario 4 and the whole interface (button, picker limited to PDF, progress, alert and OK, Pages row with 16 for Taifa, Spanish on screen); no UI tests by design, the user validates by hand on the iPhone 16.",
+          "A real security-scoped URL from Files and its access balance; the return value of startAccessingSecurityScopedResource() for a temporary file.",
+          "The picker's .failure path; leaving the screen during an import; which executor runs onCompletion.",
+          "Whether the #Preview containers listing only Game.self include Rulebook and Passage through relationships; previews were not rendered.",
+          "The red-first run of the new tests (validator is read-only).",
+          "iOS 26.0 (deployment target), a physical device, a fresh clone or clean DerivedData; the result bundle was not inspected with xcresulttool."
         ]
       }
     ],

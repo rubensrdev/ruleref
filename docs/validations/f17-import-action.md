@@ -9,3 +9,4 @@
   - Low: no test for the picker's `.failure` path, a real security-scoped URL from Files, or leaving the screen during an import; by design, listed in `not_verified`.
   - Info: security checklist found nothing relevant.
 - Not verified: scenario 4 and the whole interface (button, picker limited to PDF, progress, alert and OK, Pages row with 16 for Taifa, Spanish on screen); a real security-scoped URL and its access balance; the picker's `.failure` path; leaving the screen during an import; which executor runs `onCompletion`; whether the `#Preview` containers pull in `Rulebook` and `Passage` through relationships; the red-first run; iOS 26.0, a physical device, a fresh clone or clean DerivedData.
+- User: confirmed
