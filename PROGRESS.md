@@ -126,3 +126,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Gate notes: the Stop hook's `./init.sh` failed several times while a subagent was mid-change or running its own `xcodebuild` (once with `Terminated: 15`); those runs say nothing about the result. When `xcodebuild` dies without a result bundle, test-results prints a Python traceback instead of a clean FAIL (harness fix pending on `main`).
 - Left: scenario 5 (the sheet) is validated by hand at the end of T3.
 - Next: the user merges the f02 PR; then the harness fix for the test-results traceback on `main`; then `/feature-flow` on f03-list-games. Done when: f03 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — Harness: test-results fails cleanly; B2b recorded
+- Recorded late (B2b, 6983f83, 2026-10-14): `./init.sh` retries `xcodebuild test` once, only when the log shows a simulator launch failure and no `.swift:line:column` location, because two runs that day failed while launching the test host and passed on rerun. Dry-run in five scenarios. A second failure in a row is not retried; if that happens, reset the simulator before the retry (dry-run first).
+- Recorded late (B2b): live write probe inside the validator subagent; `echo` and `touch .probe-validator-write` were blocked by `validator-readonly-bash.sh` and no file was created. This closes the T3 done-when item "a validator write attempt blocked live".
+- `init.sh`: when `xcodebuild` dies before the result bundle is complete, test-results prints one clear line and fails, instead of a Python `JSONDecodeError` traceback. The exit status is unchanged.
+- Next: `/feature-flow` on f03-list-games, on its own branch. Done when: f03 is `accepted` and its PR is merged into `main`.

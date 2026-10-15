@@ -314,7 +314,10 @@ if [ "$PREFLIGHT_OK" -eq 1 ] && [ "$RULES_OK" -eq 1 ]; then
 
   if [ -d "$RESULT_BUNDLE" ] && xcrun xcresulttool get test-results summary --path "$RESULT_BUNDLE" 2>/dev/null | python3 -c '
 import json, sys
-summary = json.load(sys.stdin)
+try:
+    summary = json.load(sys.stdin)
+except ValueError:
+    print("xcresulttool returned no readable summary; xcodebuild probably ended before the result bundle was complete."); sys.exit(1)
 fields = ("totalTestCount", "failedTests", "skippedTests", "expectedFailures")
 missing = [f for f in fields if f not in summary]
 if missing:
