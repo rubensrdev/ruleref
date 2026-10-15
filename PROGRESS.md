@@ -199,3 +199,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Found: `#expect(throws:)` with an async closure needs a `sending` result, so a closure returning a main-actor `@Model` must discard it. As in f02, `fetchCount` returns a stale count right after a failed save and rollback; the tests count with `fetch`. `block-dangerous-commands.sh` also blocks `mkdir` in a command that mentions the Xcode project.
 - Left: the import action and ready state (f17); Taifa's segmentation decision (ADR-002 or a later spec, measured by f16).
 - Next: the validator reviews f08 through `/feature-flow`. Done when: f08 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f08 accepted
+- Validation 1 at fc770ab returned `accept` and the user confirmed. `./init.sh` green (62 tests, 0 failed, 0 skipped); the focused RulebookStoreTests/ImportTests/TaifaImportTests run passed (17). Record: `docs/validations/f08-atomic-import.md`.
+- Carry into f11: with the same PDF in two games, a failed save's `removeFile` deletes the file the first game uses; f11 must refuse with `.alreadyImported` before `store.write`.
+- Open for the user: Taifa's coarse segmentation (40 passages for 16 pages) should be decided before f13 (ADR-002 finding). Align `ContentView`'s `#Preview` container in f17.
+- Next: the user merges the f08 PR; then `/feature-flow` on the next dependency-ready feature, f09-reject-no-text-layer. Done when: f09 is `accepted` and its PR is merged into `main`.

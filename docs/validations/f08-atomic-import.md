@@ -22,3 +22,4 @@
   - `ContentView` preview rendering.
   - Import from a picked file with security-scoped access (f17); persistence across launches with the on-disk store and `RulebookStore.app` in the real sandbox.
   - iOS 26.0, a physical device, a fresh clone or clean DerivedData; the Xcode build number.
+- User: confirmed

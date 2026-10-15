@@ -398,7 +398,7 @@
     "title": "Import a rulebook atomically",
     "user_visible_behavior": "Importing into a game without a rulebook stores the file copy, the rulebook and its passages atomically.",
     "depends_on": ["f02-create-game", "f05-rulebook-id", "f06-extract-passages", "f07-join-hyphenation"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test: after import, passage count equals extraction output and the stored file exists.",
       "Test: the Taifa fixture imports with 16 pages."
@@ -427,6 +427,31 @@
           "Persistence across app launches with the app's on-disk store, and RulebookStore.app writing inside the real app sandbox.",
           "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/RulebookStoreTests -only-testing:RuleRefTests/ImportTests -only-testing:RuleRefTests/TaifaImportTests -quiet; git diff 7b644af...fc770ab -- RuleRef/Game.swift RuleRef/RulebookID.swift RuleRef/RuleRefApp.swift (plus PassageSegmenter.swift, PassageExtractor.swift, LibraryTests.swift, LibraryGamesTests.swift, ContentView.swift, GameView.swift); code review of the full 7b644af..fc770ab diff against the spec's Validator Checklist (validator, round 1)",
+        "expected": "init.sh exits 0 with every check PASS, 0 failed and 0 skipped tests; the 17 focused tests (scenarios 1-6 plus store, missing-file and save-failure tests) pass; the declared files show only the declared changes and paragraphGapRatio and the f02/f03 test containers are unchanged; prepare is @concurrent with a local PDFDocument and only Sendable values crossing; no nonisolated @Model; file written atomically before a single save; rollback and file removal on save failure; cascades on Game.rulebook and Rulebook.passages.",
+        "observed": "init.sh exit 0: totalTestCount=62, failedTests=0, skippedTests=0, expectedFailures=0; all 11 checks PASS (xcode-version Xcode 27.0, simulator iPhone 18 Pro iOS 27.0, no-pdf-in-app, catalog-coverage, ...). Focused run exit 0: all 17 tests (26 test-case runs) passed, none failed. Declared-changes diff: Game.swift +2 (cascade rulebook relationship), RulebookID.swift +9 (init?(hex:)), RuleRefApp.swift one line (three model types); the other listed files have no diff. Review: every checklist item holds. Info/Low notes: a failed save's removeFile could delete a file another game uses when the same PDF is in two games (f11 must refuse before the write); the save-failure test does not separately assert that the file was written before it was removed; the re-check after the await and the cascades are verified in code only. ContentView's #Preview container (for: Game.self) is not a defect: ContentView is outside the declared changes, and the unchanged for: Game.self test containers show SwiftData reaches Rulebook and Passage through the relationship. Verdict: accept.",
+        "context": {
+          "date": "2026-10-15",
+          "commit": "fc770abee3103a4229b7b896006463365b0de9a9",
+          "xcode": "Xcode 27.0 (as reported by init.sh; build number not checked by the validator)",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Clean working tree on feat/f08-atomic-import, warm DerivedData, not a fresh clone"
+        },
+        "not_verified": [
+          "The second game.rulebook check after the await: no test triggers it; checked in code only.",
+          "Cascade deletes of Game -> Rulebook -> Passage at runtime: no test deletes (f04, f12).",
+          "Save failures other than a read-only store (disk full, validation, migration), and removeFile failing during the rollback.",
+          "In saveFailureRollsBackAndRemovesTheFile, that the file was written before it was removed; inferred from the code, not asserted.",
+          "Taifa's per-page passage counts and attachment text: I did not export the result-bundle attachment (xcresulttool export is not allowed for the validator); only pageCount == 16, non-empty passages and the stored file's bytes were checked by the passing test.",
+          "ContentView #Preview rendering with the for: Game.self container; previews were not rendered.",
+          "Import from a real picked file with security-scoped access (f17).",
+          "Persistence across app launches with the on-disk store, and RulebookStore.app writing inside the real app sandbox.",
+          "iOS 26.0 (the deployment target) and a physical device.",
+          "A fresh clone or clean DerivedData.",
+          "The Xcode build number (only 'Xcode 27.0' was seen in init.sh output)."
         ]
       }
     ],
