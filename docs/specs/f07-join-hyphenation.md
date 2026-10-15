@@ -1,6 +1,6 @@
 # Feature Implementation Spec: Join hyphenation and normalise whitespace
 
-Approval: approved by the user on 2026-10-13
+Approval: approved by the user on 2026-10-15
 
 ## Source Feature
 
@@ -128,7 +128,7 @@ Idempotence follows from the order: after rule c no "\n" and no U+00AD are left,
 
 `PassageExtractor.extract(from:rulebookID:)` changes in one place: each segment's text goes through `PassageText.normalized(_:)` before the `ExtractedPassage` is built. A segment whose normalized text is empty (only soft hyphens and whitespace) is skipped before ordinals are assigned, so ordinals stay consecutive and no passage has empty text. `lines(on:)`, locators and bounds do not change.
 
-Declared change outside f07's own files: the expected texts in `RuleRefTests/PassageExtractorTests.swift` (f06) become the normalized texts, for example "line one line two" instead of "line one\nline two". That is the only change allowed in f06's tests. `PassageSegmenterTests` and `SyntheticPDF` are not touched. The approved f06 spec is not edited; it stays as the record of f06's version.
+Declared change outside f07's own files: the expected texts in `RuleRefTests/PassageExtractorTests.swift` (f06) become the normalized texts, for example "line one line two" instead of "line one\nline two". Second declared change, added on 2026-10-15 after a spec-gap stop: scenario 4's test (`boundsAreNonEmptyInsideTheCropBoxAndContainTheirLines`) counted each passage's lines by splitting its text on "\n", which normalized text no longer has. It now takes each passage's line count from its layout, which the test already defines (for example `twoParagraphs.map(\.count)`), and keeps every assertion. These two are the only changes allowed in f06's tests. `PassageSegmenterTests` and `SyntheticPDF` are not touched. The approved f06 spec is not edited; it stays as the record of f06's version.
 
 Risks:
 
@@ -142,7 +142,7 @@ Risks:
 - `RuleRef/PassageExtractor.swift` — modify; normalize each segment's text and skip empty results before assigning ordinals.
 - `RuleRefTests/PassageTextTests.swift` — create; scenarios 2–8.
 - `RuleRefTests/HyphenationExtractionTests.swift` — create; scenario 1, with `SyntheticPDF`.
-- `RuleRefTests/PassageExtractorTests.swift` — modify; expected texts only (declared above).
+- `RuleRefTests/PassageExtractorTests.swift` — modify; expected texts and scenario 4's line counts only (declared above).
 
 ## Visual Design Impact
 
@@ -159,7 +159,7 @@ Risks:
 
 1. Write failing `PassageTextTests` for scenarios 2–8; add `PassageText`.
 2. Write failing `HyphenationExtractionTests` for scenario 1; apply `PassageText.normalized(_:)` in `PassageExtractor.extract(from:rulebookID:)`, with the empty-text skip.
-3. Update the expected texts in `PassageExtractorTests` to the normalized texts, and nothing else there.
+3. Update the expected texts in `PassageExtractorTests` to the normalized texts, and make scenario 4's test take each passage's line count from its layout; nothing else there.
 4. Run `./init.sh`. Record evidence in `feature_list.json` and an entry in `PROGRESS.md`.
 
 ## Implementation Tasks
@@ -168,14 +168,14 @@ Risks:
 - [ ] `PassageText.swift` (`nonisolated enum`, rules a → b → c, no Foundation).
 - [ ] `HyphenationExtractionTests`: `#require` on the raw lines, then "construir" in the passage text.
 - [ ] `PassageExtractor.swift`: normalize, skip empty, then assign ordinals.
-- [ ] `PassageExtractorTests`: expected texts updated, no other change.
+- [ ] `PassageExtractorTests`: expected texts updated and scenario 4's line counts taken from the layouts, with all its assertions kept; no other change.
 - [ ] `./init.sh` green; evidence and `PROGRESS.md` updated.
 
 ## Verification Plan
 
 - `./init.sh` exits 0 with every check PASS; test-results shows the new tests, 0 failed, 0 skipped.
 - Focused run: `xcodebuild test ... -only-testing:RuleRefTests/PassageTextTests -only-testing:RuleRefTests/HyphenationExtractionTests -only-testing:RuleRefTests/PassageExtractorTests -only-testing:RuleRefTests/PassageSegmenterTests`.
-- `git diff main...HEAD -- RuleRefTests/PassageExtractorTests.swift RuleRefTests/PassageSegmenterTests.swift RuleRefTests/SyntheticPDF.swift RuleRef/PassageSegmenter.swift` (f07 runs on its own branch from `main`, as decided for T3) shows changes only to expected text literals in `PassageExtractorTests`.
+- `git diff main...HEAD -- RuleRefTests/PassageExtractorTests.swift RuleRefTests/PassageSegmenterTests.swift RuleRefTests/SyntheticPDF.swift RuleRef/PassageSegmenter.swift` (f07 runs on its own branch from `main`, as decided for T3) shows changes only to expected text literals and to how scenario 4's test gets each passage's line count in `PassageExtractorTests`.
 - No UI tests and no E2E, by design (`AGENTS.md`, Tests); f07 has no interface.
 
 ## Evidence To Capture
@@ -190,6 +190,6 @@ Risks:
 - [ ] Scenarios 1–8 are covered by passing tests; scenario 1 `#require`s the raw lines "cons-" and "truir" before asserting "construir".
 - [ ] `PassageText` is a `nonisolated` pure `enum` with no PDFKit and no Foundation; the passes run in the order a → b → c as specified, with exactly U+002D and U+2010 as hyphens.
 - [ ] `PassageExtractor` normalizes every segment's text, skips empty results before assigning ordinals, and changes nothing else.
-- [ ] `PassageSegmenter`, `PassageSegmenterTests` and `SyntheticPDF` are unchanged; in `PassageExtractorTests` only expected texts changed.
+- [ ] `PassageSegmenter`, `PassageSegmenterTests` and `SyntheticPDF` are unchanged; in `PassageExtractorTests` only expected texts and scenario 4's line counts changed.
 - [ ] No Unicode normalization, ligature or quote mapping, search, persistence or UI was added.
 - [ ] `feature_list.json` and `PROGRESS.md` were updated correctly.

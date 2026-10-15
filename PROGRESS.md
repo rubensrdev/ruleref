@@ -170,3 +170,24 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Validation 1 at 6669268 returned `accept` and the user confirmed. `./init.sh` green (37 tests, 0 failed, 0 skipped); the focused PassageSegmenterTests/PassageExtractorTests run passed (18). Record: `docs/validations/f06-extract-passages.md`.
 - Open for the user: `docs/risks-and-open-questions.md` still lists multi-column extraction as deferred and geometry vs. Vision reading order as open, although ADR-002 is Accepted (docs follow-up on `main`); the approved f06 spec says ADR-002 is not written yet (wording only, no conflict).
 - Next: the user merges the f06 PR; then `/feature-flow` on the next dependency-ready feature, f07-join-hyphenation. Done when: f07 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f07 stopped on a spec gap
+- f07-join-hyphenation is `in_progress` on branch `feat/f07-join-hyphenation`. Done (commit 0c1087d): `PassageText.normalized(_:)` (`nonisolated` enum, no Foundation, rules a → b → c) and `PassageTextTests` for scenarios 2-8; `./init.sh` green, 44 tests, 0 failed, 0 skipped.
+- Gap: f06's `PassageExtractorTests.boundsAreNonEmptyInsideTheCropBoxAndContainTheirLines()` (scenario 4) counts each passage's lines with `passage.text.split(separator: "\n")`. Normalized text has no "\n", so every passage counts as one line and the test fails. The approved f07 spec allows only expected-text-literal changes in that file, so the test cannot be fixed without a spec decision.
+- Seen in a focused run with the full change: every other test passes, including scenario 1 (PDFKit returns "cons-" and "truir" as drawn) and the three updated expected texts.
+- Stashed: the extractor change, `HyphenationExtractionTests` and the expected-text updates, in git stash "f07 step 2 WIP (scenario 4 red)".
+- Next: the user decides how scenario 4 counts lines (for example from the layout's known line counts, or by consuming lines until their normalized join equals the passage text) and re-approves the f07 spec; then the implementer applies the stash and finishes. Done when: `./init.sh` is green with the extractor change and f07 is `passing` with evidence.
+
+## 2026-10-15 — T3: f07 implemented
+- The user re-approved the f07 spec (585abfe): scenario 4 takes each passage's line count from its layout. f07-join-hyphenation is `passing` on branch `feat/f07-join-hyphenation` (code commits 0c1087d, b00d743).
+- `PassageExtractor.extract(from:rulebookID:)` runs each segment's text through `PassageText.normalized(_:)` and skips empty results before taking the ordinal. `HyphenationExtractionTests` covers scenario 1 on a synthetic PDF; f06's `PassageExtractorTests` changed only in its three expected texts and in scenario 4's line counts (stash applied and dropped).
+- `./init.sh` green: 45 tests, 0 failed, 0 skipped; focused run of the four passage suites passed (26).
+- Left: Taifa's real hyphenation, U+2011 and PDFKit's handling of drawn U+00AD (f08); iOS 26.0 and device runs.
+- Next: the validator reviews f07 through `/feature-flow`. Done when: f07 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f07 accepted
+- Validation 1 at bfad103 returned `accept` and the user confirmed. `./init.sh` green (45 tests, 0 failed, 0 skipped); the focused run of the four passage suites passed (26). Record: `docs/validations/f07-join-hyphenation.md`.
+- Process: the first implementation run stopped on a spec gap (f06's scenario 4 counted lines by splitting on "\n"); the user re-approved the spec with layout-based line counts and the resumed run passed. A spec gap is a `stop`, not a verdict.
+- Found: the validator hook blocks `-resultBundlePath`, so focused runs use the default DerivedData bundle.
+- Left for f08: Taifa's real hyphenation, U+2011 and how PDFKit reports a drawn U+00AD.
+- Next: the user merges the f07 PR; then `/feature-flow` on the next dependency-ready feature, f08-atomic-import. Done when: f08 is `accepted` and its PR is merged into `main`.

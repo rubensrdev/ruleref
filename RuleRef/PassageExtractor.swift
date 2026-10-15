@@ -25,8 +25,11 @@ nonisolated enum PassageExtractor {
             guard let page = document.page(at: pageIndex) else { continue }
             let segments = PassageSegmenter.segments(of: lines(on: page), pageBounds: page.bounds(for: .cropBox))
             for segment in segments {
+                let text = PassageText.normalized(segment.text)
+                // Skipped before the ordinal is taken, so ordinals stay consecutive.
+                guard !text.isEmpty else { continue }
                 let locator = Locator.pdf(rulebookID: rulebookID, pageIndex: pageIndex, bounds: segment.bounds)
-                passages.append(ExtractedPassage(text: segment.text, ordinal: passages.count, locator: locator))
+                passages.append(ExtractedPassage(text: text, ordinal: passages.count, locator: locator))
             }
         }
         return passages

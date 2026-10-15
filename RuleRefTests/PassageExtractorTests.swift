@@ -70,7 +70,7 @@ struct PassageExtractorTests {
 
         let passages = PassageExtractor.extract(from: document, rulebookID: Self.rulebookID)
 
-        #expect(passages.map(\.text) == Self.twoParagraphs.map { $0.joined(separator: "\n") })
+        #expect(passages.map(\.text) == Self.twoParagraphs.map { $0.joined(separator: " ") })
         #expect(passages.map(\.ordinal) == [0, 1])
         #expect(passages.map { Self.pageIndex(of: $0) } == [0, 0])
     }
@@ -85,7 +85,7 @@ struct PassageExtractorTests {
 
         let passages = PassageExtractor.extract(from: document, rulebookID: Self.rulebookID)
 
-        #expect(passages.map(\.text) == ["A road ends at a city\nor at a crossing", "or at another road\nalready on the table."])
+        #expect(passages.map(\.text) == ["A road ends at a city or at a crossing", "or at another road already on the table."])
         #expect(passages.map(\.ordinal) == [0, 1])
         #expect(passages.map { Self.pageIndex(of: $0) } == [0, 1])
     }
@@ -102,17 +102,24 @@ struct PassageExtractorTests {
 
         let passages = PassageExtractor.extract(from: document, rulebookID: Self.rulebookID)
 
-        #expect(passages.map(\.text) == [Self.wrappedTexts.joined(separator: "\n")])
+        #expect(passages.map(\.text) == [Self.wrappedTexts.joined(separator: " ")])
         #expect(passages.map(\.ordinal) == [0])
     }
 
     // MARK: Scenario 4
 
     @Test func boundsAreNonEmptyInsideTheCropBoxAndContainTheirLines() throws {
-        for pages in [Self.twoParagraphPages(), Self.continuedParagraphPages(), Self.wrappedImagePages()] {
+        // Line count of each passage, by ordinal, taken from its layout: normalized text has no "\n" to count.
+        let layouts: [(pages: [SyntheticPDF.Page], lineCounts: [Int])] = [
+            (Self.twoParagraphPages(), Self.twoParagraphs.map(\.count)),
+            (Self.continuedParagraphPages(), [2, 2]),
+            (Self.wrappedImagePages(), [Self.wrappedTexts.count]),
+        ]
+        for (pages, lineCounts) in layouts {
             let document = try SyntheticPDF.document(pages: pages)
             let passages = PassageExtractor.extract(from: document, rulebookID: Self.rulebookID)
             try #require(!passages.isEmpty)
+            try #require(passages.count == lineCounts.count)
 
             for pageIndex in 0..<document.pageCount {
                 let page = try #require(document.page(at: pageIndex))
@@ -122,7 +129,7 @@ struct PassageExtractorTests {
                     let bounds = Self.bounds(of: passage)
                     #expect(!bounds.isEmpty)
                     #expect(cropBox.contains(bounds))
-                    let lineCount = passage.text.split(separator: "\n", omittingEmptySubsequences: false).count
+                    let lineCount = lineCounts[passage.ordinal]
                     try #require(remaining.count >= lineCount)
                     for line in remaining.prefix(lineCount) {
                         #expect(bounds.contains(line.bounds), "\(line.text) is outside its passage")
