@@ -157,3 +157,11 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Validation 1 at e95c9d7 returned `accept` and the user confirmed. `./init.sh` green (19 tests, 0 failed, 0 skipped); the focused RulebookIDTests run passed (9 test runs). Record: `docs/validations/f05-rulebook-id.md`.
 - Open for the user: whether `block-dangerous-commands.sh` should stop blocking shell writes to Swift sources in commands that also mention the Xcode project (harness follow-up on `main`, outside f05).
 - Next: the user merges the f05 PR; then `/feature-flow` on the next dependency-ready feature, f06-extract-passages. Done when: f06 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f06 implemented
+- f06-extract-passages is `passing` on branch `feat/f06-extract-passages` (code commits 13e01ac, 6c8556a; docs 04e4342): `Locator` (one case, `pdf(rulebookID:pageIndex:bounds:)`), `ExtractedPassage`, `PageLine`, `PassageSegmenter` (cut on a gap > 0.5 × the page's median line height or a line above the previous one; whitespace lines ignored; bounds clipped to the crop box) and `PassageExtractor` (skips pages with zero characters before `selection(for:)`; ordinals consecutive across the rulebook). All `nonisolated`; PDFKit model classes compile without isolation escapes on the iOS 27.0 SDK.
+- `./init.sh` green: 37 tests, 0 failed, 0 skipped. Scenarios 1-7 on synthetic PDFs (`RuleRefTests/SyntheticPDF.swift`, Core Graphics and Core Text, no UIKit), 8-9 on `PageLine` values; a `>=` mutation fails the exact-threshold test.
+- Found: PDFKit reads text wrapped around an image as a second column when the full-width lines do not reach the narrow lines' x range; the scenario 3 layout uses full-width lines that span it. Worth checking on Taifa pp. 3 and 12 in f08.
+- Docs: the segmentation rule is decided in `docs/risks-and-open-questions.md`; `docs/domain-model.md` says "only extraction builds locators" is a convention.
+- Left: Taifa calibration (f08); iOS 26 SDK isolation of PDFKit classes not checked.
+- Next: the validator reviews f06 through `/feature-flow`. Done when: f06 is `accepted` and its PR is merged into `main`.
