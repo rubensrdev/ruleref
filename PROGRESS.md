@@ -184,3 +184,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green: 45 tests, 0 failed, 0 skipped; focused run of the four passage suites passed (26).
 - Left: Taifa's real hyphenation, U+2011 and PDFKit's handling of drawn U+00AD (f08); iOS 26.0 and device runs.
 - Next: the validator reviews f07 through `/feature-flow`. Done when: f07 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f07 accepted
+- Validation 1 at bfad103 returned `accept` and the user confirmed. `./init.sh` green (45 tests, 0 failed, 0 skipped); the focused run of the four passage suites passed (26). Record: `docs/validations/f07-join-hyphenation.md`.
+- Process: the first implementation run stopped on a spec gap (f06's scenario 4 counted lines by splitting on "\n"); the user re-approved the spec with layout-based line counts and the resumed run passed. A spec gap is a `stop`, not a verdict.
+- Found: the validator hook blocks `-resultBundlePath`, so focused runs use the default DerivedData bundle.
+- Left for f08: Taifa's real hyphenation, U+2011 and how PDFKit reports a drawn U+00AD.
+- Next: the user merges the f07 PR; then `/feature-flow` on the next dependency-ready feature, f08-atomic-import. Done when: f08 is `accepted` and its PR is merged into `main`.

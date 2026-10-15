@@ -342,7 +342,7 @@
     "title": "Join hyphenation and normalise whitespace",
     "user_visible_behavior": "Extraction joins line-break hyphenation and normalises whitespace.",
     "depends_on": ["f06-extract-passages"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test: a synthetic \"cons-⏎truir\" yields passage text containing \"construir\"."
     ],
@@ -365,6 +365,28 @@
           "How PDFKit reports U+00AD drawn in a PDF: soft hyphens are tested on string literals only.",
           "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/PassageTextTests -only-testing:RuleRefTests/HyphenationExtractionTests -only-testing:RuleRefTests/PassageExtractorTests -only-testing:RuleRefTests/PassageSegmenterTests; xcrun xcresulttool get test-results summary --path <focused run .xcresult>; git diff e6daeb6...bfad103 -- RuleRefTests/PassageExtractorTests.swift RuleRefTests/PassageSegmenterTests.swift RuleRefTests/SyntheticPDF.swift RuleRef/PassageSegmenter.swift",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0; the focused run passes all four suites with 0 failed and 0 skipped; every Validator Checklist item of docs/specs/f07-join-hyphenation.md holds in code and tests; the protected-files diff shows only expected-text literals and scenario 4's line-count source changed in PassageExtractorTests.",
+        "observed": "Independent validation 1, no fixes made. init.sh exit 0: totalTestCount=45, failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.0), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED; xcresult summary result=Passed, totalTestCount=26, passedTests=26, failedTests=0, skippedTests=0, no runtime warnings; 43 test runs, 24 of them from 7 parameterized tests (idempotence over all 12 inputs of scenarios 2-6 and 8). Diff check: PassageSegmenter.swift, PassageSegmenterTests.swift and SyntheticPDF.swift unchanged; PassageExtractorTests changes only the three expected texts (\\n joins to space joins) and scenario 4's line counts (from the layouts: twoParagraphs.map(\\.count), [2, 2] matching the inline continued layout, [wrappedTexts.count]), plus try #require(passages.count == lineCounts.count) guarding the index; all earlier assertions kept. Code review: PassageText is a nonisolated enum with no imports, passes a -> b -> c, hyphens exactly U+002D and U+2010, rule b on unicode scalars; PassageExtractor normalizes, skips empty before taking the ordinal, nothing else changed. Scenario 1 #requires the raw lines \"cons-\" and \"truir\" and in-paragraph spacing before expecting \"construir\" and no \"cons-\".",
+        "context": {
+          "date": "2026-10-15 11:42 CEST",
+          "commit": "bfad10383411354754e6107fd57329b9ba7b1747",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on feat/f07-join-hyphenation, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "How PDFKit reports a drawn U+00AD, U+2010 or U+2011: soft hyphens tested on string literals only.",
+          "Real rulebooks and Taifa's hyphenation: f08.",
+          "Continuation lines starting with whitespace (the hyphen would be kept).",
+          "Idempotence when whitespace is followed by a combining mark that belongs to no letter (SE-0221 leaves it undefined): reasoned through only, outside the spec's inputs.",
+          "Runs on iOS 26.0 (the deployment target) and on a physical device.",
+          "Runs from a fresh clone or with clean DerivedData.",
+          "The implementer's red-first test order and the stash apply/drop: git stash list is not an allowed validator command.",
+          "No result bundle at a validator-chosen path (the hook blocks -resultBundlePath); the default DerivedData bundle was used."
         ]
       }
     ],

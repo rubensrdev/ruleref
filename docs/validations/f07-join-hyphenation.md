@@ -23,3 +23,4 @@ Spec re-approved on 2026-10-15 (585abfe) after a spec-gap stop on the first impl
   - iOS 26.0, a physical device, a fresh clone or clean DerivedData.
   - The implementer's red-first order and the stash apply/drop (validator cannot run `git stash list`).
   - No result bundle at a validator-chosen path (the hook blocks `-resultBundlePath`).
+- User: confirmed
