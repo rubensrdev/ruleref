@@ -11,6 +11,7 @@ Status of every open decision from `docs/idea.md`:
 | Answer not in rulebook / exceptions | **Decided for m4**: explicit no-match state, never approximate (F14). AI behaviour **Deferred**: after m4, measured with 3–5 unanswerable questions in the eval set | `docs/build-brief.md` F14 |
 | Multi-column extraction | **Deferred**: ADR-002 (T3) | below |
 | UI language | **Decided**: Spanish and English via String Catalog (`Localizable.xcstrings`) | this table |
+| Passage segmentation rule | **Decided** (f06): a new passage starts when the vertical gap is greater than 0.5 × the page's median line height or a line lies above the previous one; a page break always cuts; no font or indentation rule. Recalibrated on Taifa pp. 3 and 12 in f08 if needed | `docs/specs/f06-extract-passages.md`, `PassageSegmenter` |
 
 ## Blocking next phase
 
@@ -19,7 +20,6 @@ None.
 ## Implementation-time
 
 - **Multi-column extraction (ADR-002, T3).** Geometry-based reading order vs. Vision document recognition. The MVP ships single-column only.
-- **Passage segmentation rule.** How paragraphs are cut from PDFKit lines (vertical gap threshold, indentation). Settle on Taifa pp. 3 and 12 (text wrapping images) early, before search is built on top.
 - **Ranking ties and match display.** F13 fixes the order. Whether a match shows a text excerpt or only the page number is decided in its spec.
 - **Page viewer and "no UIKit" (F15).** The viewer will use PDFKit's `PDFView` inside a `UIViewRepresentable`, the only exception to "no UIKit" (ADR-001). To be decided in its own ADR within the T4 spec (P4). Check whether `import PDFKit` is enough or that single file also needs `import UIKit`; `init.sh` currently rejects any UIKit import, so the ADR must also say how the gate allows it.
 

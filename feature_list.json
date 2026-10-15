@@ -283,13 +283,57 @@
     "title": "Extract ordered passages",
     "user_visible_behavior": "Extraction turns a text-layer PDF into ordered passages, each with a valid locator.",
     "depends_on": ["f05-rulebook-id"],
-    "status": "not_started",
+    "status": "accepted",
     "verification": [
       "Build a synthetic PDF in the test with PDFKit.",
       "Test: expected texts, order and page indices.",
       "Test: every rect is inside its page bounds."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/PassageSegmenterTests -only-testing:RuleRefTests/PassageExtractorTests",
+        "expected": "init.sh exits 0 with every check PASS; test-results shows the new PassageSegmenterTests and PassageExtractorTests with failedTests=0 and skippedTests=0; scenarios 1-7 covered by tests on synthetic PDFs written with Core Graphics and Core Text (no UIKit) and read back with PDFKit, scenarios 8-9 by tests on PageLine values.",
+        "observed": "init.sh exit 0, no retry. Test-results line: totalTestCount=37, failedTests=0, skippedTests=0, expectedFailures=0 (19 before f06, plus 18). Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Focused run (before the commit, same code): TEST SUCCEEDED, 18 passed. Reader test: PassageExtractorTests/linesAreReadOnePerDrawnLineInDrawingOrder() (one PageLine per drawn line, drawn texts in order, spacing precondition). Scenario tests: 1 PassageExtractorTests/twoParagraphsOnOnePage(); 2 paragraphContinuedOnTheNextPage(); 3 textWrappingAnImage(); 4 boundsAreNonEmptyInsideTheCropBoxAndContainTheirLines() (layouts of 1-3); 5 aPageWithoutText(); 6 determinism(); 7 rulebookID(); 8 PassageSegmenterTests/cutThresholdGapOfExactlyHalfTheMedianStaysInOnePassage(), cutThresholdGapJustAboveHalfTheMedianStartsANewPassage(), cutThresholdLineAboveThePreviousOneStartsANewPassage(), plus cutThresholdOverlapThatDoesNotMoveUpDoesNotCut() and cutThresholdRatioIsOneHalf(); 9 ignoredLinesWhitespaceLineAddsNoText(), ignoredLinesWhitespaceLineDoesNotAffectTheMedian(), ignoredLinesOverhangingSegmentIsClippedToThePage(), ignoredLinesGroupOutsideThePageYieldsNoSegment(), ignoredLinesOnlyWhitespaceYieldsNoSegments(). Each PDF-based test #requires the spacing precondition on the measured PageLine bounds. Mutation check, not committed: with gap >= threshold instead of >, the PassageSegmenterTests run failed only cutThresholdGapOfExactlyHalfTheMedianStaysInOnePassage(). Layout finding: in a first scenario 3 layout the full-width lines (x 72 to about 222) did not reach the shifted lines (x 320), and PDFKit returned the last full-width line before the shifted ones (reading them as a second column), giving 3 passages; the committed layout has full-width lines spanning the shifted lines' x range, as in a real wrap, and PDFKit returns drawing order. No catalog keys added (no UI). PDFKit model classes compiled as nonisolated with no isolation escapes on the iOS 27.0 SDK.",
+        "context": {
+          "date": "2026-10-15 10:59 CEST",
+          "commit": "04e43426408e492f4ac5ba4a4cf75d1c3436745f",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f06-extract-passages, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Real rulebooks and the Taifa calibration of the 0.5 ratio (pp. 3 and 12): f08.",
+          "Multi-column layouts (ADR-002); PDFKit reading order was only seen on the synthetic layouts, and a wrap whose full-width lines do not span the narrow lines' x range is read as two columns and split.",
+          "Rotated pages and pages whose crop box differs from the media box: the synthetic PDFs have neither.",
+          "iOS 26 SDK isolation of PDFDocument, PDFPage and PDFSelection: only the iOS 27.0 SDK is installed.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "The tests were not run red before the implementation: they did not compile until the types existed; the mutation check stands in for the threshold only.",
+          "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/PassageSegmenterTests -only-testing:RuleRefTests/PassageExtractorTests; xcrun xcresulttool get test-results summary --path <focused run .xcresult>",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0; the focused run passes all PassageSegmenterTests and PassageExtractorTests with 0 failed and 0 skipped; every Validator Checklist item of docs/specs/f06-extract-passages.md holds in code and tests.",
+        "observed": "Independent validation 1, no fixes made. init.sh exit 0: totalTestCount=37, failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.0), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED; xcresult summary result=Passed, totalTestCount=18, passedTests=18, failedTests=0, skippedTests=0, no runtime warnings. Code review: Locator has a single case pdf(rulebookID:pageIndex:bounds:), Equatable and Sendable; all six domain types are nonisolated; the cut is gap > 0.5 x median (strict) or midY above the previous line, with no font or indent rule; the count > 0 guard comes before selection(for: NSRange(0, count)), and the Cupertino docs confirm the exception on zero or out-of-range lengths; lines are joined with \\n with no normalising. Scenario 3's layout was reviewed and is a faithful wrap: narrow lines shifted right beside a filled rect, same 14 pt step, and the shift and narrowing are #required on PDFKit-measured bounds. Docs updated as the spec requires.",
+        "context": {
+          "date": "2026-10-15 11:12 CEST",
+          "commit": "6669268f02618bde46e57c8f779c22210d6f9acc",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on feat/f06-extract-passages, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Real rulebooks and the Taifa calibration of the 0.5 ratio (pp. 3 and 12): f08.",
+          "Text wrapping where the full-width lines do not span the narrow lines' x range: PDFKit reads it as two columns and splits it (implementer's finding); not reproduced by the validator.",
+          "Multi-column layouts (ADR-002 accepts the degradation).",
+          "Rotated pages, and pages whose crop box differs from the media box.",
+          "iOS 26 SDK isolation of PDFDocument, PDFPage and PDFSelection: only the iOS 27.0 SDK is installed.",
+          "Runs on iOS 26.0 (the deployment target) and on a physical device.",
+          "The implementer's uncommitted >= mutation check: not rerun because the validator is read-only; only checked analytically.",
+          "Runs from a fresh clone or with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: T3. Single-column only; multi-column is deferred to ADR-002."
   },
   {

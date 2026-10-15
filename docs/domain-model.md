@@ -35,7 +35,7 @@ Terms follow `CONTEXT.md`. Scope is the m4 MVP; reserved concepts are noted at t
 - `bounds` is non-empty and lies inside that page's bounds;
 - the region contains the passage's text, so the viewer can highlight it.
 
-A locator is only constructed by extraction; there is no public way to build one by hand outside tests.
+A locator is only constructed by extraction; there is no public way to build one by hand outside tests. This is a convention, not enforced: within the single app module any code can call `Locator.pdf(...)` (f06).
 
 **Survival across re-import**: identity comes from file bytes, not file name or path. Re-importing the same file is a no-op, so existing locators stay valid unchanged. Extraction is deterministic: deleting a rulebook and importing the same file again yields equal locators. A different file (even one byte) is a different rulebook with different locators; there is no replace operation.
 
