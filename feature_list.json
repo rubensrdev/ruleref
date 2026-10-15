@@ -342,12 +342,12 @@
     "title": "Join hyphenation and normalise whitespace",
     "user_visible_behavior": "Extraction joins line-break hyphenation and normalises whitespace.",
     "depends_on": ["f06-extract-passages"],
-    "status": "not_started",
+    "status": "in_progress",
     "verification": [
       "Test: a synthetic \"cons-⏎truir\" yields passage text containing \"construir\"."
     ],
     "evidence": [],
-    "notes": "Task: T3."
+    "notes": "Task: T3. Implementation stopped on 2026-10-15 for a spec gap: f06's PassageExtractorTests.boundsAreNonEmptyInsideTheCropBoxAndContainTheirLines() counts each passage's lines by splitting its text on \"\\n\", which normalized text no longer has, and the spec allows only expected-text changes in that file. PassageText is committed (0c1087d); the extractor change, scenario 1 test and expected-text updates are in git stash 'f07 step 2 WIP (scenario 4 red)'."
   },
   {
     "id": "f08-atomic-import",
