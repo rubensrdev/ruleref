@@ -31,12 +31,32 @@
         }
       }
     },
+    "Create a game to start your library." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea un juego para empezar tu biblioteca."
+          }
+        }
+      }
+    },
     "Enter a name for the game." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escribe un nombre para el juego."
+          }
+        }
+      }
+    },
+    "Library" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biblioteca"
           }
         }
       }
@@ -57,6 +77,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuevo juego"
+          }
+        }
+      }
+    },
+    "No Games" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay juegos"
+          }
+        }
+      }
+    },
+    "No Rulebook Yet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay reglamento"
           }
         }
       }
