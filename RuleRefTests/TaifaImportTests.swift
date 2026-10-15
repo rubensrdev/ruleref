@@ -27,7 +27,7 @@ struct TaifaImportTests {
         let store = RulebookStore(baseDirectory: directory.appending(path: "Rulebooks", directoryHint: .isDirectory))
         let game = try library.createGame(named: "Taifa")
 
-        let rulebook = try await library.importRulebook(fileAt: fixture, into: game, store: store)
+        let rulebook = try await library.importRulebook(fileAt: fixture, into: game, store: store).rulebook
 
         #expect(rulebook.pageCount == 16)
         #expect(!rulebook.passages.isEmpty)

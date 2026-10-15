@@ -1,30 +1,31 @@
 import Foundation
 import PDFKit
 
-/// The heavy part of an import: read, fingerprint and extract, off the main actor.
+/// The heavy parts of an import, off the main actor: fingerprinting, then opening and extraction.
 nonisolated enum RulebookPreparer {
-    /// Only a `URL` goes in and only a `PreparedRulebook` comes out; the `PDFDocument` never leaves this function.
+    /// Reads the bytes once and hashes them once; the library checks the ID before anything is extracted.
     @concurrent
-    static func prepare(fileAt url: URL) async throws -> PreparedRulebook {
+    static func fingerprint(fileAt url: URL) async throws -> FingerprintedFile {
         let bytes: Data
         do {
             bytes = try Data(contentsOf: url)
         } catch {
             throw ImportError.unreadable
         }
+        return FingerprintedFile(rulebookID: RulebookID(bytes: bytes), bytes: bytes)
+    }
 
-        // Fingerprinting: the bytes are read and hashed once.
-        let rulebookID = RulebookID(bytes: bytes)
-        // f11 plugs in here: same ID in this game → duplicateNoOp, in another game → .alreadyImported.
-
-        guard let document = PDFDocument(data: bytes) else { throw ImportError.unreadable }
+    /// Only a `FingerprintedFile` goes in and only a `PreparedRulebook` comes out; the `PDFDocument` never leaves this function.
+    @concurrent
+    static func prepare(_ file: FingerprintedFile) async throws -> PreparedRulebook {
+        guard let document = PDFDocument(data: file.bytes) else { throw ImportError.unreadable }
         // Only a locked document is rejected; an encrypted one that opens unlocked takes the normal path.
         if document.isLocked { throw ImportError.locked }
 
-        let passages = PassageExtractor.extract(from: document, rulebookID: rulebookID)
+        let passages = PassageExtractor.extract(from: document, rulebookID: file.rulebookID)
         // No passages in the whole document means no usable text layer; pages without text alone do not reject.
         if passages.isEmpty { throw ImportError.noTextLayer }
 
-        return PreparedRulebook(rulebookID: rulebookID, pageCount: document.pageCount, bytes: bytes, passages: passages)
+        return PreparedRulebook(rulebookID: file.rulebookID, pageCount: document.pageCount, bytes: file.bytes, passages: passages)
     }
 }
