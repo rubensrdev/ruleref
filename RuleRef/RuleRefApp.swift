@@ -14,6 +14,6 @@ struct RuleRefApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: Game.self)
+        .modelContainer(for: [Game.self, Rulebook.self, Passage.self])
     }
 }

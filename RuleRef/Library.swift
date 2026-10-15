@@ -36,4 +36,40 @@ struct Library {
         }
         return game
     }
+
+    /// Imports the PDF at `url` into `game`: the file copy, the rulebook and its passages are stored together or not at all.
+    /// Reading, fingerprinting and extraction run off the main actor; storing runs here, in one step.
+    func importRulebook(fileAt url: URL, into game: Game, store: RulebookStore) async throws -> Rulebook {
+        guard game.rulebook == nil else { throw ImportError.gameHasRulebook }
+
+        let prepared = try await RulebookPreparer.prepare(fileAt: url)
+
+        // The main actor may have run other work during the await.
+        guard game.rulebook == nil else { throw ImportError.gameHasRulebook }
+
+        let id = prepared.rulebookID
+        do {
+            try store.write(prepared.bytes, for: id)
+        } catch {
+            throw ImportError.storage
+        }
+
+        // No suspension point from the first insert to save(), so nothing else sees a half-built rulebook.
+        let rulebook = Rulebook(rulebookID: id, pageCount: prepared.pageCount, importDate: .now)
+        context.insert(rulebook)
+        for extracted in prepared.passages {
+            let passage = Passage(extracted)
+            context.insert(passage)
+            passage.rulebook = rulebook
+        }
+        game.rulebook = rulebook
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            try? store.removeFile(for: id)
+            throw ImportError.storage
+        }
+        return rulebook
+    }
 }
