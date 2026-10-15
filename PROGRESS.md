@@ -177,3 +177,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Seen in a focused run with the full change: every other test passes, including scenario 1 (PDFKit returns "cons-" and "truir" as drawn) and the three updated expected texts.
 - Stashed: the extractor change, `HyphenationExtractionTests` and the expected-text updates, in git stash "f07 step 2 WIP (scenario 4 red)".
 - Next: the user decides how scenario 4 counts lines (for example from the layout's known line counts, or by consuming lines until their normalized join equals the passage text) and re-approves the f07 spec; then the implementer applies the stash and finishes. Done when: `./init.sh` is green with the extractor change and f07 is `passing` with evidence.
+
+## 2026-10-15 — T3: f07 implemented
+- The user re-approved the f07 spec (585abfe): scenario 4 takes each passage's line count from its layout. f07-join-hyphenation is `passing` on branch `feat/f07-join-hyphenation` (code commits 0c1087d, b00d743).
+- `PassageExtractor.extract(from:rulebookID:)` runs each segment's text through `PassageText.normalized(_:)` and skips empty results before taking the ordinal. `HyphenationExtractionTests` covers scenario 1 on a synthetic PDF; f06's `PassageExtractorTests` changed only in its three expected texts and in scenario 4's line counts (stash applied and dropped).
+- `./init.sh` green: 45 tests, 0 failed, 0 skipped; focused run of the four passage suites passed (26).
+- Left: Taifa's real hyphenation, U+2011 and PDFKit's handling of drawn U+00AD (f08); iOS 26.0 and device runs.
+- Next: the validator reviews f07 through `/feature-flow`. Done when: f07 is `accepted` and its PR is merged into `main`.
