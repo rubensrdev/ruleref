@@ -51,6 +51,36 @@
         }
       }
     },
+    "Import Failed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo importar"
+          }
+        }
+      }
+    },
+    "Import Rulebook" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar reglamento"
+          }
+        }
+      }
+    },
+    "Importing…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importando…"
+          }
+        }
+      }
+    },
     "Library" : {
       "localizations" : {
         "es" : {
@@ -101,12 +131,92 @@
         }
       }
     },
+    "OK" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        }
+      }
+    },
+    "Pages" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Páginas"
+          }
+        }
+      }
+    },
     "The game could not be saved." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se pudo guardar el juego."
+          }
+        }
+      }
+    },
+    "The rulebook could not be saved. Try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido guardar el reglamento. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "This file could not be opened as a PDF. It may be damaged or not be a PDF." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este archivo no se ha podido abrir como PDF. Puede que esté dañado o que no sea un PDF."
+          }
+        }
+      }
+    },
+    "This game already has a rulebook." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este juego ya tiene un reglamento."
+          }
+        }
+      }
+    },
+    "This PDF asks for a password. Import a copy without a password." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este PDF pide una contraseña. Importa una copia sin contraseña."
+          }
+        }
+      }
+    },
+    "This PDF has no selectable text. Scanned rulebooks are not supported." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este PDF no tiene texto seleccionable. No se admiten reglamentos escaneados."
+          }
+        }
+      }
+    },
+    "This rulebook is already in “%@”." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este reglamento ya está en «%@»."
           }
         }
       }

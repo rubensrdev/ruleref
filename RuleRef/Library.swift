@@ -76,6 +76,21 @@ struct Library {
         return .imported(rulebook)
     }
 
+    /// Imports a file handed over by the system picker, inside security-scoped access that is released
+    /// on success and on error. A failed start does not stop the import (a plain file needs no access).
+    func importPickedFile(at url: URL, into game: Game, store: RulebookStore) async -> Result<ImportOutcome, ImportError> {
+        let didStart = url.startAccessingSecurityScopedResource()
+        defer { if didStart { url.stopAccessingSecurityScopedResource() } }
+        do {
+            return .success(try await importRulebook(fileAt: url, into: game, store: store))
+        } catch let error as ImportError {
+            return .failure(error)
+        } catch {
+            // importRulebook throws only ImportError (f08-f11); anything else is treated as a storage failure.
+            return .failure(.storage)
+        }
+    }
+
     /// The stored rulebook with `id`, if any. No #Unique on `rulebookID` (SwiftData would upsert); the checks keep it unique.
     private func rulebook(withID id: RulebookID) throws -> Rulebook? {
         let hex = id.hex
