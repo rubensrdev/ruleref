@@ -463,12 +463,32 @@
     "title": "Reject PDFs without a text layer",
     "user_visible_behavior": "Import of a PDF with no text layer fails with an explicit error and persists nothing.",
     "depends_on": ["f08-atomic-import"],
-    "status": "not_started",
+    "status": "passing",
     "verification": [
       "Test with an image-only synthetic PDF: error `.noTextLayer`.",
       "Test: zero rulebooks and passages persisted."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/NoTextLayerImportTests -only-testing:RuleRefTests/ImportTests; xcrun xcresulttool get test-results summary --path <focused run .xcresult>; git diff main...HEAD -- RuleRef/ImportError.swift RuleRef/RulebookPreparer.swift; git diff --stat main...HEAD",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0, showing the new NoTextLayerImportTests and f08's tests passing unchanged; scenarios 1-4 covered by passing tests, each on its own in-memory container and temporary directory with its numberOfCharacters preconditions #require'd before the import; the diff of f08's files shows only the new case, the check and its comment.",
+        "observed": "init.sh exit 0, no retry. Test-results line: totalTestCount=66, failedTests=0, skippedTests=0, expectedFailures=0 (62 after f08, plus 4). Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Focused run at this commit: TEST SUCCEEDED; xcresulttool summary result=Passed, totalTestCount=11, passedTests=11, failedTests=0, skippedTests=0, expectedFailures=0. Scenario tests: 1 NoTextLayerImportTests/imageOnlyPDF(); 2 NoTextLayerImportTests/blankPages(); 3 NoTextLayerImportTests/mixedPDFImports(); 4 NoTextLayerImportTests/gameCanImportAfterARejection(). The image-only, blank and mixed preconditions held: PDFKit reported numberOfCharacters == 0 for SyntheticPDF pages with only a filled rectangle and for empty pages. 'Nothing persisted' checks: exactly .noTextLayer; 0 Rulebook and 0 Passage rows (counted with fetch) in the library's context and in a new ModelContext on the same container; no file at store.fileURL(for: RulebookID(bytes: data)); the store's base directory absent or empty (a missing directory counts as empty); game.rulebook == nil. Red first: with only the new case added and no check, the focused NoTextLayerImportTests run failed imageOnlyPDF(), blankPages() and gameCanImportAfterARejection() with 'an error was expected but none was thrown: ImportError.noTextLayer' and passed mixedPDFImports(), as the spec predicts. Diff summary (main 0309e36...HEAD): ImportError.swift +2 (case noTextLayer and its one-line doc comment, matching the other cases); RulebookPreparer.swift +2 -1 (the f09 plug-in comment replaced by a one-line comment and `if passages.isEmpty { throw ImportError.noTextLayer }`, right after PassageExtractor.extract and before PreparedRulebook; the @concurrent signature, the step order and the f10 and f11 plug-in comments unchanged); new RuleRefTests/NoTextLayerImportTests.swift +166; no other file. No existing test imports a zero-passage PDF; f08's ImportTests (bytesThatAreNotAPDF still .unreadable) and TaifaImportTests pass unchanged. Names follow the implementation as the spec assumed: Library.importRulebook(fileAt:into:store:), RulebookStore.fileURL(for:) and baseDirectory, Rulebook.orderedPassages, Passage.extractedPassage(rulebookID:), Rulebook.rulebookID stores the hex (compared with RulebookID.hex). No catalog keys added (no UI).",
+        "context": {
+          "date": "2026-10-15 12:27 CEST",
+          "commit": "01f9afc62d86ff42cfbfcf3153f60c222cd354d8",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f09-reject-no-text-layer, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Real scanned PDFs, including ones with an invisible OCR layer added by a scanner app (that would count as a text layer and import); no real scanned PDF is in the repo.",
+          "Encrypted PDFs: until f10 adds .locked, an encrypted PDF that opens but exposes no text may fail as .noTextLayer.",
+          "How the error reaches the user (f17).",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "Not run from a fresh clone or with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: T3."
   },
   {
