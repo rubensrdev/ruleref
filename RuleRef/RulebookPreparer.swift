@@ -18,7 +18,8 @@ nonisolated enum RulebookPreparer {
         // f11 plugs in here: same ID in this game → duplicateNoOp, in another game → .alreadyImported.
 
         guard let document = PDFDocument(data: bytes) else { throw ImportError.unreadable }
-        // f10 plugs in here: an encrypted document that stays locked → .locked, told apart from .unreadable.
+        // Only a locked document is rejected; an encrypted one that opens unlocked takes the normal path.
+        if document.isLocked { throw ImportError.locked }
 
         let passages = PassageExtractor.extract(from: document, rulebookID: rulebookID)
         // No passages in the whole document means no usable text layer; pages without text alone do not reject.

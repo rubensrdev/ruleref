@@ -40,11 +40,25 @@ enum SyntheticPDF {
         return lines
     }
 
-    static func data(pages: [Page]) throws -> Data {
+    /// PDF passwords: ASCII, at most 32 characters. Only the owner password turns encryption on.
+    nonisolated struct Encryption {
+        let ownerPassword: String
+        let userPassword: String?
+    }
+
+    static func data(pages: [Page], encryption: Encryption? = nil) throws -> Data {
         let buffer = NSMutableData()
         let consumer = try #require(CGDataConsumer(data: buffer as CFMutableData))
         var box = mediaBox
-        let context = try #require(CGContext(consumer: consumer, mediaBox: &box, nil))
+        var auxiliaryInfo: CFDictionary?
+        if let encryption {
+            var info: [CFString: String] = [kCGPDFContextOwnerPassword: encryption.ownerPassword]
+            if let userPassword = encryption.userPassword {
+                info[kCGPDFContextUserPassword] = userPassword
+            }
+            auxiliaryInfo = info as CFDictionary
+        }
+        let context = try #require(CGContext(consumer: consumer, mediaBox: &box, auxiliaryInfo))
         let font = CTFontCreateWithName("Helvetica" as CFString, fontSize, nil)
         let fontKey = NSAttributedString.Key(kCTFontAttributeName as String)
 
