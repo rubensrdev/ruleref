@@ -6,4 +6,6 @@ nonisolated enum ImportError: Error, Equatable, Sendable {
     case storage
     /// The game already has a rulebook; nothing was read.
     case gameHasRulebook
+    /// Extraction found no passages in the whole document; nothing was written.
+    case noTextLayer
 }
