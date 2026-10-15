@@ -58,7 +58,7 @@ Transitions: created → `empty`. Successful import: `empty` → `ready`. Delete
 |---|---|
 | `picked` | → `fingerprinting` |
 | `fingerprinting` (SHA-256) | → `duplicateNoOp` if the same game already holds this ID · → `failed(.alreadyImported(gameName))` if another game holds it · → `extracting` |
-| `extracting` (PDFKit, per page) | → `failed(.unreadable)` if the file can't be opened · → `failed(.locked)` if encrypted · → `failed(.noTextLayer)` if zero passages · → `storing` |
+| `extracting` (PDFKit, per page) | → `failed(.unreadable)` if the file can't be opened · → `failed(.locked)` if locked (needs a password to open) · → `failed(.noTextLayer)` if zero passages · → `storing` |
 | `storing` (file copy + rulebook + passages, one transaction) | → `succeeded` · → `failed(.storage)` with everything rolled back |
 
 Terminal: `succeeded`, `duplicateNoOp`, `failed(reason)`. Every failure leaves zero persisted rows and no stored file. Pages without text in an otherwise readable PDF yield no passages. The import still succeeds.
@@ -84,7 +84,7 @@ No lifecycle: they exist only in a fully imported, immutable state, and are dele
 ## Edge cases
 
 - Image-only PDF → `.noTextLayer`, nothing stored.
-- Encrypted or corrupt file → `.locked` / `.unreadable`, nothing stored.
+- Locked (needs a password to open) or corrupt file → `.locked` / `.unreadable`, nothing stored. An encrypted PDF that opens unlocked (for example, owner password only) follows the normal path.
 - Paragraph split across a page break → two passages, one per page.
 - Hyphenated line breaks ("cons-⏎truir") → joined in passage text. Genuine hyphenated words that happen to end a line may be joined wrongly; accepted.
 - Mixed pages (some text, some image-only) → import succeeds; image pages are unsearchable.

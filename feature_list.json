@@ -519,12 +519,55 @@
     "title": "Reject locked or unreadable files",
     "user_visible_behavior": "Import of a locked or unreadable file fails with an explicit error and persists nothing.",
     "depends_on": ["f08-atomic-import"],
-    "status": "not_started",
+    "status": "accepted",
     "verification": [
       "Test with an encrypted file and a corrupt file: distinct errors.",
       "Test: nothing persisted in either case."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/UnreadableFileImportTests -only-testing:RuleRefTests/ImportTests -only-testing:RuleRefTests/PassageExtractorTests -only-testing:RuleRefTests/NoTextLayerImportTests; xcrun xcresulttool get test-results summary --path <focused run .xcresult>; git diff main...HEAD -- RuleRef/ImportError.swift RuleRef/RulebookPreparer.swift RuleRefTests/SyntheticPDF.swift; git diff --stat main...HEAD",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0, showing the new UnreadableFileImportTests and f06's, f08's and f09's tests passing unchanged; scenarios 1-5 covered by passing tests, each on its own in-memory container and temporary directory, with the PDFDocument(data:), isEncrypted and isLocked preconditions #require'd before the import; the diff of f06's and f08's files shows only the new case, the check and its comment, and the additive encryption parameter.",
+        "observed": "init.sh exit 0, no retry. Test-results line: totalTestCount=71, failedTests=0, skippedTests=0, expectedFailures=0 (66 after f09, plus 5). Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Focused run at this commit: TEST SUCCEEDED; xcresulttool summary result=Passed, totalTestCount=24, passedTests=24, failedTests=0, skippedTests=0, expectedFailures=0. Scenario tests: 1 UnreadableFileImportTests/userPasswordLocked(); 2 UnreadableFileImportTests/ownerPasswordOnlyImports(); 3 UnreadableFileImportTests/corruptFileUnreadable(); 4 UnreadableFileImportTests/distinctErrors(); 5 UnreadableFileImportTests/gameCanImportAfterARejection(). Every spec precondition held on the iOS 27.0 simulator: PDFDocument(data:) opened the owner+user-password PDF as non-nil with isEncrypted == true and isLocked == true; the owner-only PDF opened with isEncrypted == true and isLocked == false and PassageExtractor returned its text (pageCount 1, passages non-empty, stored bytes equal); PDFDocument(data:) returned nil for \"%PDF-1.7\\n\" plus 0x00...0xFF x4. Red first: with only the new case added and no check, the focused UnreadableFileImportTests run failed userPasswordLocked(), distinctErrors() and gameCanImportAfterARejection() with 'error → .noTextLayer' (the locked PDF reached extraction and yielded no passages) and passed ownerPasswordOnlyImports() and corruptFileUnreadable(), as the spec predicts. Diff summary (main c071af7...HEAD): ImportError.swift +2 (case locked and its one-line doc comment, matching the other cases); RulebookPreparer.swift +2 -1 (the f10 plug-in comment replaced by a one-line comment and `if document.isLocked { throw ImportError.locked }`, right after PDFDocument(data:) and before PassageExtractor.extract; the @concurrent signature, step order, .unreadable paths, f09's check and the f11 comment unchanged; isEncrypted and unlock(withPassword:) not used in app code); SyntheticPDF.swift +17 -1 (nonisolated struct Encryption with ownerPassword: String and userPassword: String?, and data(pages:encryption: Encryption? = nil); with nil the auxiliary dictionary stays nil as in f06; existing call sites unchanged); new RuleRefTests/UnreadableFileImportTests.swift +211; docs/domain-model.md 2 lines (locked means needs a password to open; an encrypted PDF that opens unlocked follows the normal path). Names follow the implementation as the spec assumed: SyntheticPDF.data(pages:) is the entry point that produces Data, Library.importRulebook(fileAt:into:store:), RulebookStore.fileURL(for:) and baseDirectory, Rulebook.orderedPassages, Passage.extractedPassage(rulebookID:), Rulebook.rulebookID stores the hex. Scenario 4 checks 'not equal' on the two ImportError values returned by #expect(throws: ImportError.self). No catalog keys added (no UI). Passwords used: owner \"ruleref-owner\", user \"ruleref-user\" (ASCII, under 32 characters).",
+        "context": {
+          "date": "2026-10-15 12:44 CEST",
+          "commit": "a45587c1cd73016d9bb92ed8742fd7a7d11fe8e5",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f10-reject-unreadable-file, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Real-world encrypted and damaged rulebooks; no such fixture is in the repo.",
+          "Encryption algorithms and key lengths other than Core Graphics' default (kCGPDFContextEncryptionKeyLength not set).",
+          "PDFs with restrictive permissions beyond owner-only encryption (for example copying disallowed).",
+          "How the error reaches the user (f17).",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device; the PDFKit preconditions were observed on the iOS 27.0 simulator only.",
+          "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/UnreadableFileImportTests -only-testing:RuleRefTests/ImportTests -only-testing:RuleRefTests/PassageExtractorTests -only-testing:RuleRefTests/NoTextLayerImportTests; xcrun xcresulttool get test-results summary --path <focused run .xcresult>; git diff --stat c071af7..973726d; git diff c071af7..973726d -- RuleRef/ImportError.swift RuleRef/RulebookPreparer.swift RuleRefTests/SyntheticPDF.swift docs/domain-model.md",
+        "expected": "Independent validation: init.sh exits 0 with every check PASS and 0 failed / 0 skipped tests; the focused run passes with scenarios 1-5 (UnreadableFileImportTests) plus f06, f08 and f09 tests unchanged; the diff touches only the declared files, with only the locked case, the isLocked check and its comment, and the additive encryption parameter; app code does not read isEncrypted, call unlock(withPassword:) or check permissions.",
+        "observed": "Validator rerun at 973726d: init.sh PASS, totalTestCount=71, failedTests=0, skippedTests=0, expectedFailures=0, all 11 checks PASS. Focused run TEST SUCCEEDED; xcresulttool result=Passed, totalTestCount=24, passedTests=24, failedTests=0, skippedTests=0, no runtime warnings; userPasswordLocked, ownerPasswordOnlyImports, corruptFileUnreadable, distinctErrors, gameCanImportAfterARejection all passed, as did ImportTests/bytesThatAreNotAPDF and missingFileIsUnreadable. Diff stat: PROGRESS.md, RuleRef/ImportError.swift (+2), RuleRef/RulebookPreparer.swift (+2 -1), RuleRefTests/SyntheticPDF.swift (+17 -1), RuleRefTests/UnreadableFileImportTests.swift (new, 211), docs/domain-model.md (2 lines), feature_list.json. The check sits right after PDFDocument(data:) and before PassageExtractor.extract; app code reads only isLocked. Every precondition is #require'd before the import. Scenario 4 asserts nothing persisted after both imports (not after each, contrary to the handoff note; the spec requires only after both). Verdict: accept.",
+        "context": {
+          "date": "2026-10-15",
+          "commit": "973726dd490a3c468cb3f5855e0aa8753a888261",
+          "xcode": "Xcode 27.0 (per init.sh; build number not checked by the validator)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on feat/f10-reject-unreadable-file, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Red-first behaviour (scenarios 1, 4 and 5 failing without the check) was not reproduced; the validator is read-only.",
+          "Exact Xcode build number; xcodebuild -version is not an allowed validator command.",
+          "Real-world encrypted and damaged rulebooks; no such fixture is in the repo.",
+          "Encryption algorithms and key lengths other than Core Graphics' default (kCGPDFContextEncryptionKeyLength not set).",
+          "PDFs with restrictive permissions beyond owner-only encryption.",
+          "How the error reaches the user (f17).",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "Not run from a fresh clone or with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: T3."
   },
   {
