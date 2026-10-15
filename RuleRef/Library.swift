@@ -4,6 +4,16 @@ import SwiftData
 struct Library {
     let context: ModelContext
 
+    /// Every game, sorted by its folded name key. The only place the library's order is defined;
+    /// `games()` and the library screen's `@Query` both use it.
+    static var alphabeticalGames: FetchDescriptor<Game> {
+        FetchDescriptor<Game>(sortBy: [SortDescriptor(\.nameKey, comparator: .localizedStandard, order: .forward)])
+    }
+
+    func games() throws -> [Game] {
+        try context.fetch(Self.alphabeticalGames)
+    }
+
     /// Creates and saves a game; throws `.blank` or `.duplicate` without inserting anything.
     /// If saving fails, the insert is undone before rethrowing, so nothing is left to count as a duplicate or to autosave.
     @discardableResult
