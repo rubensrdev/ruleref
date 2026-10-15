@@ -212,3 +212,8 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green: 66 tests, 0 failed, 0 skipped; the focused NoTextLayerImportTests/ImportTests run passed (11). No existing test imported a zero-passage PDF.
 - Left: real scanned PDFs (an invisible OCR layer would import); encrypted PDFs may fail as `.noTextLayer` until f10; the error's presentation (f17).
 - Next: the validator reviews f09 through `/feature-flow`. Done when: f09 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f09 accepted
+- Validation 1 at cdc33ad returned `accept` and the user confirmed. `./init.sh` green (66 tests, 0 failed, 0 skipped); the focused NoTextLayerImportTests/ImportTests run passed (11). Record: `docs/validations/f09-reject-no-text-layer.md`.
+- The doc comment on `case noTextLayer` was judged acceptable despite the spec's "Nothing else changes".
+- Next: the user merges the f09 PR; then `/feature-flow` on the next dependency-ready feature, f10-reject-unreadable-file. Done when: f10 is `accepted` and its PR is merged into `main`.

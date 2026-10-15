@@ -17,3 +17,4 @@
   - How the error reaches the user (f17).
   - iOS 26.0, a physical device, a fresh clone or clean DerivedData; the Xcode build number.
   - A repo-wide search for OCR/Vision/UIKit (relied on the feature diff and `init.sh`'s source rules).
+- User: confirmed

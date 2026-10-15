@@ -463,7 +463,7 @@
     "title": "Reject PDFs without a text layer",
     "user_visible_behavior": "Import of a PDF with no text layer fails with an explicit error and persists nothing.",
     "depends_on": ["f08-atomic-import"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test with an image-only synthetic PDF: error `.noTextLayer`.",
       "Test: zero rulebooks and passages persisted."
@@ -486,6 +486,28 @@
           "How the error reaches the user (f17).",
           "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
           "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/NoTextLayerImportTests -only-testing:RuleRefTests/ImportTests; xcrun xcresulttool get test-results summary --path <DerivedData>/Logs/Test/Test-RuleRef-2026.10.15_12-31-33-+0200.xcresult; git diff 0309e36...cdc33ad -- RuleRef/ImportError.swift RuleRef/RulebookPreparer.swift; git diff --stat 0309e36...cdc33ad (independent validator, validation 1)",
+        "expected": "init.sh exits 0 with every check PASS and failedTests=0, skippedTests=0; the focused run passes NoTextLayerImportTests scenarios 1-4 and f08's ImportTests unchanged (bytesThatAreNotAPDF still .unreadable); the diff of f08's files shows only the noTextLayer case, the passages.isEmpty check after PassageExtractor.extract and before PreparedRulebook, and its comment; no other existing file changed besides feature_list.json and PROGRESS.md.",
+        "observed": "init.sh exit 0: totalTestCount=66, failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.0), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED; xcresulttool result=Passed, totalTestCount=11, passedTests=11, failedTests=0, skippedTests=0, expectedFailures=0, no runtime warnings; NoTextLayerImportTests imageOnlyPDF(), blankPages(), mixedPDFImports(), gameCanImportAfterARejection() and all 7 ImportTests passed. Diff stat: PROGRESS.md, RuleRef/ImportError.swift (+2: case noTextLayer plus a one-line doc comment matching the other cases, judged acceptable), RuleRef/RulebookPreparer.swift (+2 -1: plug-in comment replaced by a one-line comment and `if passages.isEmpty { throw ImportError.noTextLayer }`; @concurrent signature, step order and f10/f11 comments unchanged), new RuleRefTests/NoTextLayerImportTests.swift, feature_list.json. All 7 Validator Checklist items confirmed by reading code and tests. Verdict: accept.",
+        "context": {
+          "date": "2026-10-15 12:32 CEST",
+          "commit": "cdc33addaa9f28043f638086428cc63a7ccfc9ba",
+          "xcode": "Xcode 27.0 (as reported by init.sh; build number not checked)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on feat/f09-reject-no-text-layer, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Red-first behavior (scenarios 1, 2 and 4 failing without the check): the validator is read-only and cannot remove the check; confirmed only by reading the code.",
+          "Real scanned PDFs, including ones with an invisible OCR layer; no fixture in the repo.",
+          "Encrypted PDFs: may fail as .noTextLayer until f10 adds .locked.",
+          "How the error reaches the user (f17).",
+          "Not run on iOS 26.0 (deployment target) nor on a physical device.",
+          "Not run from a fresh clone or with clean DerivedData.",
+          "Exact Xcode build number (xcodebuild -version is outside the validator's allowed commands).",
+          "No repo-wide grep for OCR/Vision/UIKit (no grep tool available); relied on the full feature diff and init.sh's source rules."
         ]
       }
     ],
