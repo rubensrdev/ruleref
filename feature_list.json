@@ -576,12 +576,36 @@
     "title": "Re-import of the same file",
     "user_visible_behavior": "Re-importing the same file into the same game is a no-op; the same file into another game is refused, naming that game.",
     "depends_on": ["f08-atomic-import", "f09-reject-no-text-layer", "f10-reject-unreadable-file"],
-    "status": "not_started",
+    "status": "passing",
     "verification": [
       "Test: locators before and after re-import are equal and counts unchanged.",
       "Test: a second game gets `.alreadyImported(gameName)`."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/ReimportTests -only-testing:RuleRefTests/ImportTests -only-testing:RuleRefTests/NoTextLayerImportTests -only-testing:RuleRefTests/UnreadableFileImportTests -only-testing:RuleRefTests/TaifaImportTests; git diff main...HEAD -- RuleRefTests/",
+        "expected": "init.sh exits 0 with every check PASS and test-results failedTests=0, skippedTests=0, showing the new ReimportTests and every f08-f10 test passing; scenarios 1-7 covered by passing tests, each on its own in-memory container and temporary directory; in existing test files the diff shows only changed call sites, no changed #expect or #require.",
+        "observed": "init.sh exit 0, no retry. Test-results line: totalTestCount=78, failedTests=0, skippedTests=0, expectedFailures=0 (71 after f10, plus 7). Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Focused run at this commit: TEST SUCCEEDED, 24 tests passed (ReimportTests 7, ImportTests 7, NoTextLayerImportTests 4, UnreadableFileImportTests 5, TaifaImportTests 1), none failed. Scenario tests: 1 ReimportTests/idempotentReimportIntoTheSameGame(); 2 sameFileAnotherGame(); 3 theStoredNameIsReturned(); 4 anotherFileSameGame(); 5 theIDCheckComesBeforeTheGameCheck(); 6 simultaneousImportsIntoTwoGames(); 7 simultaneousImportsIntoTheSameGame(); 8 is the full init.sh run. 'Nothing changed' compares Rulebook and Passage fetchCount, every stored file name with its bytes, and each game's rulebook persistentModelID. Scenarios 6 and 7 start each import in its own Task { @MainActor in ... } that captures only the ModelContainer, the URL, the store and the game name, builds a Library over container.mainContext, fetches its game by name and returns a test-private Sendable summary (imported/alreadyPresent with the rulebook's PersistentIdentifier, or failed(ImportError)); no strict-concurrency diagnostics. Mutation check, not committed: without the step-(d) check, the focused ReimportTests run failed scenarios 6 and 7 and passed 1-5, so in that run both concurrent imports passed step (b) and step (d) caught the loser. Test diff (main 0c417ea...HEAD): ImportTests.swift 2 lines and TaifaImportTests.swift 1 line, each appending .rulebook to a `let rulebook = try await library.importRulebook(...)` call; no #expect or #require changed; the other call sites already discarded the result (`_ =`) and needed no change; NoTextLayerImportTests.swift and UnreadableFileImportTests.swift unchanged. Code: FingerprintedFile (nonisolated, Sendable); ImportOutcome (nonisolated, not Sendable, imported/alreadyPresent, var rulebook); ImportError.alreadyImported(gameName:); RulebookPreparer.fingerprint(fileAt:) and prepare(_:), both @concurrent, the bytes read and hashed once in fingerprint, prepare keeping PDFDocument(data:) -> .locked -> extract -> .noTextLayer; Library.importRulebook returns ImportOutcome: fingerprint, check, prepare, check again, then f08's store step unchanged, with no await between the last check and save(); the look-up is FetchDescriptor<Rulebook> on rulebookID == hex with fetchLimit = 1, fetch errors mapped to .storage; no #Unique. store.write runs only after the step-(d) check found no rulebook with this ID, so no path writes or removes a file another game holds (the f08 carry-over). Names follow the implementation: SyntheticPDF.data(pages:), Rulebook.rulebookID stores the hex (the predicate compares it with RulebookID.hex), RulebookStore.fileURL(for:) and baseDirectory. Beyond the spec's literal 'add the case': the doc comment of ImportError.gameHasRulebook said 'nothing was read', which is no longer true after the reorder; it now says 'nothing was extracted or written'. No catalog keys added (no UI).",
+        "context": {
+          "date": "2026-10-15 13:08 CEST",
+          "commit": "9a3a5cace8261f9b310a98603c0022d69f22f542",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f11-reimport-same-file, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "That scenarios 6 and 7 always exercise the step-(d) re-check rather than step (b): the mutation run shows they did in that run, but the interleaving is up to the scheduler and is not guaranteed on every run.",
+          "That every rewrite of the file changes its modification date: scenario 1's unchanged-date check relies on it; not measured.",
+          "Re-import of a real file picked twice with the system picker (f17).",
+          "A persistent on-disk store across app launches; the scenarios use in-memory containers.",
+          "The fetch error -> .storage path and the 'rulebook without a game' -> .storage path: no test provokes either (f08's invariants make the second impossible).",
+          "A mutation swapping the ID check and the game check was not run; scenario 5's order is checked by its passing test and in code.",
+          "The tests were not run red against f08's code: they did not compile until ImportOutcome existed; the step-(d) mutation stands in for scenarios 6 and 7 only.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "Not run from a fresh clone or with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: T3."
   },
   {

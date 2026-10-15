@@ -231,3 +231,11 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - f09's interim consequence is resolved: a locked PDF now fails as `.locked` and never reaches extraction.
 - The doc comment on `case locked` was judged acceptable, as in f09. The red-first claim was not reproduced by the read-only validator.
 - Next: the user merges the f10 PR; then `/feature-flow` on the next dependency-ready feature, f11-reimport-same-file (it must refuse `.alreadyImported` before `store.write`). Done when: f11 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f11 implemented
+- f11-reimport-same-file is `passing` on branch `feat/f11-reimport-same-file` (code commit 9a3a5ca): `FingerprintedFile`, `ImportOutcome` (`imported` / `alreadyPresent`), `ImportError.alreadyImported(gameName:)`. `RulebookPreparer` is split into `fingerprint(fileAt:)` and `prepare(_:)`, both `@concurrent`. `Library.importRulebook` now fingerprints, checks, prepares, checks again and then runs f08's store step, returning `ImportOutcome`. The check looks up the ID first (`FetchDescriptor<Rulebook>`, `fetchLimit` 1): if this game holds it, the call is a no-op; if another game does, the call fails naming that game's stored name. After that comes `.gameHasRulebook`.
+- f08 carry-over closed: `store.write` runs only after the step-(d) check, so no path writes or removes a file another game holds.
+- `./init.sh` green: 78 tests, 0 failed, 0 skipped. `ReimportTests` covers scenarios 1-7. Existing tests changed only at three call sites (`.rulebook`). Mutation check: without the step-(d) check, scenarios 6 and 7 fail.
+- Change from f08-f10: `.gameHasRulebook` no longer comes before reading; a game with a rulebook given unreadable bytes now gets `.unreadable`.
+- Left: what the user sees for each outcome (f17).
+- Next: the validator reviews f11 through `/feature-flow`. Done when: f11 is `accepted` and its PR is merged into `main`.
