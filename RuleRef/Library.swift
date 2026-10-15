@@ -38,14 +38,17 @@ struct Library {
     }
 
     /// Imports the PDF at `url` into `game`: the file copy, the rulebook and its passages are stored together or not at all.
-    /// Reading, fingerprinting and extraction run off the main actor; storing runs here, in one step.
-    func importRulebook(fileAt url: URL, into game: Game, store: RulebookStore) async throws -> Rulebook {
-        guard game.rulebook == nil else { throw ImportError.gameHasRulebook }
+    /// The same file is held by at most one game: in `game` it is a no-op (`.alreadyPresent`), in another game
+    /// `.alreadyImported`. Reading, fingerprinting and extraction run off the main actor; storing runs here, in one step.
+    func importRulebook(fileAt url: URL, into game: Game, store: RulebookStore) async throws -> ImportOutcome {
+        let file = try await RulebookPreparer.fingerprint(fileAt: url)
+        if let existing = try check(file.rulebookID, for: game) { return .alreadyPresent(existing) }
 
-        let prepared = try await RulebookPreparer.prepare(fileAt: url)
+        let prepared = try await RulebookPreparer.prepare(file)
 
-        // The main actor may have run other work during the await.
-        guard game.rulebook == nil else { throw ImportError.gameHasRulebook }
+        // The main actor may have finished another import during the awaits. No await from here to save(),
+        // so no path writes or removes the file of a rulebook another game holds.
+        if let existing = try check(file.rulebookID, for: game) { return .alreadyPresent(existing) }
 
         let id = prepared.rulebookID
         do {
@@ -70,6 +73,32 @@ struct Library {
             try? store.removeFile(for: id)
             throw ImportError.storage
         }
-        return rulebook
+        return .imported(rulebook)
+    }
+
+    /// The stored rulebook with `id`, if any. No #Unique on `rulebookID` (SwiftData would upsert); the checks keep it unique.
+    private func rulebook(withID id: RulebookID) throws -> Rulebook? {
+        let hex = id.hex
+        var sameID = FetchDescriptor<Rulebook>(predicate: #Predicate { $0.rulebookID == hex })
+        sameID.fetchLimit = 1
+        do {
+            return try context.fetch(sameID).first
+        } catch {
+            throw ImportError.storage
+        }
+    }
+
+    /// Returns the rulebook `game` already holds for `id` (the no-op), throws if the import must be refused,
+    /// or returns `nil` when the import may go on. The ID check comes before the game check.
+    private func check(_ id: RulebookID, for game: Game) throws -> Rulebook? {
+        if let existing = try rulebook(withID: id) {
+            guard let holder = existing.game else { throw ImportError.storage }
+            guard holder.persistentModelID == game.persistentModelID else {
+                throw ImportError.alreadyImported(gameName: holder.name)
+            }
+            return existing
+        }
+        guard game.rulebook == nil else { throw ImportError.gameHasRulebook }
+        return nil
     }
 }

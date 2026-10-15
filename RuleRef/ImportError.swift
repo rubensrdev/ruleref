@@ -6,8 +6,10 @@ nonisolated enum ImportError: Error, Equatable, Sendable {
     case locked
     /// Writing the file copy or saving the rulebook failed; everything was rolled back.
     case storage
-    /// The game already has a rulebook; nothing was read.
+    /// The game already has another rulebook; nothing was extracted or written.
     case gameHasRulebook
+    /// Another game already holds this file; `gameName` is that game's stored name.
+    case alreadyImported(gameName: String)
     /// Extraction found no passages in the whole document; nothing was written.
     case noTextLayer
 }

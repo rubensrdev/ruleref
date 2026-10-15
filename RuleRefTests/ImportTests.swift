@@ -91,7 +91,7 @@ struct ImportTests {
         let data = try Self.pdfA()
         let url = try writeTemporaryFile(data)
 
-        let rulebook = try await library.importRulebook(fileAt: url, into: game, store: store)
+        let rulebook = try await library.importRulebook(fileAt: url, into: game, store: store).rulebook
 
         let id = RulebookID(bytes: data)
         let imported = try #require(game.rulebook)
@@ -110,7 +110,7 @@ struct ImportTests {
         defer { removeDirectory() }
         let game = try library.createGame(named: "Taifa")
         let data = try Self.pdfA()
-        let rulebook = try await library.importRulebook(fileAt: try writeTemporaryFile(data), into: game, store: store)
+        let rulebook = try await library.importRulebook(fileAt: try writeTemporaryFile(data), into: game, store: store).rulebook
         let id = RulebookID(bytes: data)
         let original = rulebook.orderedPassages.map { $0.extractedPassage(rulebookID: id) }
 
