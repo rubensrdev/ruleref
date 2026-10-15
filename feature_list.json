@@ -231,12 +231,31 @@
     "title": "Rulebook ID from file bytes",
     "user_visible_behavior": "A rulebook ID is the SHA-256 of the file bytes.",
     "depends_on": ["f01-cli-build-and-tests"],
-    "status": "not_started",
+    "status": "passing",
     "verification": [
       "Test: same bytes give the same ID.",
       "Test: one changed byte gives a different ID."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/RulebookIDTests",
+        "expected": "init.sh exits 0 with every check PASS; test-results shows the new RulebookIDTests with failedTests=0 and skippedTests=0; scenarios 1-4 covered by passing tests; RulebookID is nonisolated, uses CryptoKit SHA256.hash(data:) and builds the hex from the digest bytes, not from description.",
+        "observed": "init.sh exit 0, no retry. Test-results line: totalTestCount=19, failedTests=0, skippedTests=0, expectedFailures=0 (14 before f05, plus 5). Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED, every RulebookIDTests case passed (9 test runs, the format test with 5 arguments). Scenario tests: scenario 1 RulebookIDTests/sameBytesGiveTheSameID() (two separate Data values with the same bytes); scenario 2 RulebookIDTests/oneChangedByteGivesADifferentID() (1024 bytes, byte 512 XOR 0x01, the test checks exactly one byte differs); scenario 3 RulebookIDTests/knownVectorForABC(); scenario 4 RulebookIDTests/emptyInputGivesTheKnownVector() and RulebookIDTests/hexIs64LowercaseHexCharacters(bytes:) (empty, \"abc\", [0x00], [0xFF,0xFE,0xFD], 4096 x 0xAB). Mutation check, not committed: with uppercase hex digits, the focused run failed knownVectorForABC(), emptyInputGivesTheKnownVector() and all 5 format cases; scenarios 1 and 2 passed. No catalog keys added (no UI).",
+        "context": {
+          "date": "2026-10-15 10:32 CEST",
+          "commit": "be1109f1a13997cc82b35aa9056c4590ad282fab",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f05-rulebook-id, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Hashing of real files and of large inputs (reading the file and incremental hashing belong to f08); the largest tested input is 4096 bytes.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "The tests were not run red before the implementation: they did not compile until RulebookID existed; the mutation check stands in for it.",
+          "Not run from a fresh clone or with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: T3."
   },
   {

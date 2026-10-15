@@ -145,3 +145,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Spec drift for the user: the approved spec's Non-Goals give import and the `ready` state to f08; since the 2026-10-13 split they belong to f17. Behavior is unaffected; only the user can update the spec.
 - Left: scenario 4 (list, empty state, game screen) is validated by hand at the end of T3.
 - Next: the user merges the f03 PR; then `/feature-flow` on the next dependency-ready feature, f05-rulebook-id. Done when: f05 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f05 implemented
+- f05-rulebook-id is `passing` on branch `feat/f05-rulebook-id` (code commit be1109f): `RulebookID` (`nonisolated`, `Hashable`, `Sendable`; `hex` built from the CryptoKit `SHA256.hash(data:)` digest bytes, two lowercase digits per byte, never from `description`).
+- `./init.sh` green: 19 tests, 0 failed, 0 skipped. Scenarios 1-4 are covered by `RulebookIDTests`; an uppercase-hex mutation fails scenarios 3 and 4.
+- Found: `block-dangerous-commands.sh` blocks a shell write (`sed -i`) in any command that also mentions the Xcode project, even when the file written is a Swift source; mutation checks use Edit, then a separate `xcodebuild` call.
+- Left: reading the file and incremental hashing of large files belong to f08.
+- Next: the validator reviews f05 through `/feature-flow`. Done when: f05 is `accepted` and its PR is merged into `main`.
