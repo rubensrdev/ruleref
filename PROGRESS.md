@@ -132,3 +132,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Recorded late (B2b): live write probe inside the validator subagent; `echo` and `touch .probe-validator-write` were blocked by `validator-readonly-bash.sh` and no file was created. This closes the T3 done-when item "a validator write attempt blocked live".
 - `init.sh`: when `xcodebuild` dies before the result bundle is complete, test-results prints one clear line and fails, instead of a Python `JSONDecodeError` traceback. The exit status is unchanged.
 - Next: `/feature-flow` on f03-list-games, on its own branch. Done when: f03 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f03 implemented
+- f03-list-games is `passing` on branch `feat/f03-list-games` (code commit cd953e1): `Library.alphabeticalGames` (the one sorted `FetchDescriptor<Game>`, on `nameKey`, `.localizedStandard`, forward) and `Library.games()`; the root screen is the library (`NavigationStack`, `@Query(Library.alphabeticalGames)`, `ContentUnavailableView` when empty, "New Game" moved to the toolbar, navigation by value); `GameView` shows the name and "No Rulebook Yet" with no actions. Four new catalog keys with Spanish values.
+- `./init.sh` green: 14 tests, 0 failed, 0 skipped. Scenarios 1-3 are covered by `LibraryGamesTests`; a no-sort mutation fails scenarios 1 and 3.
+- f03 owns the minimal game screen; the import action and the ready state stay with f17.
+- Left: scenario 4 (list, empty state, game screen) is validated by hand at the end of T3.
+- Next: the validator reviews f03 through `/feature-flow`. Done when: f03 is `accepted` and its PR is merged into `main`.

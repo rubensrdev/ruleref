@@ -159,12 +159,34 @@
     "title": "List games alphabetically",
     "user_visible_behavior": "Library lists games alphabetically, with an empty state when there are none.",
     "depends_on": ["f02-create-game"],
-    "status": "not_started",
+    "status": "passing",
     "verification": [
       "Test on the library query: alphabetical order.",
       "Test on the library query: empty flag when there are no games."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/LibraryGamesTests",
+        "expected": "init.sh exits 0 with every check PASS; test-results shows the new LibraryGamesTests with failedTests=0 and skippedTests=0; catalog-coverage passes with the four new keys; scenarios 1-3 covered by passing tests on in-memory containers with games created through Library.createGame(named:).",
+        "observed": "init.sh exit 0, no retry. Test-results line: totalTestCount=14, failedTests=0, skippedTests=0, expectedFailures=0 (11 before f03, plus 3). Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED, 3 passed. Scenario tests (each with its own in-memory ModelContainer): scenario 1 LibraryGamesTests/alphabeticalOrder() (created \"Zombicide\", \"azul\", \"Ábaco\"; games() names are \"Ábaco\", \"azul\", \"Zombicide\"); scenario 2 LibraryGamesTests/emptyLibrary(); scenario 3 LibraryGamesTests/orderAfterCreating() (\"azul\", \"Zombicide\", then \"azul\", \"Catán\", \"Zombicide\"). The sort is defined once in Library.alphabeticalGames (nameKey, .localizedStandard, .forward); Library.games() and ContentView's @Query(Library.alphabeticalGames) both use it. Mutation check, not committed: with alphabeticalGames returning FetchDescriptor<Game>() (no sort), the focused run failed alphabeticalOrder() and orderAfterCreating(); emptyLibrary() passed.",
+        "context": {
+          "date": "2026-10-15 10:02 CEST",
+          "commit": "cd953e1400c3d2a35e50104a0d1bf89d249bee71",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f03-list-games, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Scenario 4: the library list, its empty state, the New Game toolbar button and GameView (title and No Rulebook Yet, navigation back) were not exercised; no UI tests by design, the user validates them by hand on the iPhone 16.",
+          "Order for non-Latin names (Greek, Cyrillic, CJK) and for names starting with digits or punctuation.",
+          "How the SwiftData store applies the .localizedStandard comparator beyond the tested Latin names; the order of the scenario names alone does not prove the sort is on nameKey rather than name (checked in code only).",
+          "The SF Symbols books.vertical and book.closed were not checked to exist.",
+          "Spanish rendering of the new strings on screen; only the catalog checks ran.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "The tests were not run red before the implementation: they did not compile until Library.games() existed; the mutation check stands in for it."
+        ]
+      }
+    ],
     "notes": "Task: T3."
   },
   {
