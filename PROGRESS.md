@@ -152,3 +152,8 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Found: `block-dangerous-commands.sh` blocks a shell write (`sed -i`) in any command that also mentions the Xcode project, even when the file written is a Swift source; mutation checks use Edit, then a separate `xcodebuild` call.
 - Left: reading the file and incremental hashing of large files belong to f08.
 - Next: the validator reviews f05 through `/feature-flow`. Done when: f05 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f05 accepted
+- Validation 1 at e95c9d7 returned `accept` and the user confirmed. `./init.sh` green (19 tests, 0 failed, 0 skipped); the focused RulebookIDTests run passed (9 test runs). Record: `docs/validations/f05-rulebook-id.md`.
+- Open for the user: whether `block-dangerous-commands.sh` should stop blocking shell writes to Swift sources in commands that also mention the Xcode project (harness follow-up on `main`, outside f05).
+- Next: the user merges the f05 PR; then `/feature-flow` on the next dependency-ready feature, f06-extract-passages. Done when: f06 is `accepted` and its PR is merged into `main`.
