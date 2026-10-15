@@ -398,12 +398,63 @@
     "title": "Import a rulebook atomically",
     "user_visible_behavior": "Importing into a game without a rulebook stores the file copy, the rulebook and its passages atomically.",
     "depends_on": ["f02-create-game", "f05-rulebook-id", "f06-extract-passages", "f07-join-hyphenation"],
-    "status": "not_started",
+    "status": "accepted",
     "verification": [
       "Test: after import, passage count equals extraction output and the stored file exists.",
       "Test: the Taifa fixture imports with 16 pages."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/RulebookStoreTests -only-testing:RuleRefTests/ImportTests -only-testing:RuleRefTests/TaifaImportTests; xcrun xcresulttool get test-results summary --path <focused run .xcresult>; xcrun xcresulttool export attachments --path <focused run .xcresult>; git diff main...HEAD -- RuleRef/Game.swift RuleRef/RulebookID.swift RuleRef/RuleRefApp.swift",
+        "expected": "init.sh exits 0 with every check PASS (no-pdf-in-app included) and test-results failedTests=0, skippedTests=0, showing the new RulebookStoreTests, ImportTests and TaifaImportTests; scenarios 1-6 covered by passing tests, each on its own in-memory container and temporary directory; the diff of Game.swift, RulebookID.swift and RuleRefApp.swift shows only the declared changes.",
+        "observed": "init.sh exit 0, no retry. Test-results line: totalTestCount=62, failedTests=0, skippedTests=0, expectedFailures=0 (45 after f07, plus 9 RulebookStoreTests, 7 ImportTests and 1 TaifaImportTests). Summary: PASS xcode-version: Xcode 27.0; PASS simulator: iPhone 18 Pro, iOS 27.0; PASS no-jsonserialization; PASS no-uikit-xctest; PASS no-third-party-deps; PASS no-pdf-in-app; PASS string-catalog; PASS feature-list; PASS xcodebuild-test; PASS test-results; PASS catalog-coverage; init.sh: PASS. Focused run at this commit: TEST SUCCEEDED; xcresulttool summary result=Passed, 17 tests (26 test runs), 0 failed, 0 skipped, no runtime warnings. Scenario tests: 1 ImportTests/successfulImportOfASyntheticPDF(); 2 ImportTests/persistence(); 3 TaifaImportTests/taifaFixture() (fixture resolved with Bundle(for:) on a test-target class and #require'd, so a missing fixture fails); 4 ImportTests/storageFailure(); 5 ImportTests/bytesThatAreNotAPDF(); 6 ImportTests/gameThatAlreadyHasARulebook(). Beyond the scenarios: ImportTests/missingFileIsUnreadable() and ImportTests/saveFailureRollsBackAndRemovesTheFile() (on-disk store reopened with ModelConfiguration(url:allowsSave: false): .storage, no pending changes, 0 Rulebook and 0 Passage rows in the library's context and in a new context, the stored file removed, game.rulebook == nil). RulebookStoreTests: path, app store location, write creating directories, atomic replace with no auxiliary file left, write failing under a regular file, removal, missing-file removal, init?(hex:) round trip (3 inputs) and rejects (8 inputs). Taifa: pageCount=16, 40 passages, per page (0-based) 0:3, 1:3, 2:2, 3:2, 4:2, 5:2, 6:2, 7:2, 8:2, 9:2, 10:2, 11:2, 12:3, 13:3, 14:2, 15:6 (from the test's taifa-passages.txt attachment); the stored file equals the fixture's bytes. Fixture bundling confirmed directly: the synchronized RuleRefTests folder copies taifa-3.0.pdf into the test bundle, found at its top level by url(forResource:withExtension:). Declared-changes diff (main 7b644af...HEAD): Game.swift +2 (the @Relationship(deleteRule: .cascade, inverse: \\Rulebook.game) rulebook property); RulebookID.swift +9 (init?(hex:) only); RuleRefApp.swift 1 line (.modelContainer(for: [Game.self, Rulebook.self, Passage.self])). The f02 and f03 test containers (for: Game.self) pass unchanged, so they were not modified. PassageSegmenter.swift and PassageExtractor.swift are unchanged (paragraphGapRatio untouched). Names follow the implementation: Rulebook.init(rulebookID: RulebookID, pageCount:importDate:) stores the hex; Passage.init(_ extracted: ExtractedPassage) unpacks the locator. Test-side note: #expect(throws:) with an async closure needs a sending result, so those closures discard the returned Rulebook; ImportTests counts rows with fetch(...).count because fetchCount on the library's context returned a stale count right after the failed save and rollback (the f02 finding), while fetch, hasChanges and a new context all showed 0. No catalog keys added (no UI).",
+        "context": {
+          "date": "2026-10-15 12:09 CEST",
+          "commit": "b9a61b134f1c1ea934badf6313881fbe33a7db9e",
+          "xcode": "Xcode 27.0 (27A266a)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f08-atomic-import, clean tree except the uncommitted feature_list.json status change, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Import from a real picked file, with security-scoped access: f17.",
+          "The save-failure path is exercised only with a read-only store (allowsSave: false); other save failures (disk full, validation or migration errors) and a failure of removeFile during the rollback were not exercised.",
+          "The re-check of game.rulebook after the await (another import finishing during the suspension) is not provoked by a test; it is checked in code only.",
+          "No mutation checks were run on the import code; the tests were not run red before the implementation (they did not compile until the types existed).",
+          "Taifa's segmentation: 40 passages for 16 pages, most of them a whole page body, plus one passage per printed page number; recorded as an ADR-002 finding in docs/risks-and-open-questions.md, the 0.5 ratio unchanged as the spec requires. Text wrapped around images on pp. 3 and 12 was not checked line by line.",
+          "How PDFKit reports a drawn U+00AD on Taifa: the extracted text has no U+00AD and no line-break hyphen left inside a passage, which does not show whether the source drew soft hyphens.",
+          "That SwiftData discovers Rulebook and Passage from Game alone in the app's own container: the app lists all three; only the tests' for: Game.self containers rely on it, and they pass.",
+          "The #Preview in ContentView still uses .modelContainer(for: Game.self, inMemory: true); previews were not rendered.",
+          "Persistence across app launches with the app's on-disk store, and RulebookStore.app writing inside the real app sandbox.",
+          "Not run on iOS 26.0 (the deployment target) nor on a physical device.",
+          "Not run from a fresh clone or with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/RulebookStoreTests -only-testing:RuleRefTests/ImportTests -only-testing:RuleRefTests/TaifaImportTests -quiet; git diff 7b644af...fc770ab -- RuleRef/Game.swift RuleRef/RulebookID.swift RuleRef/RuleRefApp.swift (plus PassageSegmenter.swift, PassageExtractor.swift, LibraryTests.swift, LibraryGamesTests.swift, ContentView.swift, GameView.swift); code review of the full 7b644af..fc770ab diff against the spec's Validator Checklist (validator, round 1)",
+        "expected": "init.sh exits 0 with every check PASS, 0 failed and 0 skipped tests; the 17 focused tests (scenarios 1-6 plus store, missing-file and save-failure tests) pass; the declared files show only the declared changes and paragraphGapRatio and the f02/f03 test containers are unchanged; prepare is @concurrent with a local PDFDocument and only Sendable values crossing; no nonisolated @Model; file written atomically before a single save; rollback and file removal on save failure; cascades on Game.rulebook and Rulebook.passages.",
+        "observed": "init.sh exit 0: totalTestCount=62, failedTests=0, skippedTests=0, expectedFailures=0; all 11 checks PASS (xcode-version Xcode 27.0, simulator iPhone 18 Pro iOS 27.0, no-pdf-in-app, catalog-coverage, ...). Focused run exit 0: all 17 tests (26 test-case runs) passed, none failed. Declared-changes diff: Game.swift +2 (cascade rulebook relationship), RulebookID.swift +9 (init?(hex:)), RuleRefApp.swift one line (three model types); the other listed files have no diff. Review: every checklist item holds. Info/Low notes: a failed save's removeFile could delete a file another game uses when the same PDF is in two games (f11 must refuse before the write); the save-failure test does not separately assert that the file was written before it was removed; the re-check after the await and the cascades are verified in code only. ContentView's #Preview container (for: Game.self) is not a defect: ContentView is outside the declared changes, and the unchanged for: Game.self test containers show SwiftData reaches Rulebook and Passage through the relationship. Verdict: accept.",
+        "context": {
+          "date": "2026-10-15",
+          "commit": "fc770abee3103a4229b7b896006463365b0de9a9",
+          "xcode": "Xcode 27.0 (as reported by init.sh; build number not checked by the validator)",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Clean working tree on feat/f08-atomic-import, warm DerivedData, not a fresh clone"
+        },
+        "not_verified": [
+          "The second game.rulebook check after the await: no test triggers it; checked in code only.",
+          "Cascade deletes of Game -> Rulebook -> Passage at runtime: no test deletes (f04, f12).",
+          "Save failures other than a read-only store (disk full, validation, migration), and removeFile failing during the rollback.",
+          "In saveFailureRollsBackAndRemovesTheFile, that the file was written before it was removed; inferred from the code, not asserted.",
+          "Taifa's per-page passage counts and attachment text: I did not export the result-bundle attachment (xcresulttool export is not allowed for the validator); only pageCount == 16, non-empty passages and the stored file's bytes were checked by the passing test.",
+          "ContentView #Preview rendering with the for: Game.self container; previews were not rendered.",
+          "Import from a real picked file with security-scoped access (f17).",
+          "Persistence across app launches with the on-disk store, and RulebookStore.app writing inside the real app sandbox.",
+          "iOS 26.0 (the deployment target) and a physical device.",
+          "A fresh clone or clean DerivedData.",
+          "The Xcode build number (only 'Xcode 27.0' was seen in init.sh output)."
+        ]
+      }
+    ],
     "notes": "Task: T3. Taifa 3.0 lives only in the test target, with its attribution file. The import action and the ready state are f17."
   },
   {

@@ -191,3 +191,17 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Found: the validator hook blocks `-resultBundlePath`, so focused runs use the default DerivedData bundle.
 - Left for f08: Taifa's real hyphenation, U+2011 and how PDFKit reports a drawn U+00AD.
 - Next: the user merges the f07 PR; then `/feature-flow` on the next dependency-ready feature, f08-atomic-import. Done when: f08 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f08 implemented
+- f08-atomic-import is `passing` on branch `feat/f08-atomic-import` (code commits c38cba0, a0d8488; docs b9a61b1): `RulebookStore` (`<base>/<hex>.pdf`, atomic write, missing file ignored on removal), `RulebookID.init?(hex:)`, `ImportError`, `PreparedRulebook`, `RulebookPreparer.prepare(fileAt:)` (`@concurrent`; reads and hashes once; the `PDFDocument` stays local), the `Rulebook` and `Passage` models (cascades; `orderedPassages`; `Passage.extractedPassage(rulebookID:)` rebuilds the locator), `Game.rulebook` and `Library.importRulebook(fileAt:into:store:)` (checks before and after the await, writes the file before the single `save()`, rolls back and removes the file if the save fails). The app container lists the three model types.
+- `./init.sh` green: 62 tests, 0 failed, 0 skipped. Scenarios 1, 2, 4, 5 and 6 in `ImportTests`, scenario 3 in `TaifaImportTests`; a read-only store also covers the save-failure path. The f02 and f03 test containers did not need changes.
+- Taifa: the fixture reaches the test bundle through the synchronized folder; 16 pages, 40 passages. Finding for ADR-002 (in `docs/risks-and-open-questions.md`): most passages are a whole page body, because Taifa's paragraph gaps are not above 0.5 × the median line height, and each printed page number is its own passage. No line-break hyphen is left inside a passage. The ratio is unchanged.
+- Found: `#expect(throws:)` with an async closure needs a `sending` result, so a closure returning a main-actor `@Model` must discard it. As in f02, `fetchCount` returns a stale count right after a failed save and rollback; the tests count with `fetch`. `block-dangerous-commands.sh` also blocks `mkdir` in a command that mentions the Xcode project.
+- Left: the import action and ready state (f17); Taifa's segmentation decision (ADR-002 or a later spec, measured by f16).
+- Next: the validator reviews f08 through `/feature-flow`. Done when: f08 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-15 — T3: f08 accepted
+- Validation 1 at fc770ab returned `accept` and the user confirmed. `./init.sh` green (62 tests, 0 failed, 0 skipped); the focused RulebookStoreTests/ImportTests/TaifaImportTests run passed (17). Record: `docs/validations/f08-atomic-import.md`.
+- Carry into f11: with the same PDF in two games, a failed save's `removeFile` deletes the file the first game uses; f11 must refuse with `.alreadyImported` before `store.write`.
+- Open for the user: Taifa's coarse segmentation (40 passages for 16 pages) should be decided before f13 (ADR-002 finding). Align `ContentView`'s `#Preview` container in f17.
+- Next: the user merges the f08 PR; then `/feature-flow` on the next dependency-ready feature, f09-reject-no-text-layer. Done when: f09 is `accepted` and its PR is merged into `main`.
