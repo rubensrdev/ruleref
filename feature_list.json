@@ -945,7 +945,7 @@
     "title": "Open a match highlighted on its page",
     "user_visible_behavior": "Opening a match shows its page in the page viewer with the passage rectangle highlighted.",
     "depends_on": ["f13-text-search"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test: the page index and highlight bounds passed to the viewer equal the locator's."
     ],
@@ -993,6 +993,31 @@
           "The Spanish texts on screen; only the catalog checks ran.",
           "iOS 26.0 (the deployment target), a physical device and a Release build.",
           "A fresh clone with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/PageHighlightTests -only-testing:RuleRefTests/PDFPageViewTests; git diff main...HEAD --stat; git diff main...HEAD -- init.sh; git diff main...HEAD -- RuleRef/ (read in full); git diff main...HEAD -- RuleRef/Shared/; git show da7e2f5 (validator rerun, validation 2)",
+        "expected": "init.sh exits 0 with every check PASS and 109 tests, 0 failed, 0 skipped; the focused run ends in ** TEST SUCCEEDED **, 4 of 4; the stat lists only the spec's files plus feature_list.json, PROGRESS.md and the orchestrator's validation record; init.sh is unchanged; PDFPageView.swift imports only SwiftUI and PDFKit; there is no import UIKit, write(to: or dataRepresentation in RuleRef/; RuleRef/Shared/ mentions no Features/ type (F1 fixed).",
+        "observed": "Independent validator rerun (validation 2, verdict accept). init.sh exit 0, init.sh: PASS, totalTestCount=109, failedTests=0, skippedTests=0, expectedFailures=0, all 11 checks PASS. Focused run ** TEST SUCCEEDED **, 4 of 4 passed. The stat holds the 13 spec, evidence and progress files plus docs/validations/f15-page-viewer-highlight.md. The init.sh diff is empty; PDFPageView.swift imports PDFKit and SwiftUI only. Reading the RuleRef/ diff found no forbidden API. SamplePDF.swift now exposes previewLocator: Locator and uses only the Domain/ types Locator and RulebookID. da7e2f5 changes only SamplePDF.swift and the five preview call sites.",
+        "context": {
+          "date": "2026-10-16 12:47 CEST",
+          "commit": "bfd862c5bafe177e1aa5e867c663f8011113c28d (code at da7e2f5)",
+          "xcode": "Xcode 27.1",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Working checkout, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Scenario 4 by hand: Taifa on the iPhone 16, search, tap a match, the page titled \"Page N\" with the passage marked, then back",
+          "The highlight's color and position on screen, and whether go(to:on:) in makeUIView scrolls before the view has a size",
+          "The previews (not rendered; SamplePDF.data() not run by any check)",
+          "Whether NavigationLink builds destinations eagerly, and whether makeUIView runs once per viewer",
+          "Taifa pages 3 and 12, and memory with large rulebooks",
+          "The Spanish texts on screen",
+          "iOS 26.0, a physical device, a Release build",
+          "A fresh clone with clean DerivedData",
+          "A search-based run of the forbidden-API check (hook blocked it; the diff was read instead)",
+          "xcresult details beyond the console and init.sh counts",
+          "The exact simulator build number"
         ]
       }
     ],
