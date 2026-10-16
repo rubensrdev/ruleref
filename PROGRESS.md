@@ -313,3 +313,11 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - The table rows on pages 2 and 11 become one passage each. The spec did not foresee it; the user accepted it, because ADR-002 treats tables as an accepted degradation, and f16 measures it.
 - Not verified: the measured values re-extracted by the validator, iOS 26.0 and a device, other rulebooks, how matches look in the app (no search yet).
 - Next: the user merges the f18 PR on GitHub, then `/feature-flow` on f19-interface-conventions. Done when: the f18 PR is merged into `main` and f19 is `accepted` with its PR open.
+
+## 2026-10-16 — T4: f19 passing
+- f19-interface-conventions is `passing` on branch `feat/f19-interface-conventions` (code commit 8d1eda6). `ContentView` is now `LibraryView` with a "+" toolbar button (icon only); the new-game sheet splits into `NewGameForm` (plain values, `.cancel` and `.confirm` role buttons) and the `NewGameSheet` wrapper, with the failure mapping in `NewGameFailure`; the game screen splits into `GameContent` (plain values, "Import Rulebook" with `square.and.arrow.down`, the alert) and the `GameView` wrapper.
+- Previews, named per state and inside `#if DEBUG`, use `RuleRef/Shared/SampleLibrary.swift` (in-memory container for all three models; `GamesPreview` and `EmptyLibraryPreview`). This closes the f17 open item on the preview containers.
+- Catalog: "Cancel" and "Create" removed; no key added.
+- `./init.sh` green on 8d1eda6: 92 tests (91 plus `NewGameFailureTests`), 0 failed, 0 skipped.
+- Left: the user opens every preview in Xcode and checks the three screens on the iPhone 16 (scenario 5), including how the role buttons render.
+- Next: the f19 validator run through `/feature-flow`, then its PR. Done when: f19 is `accepted` and its PR is merged; then f13 starts.
