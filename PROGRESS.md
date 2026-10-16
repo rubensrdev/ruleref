@@ -406,3 +406,8 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Validator notes, none blocking: no test swaps the fixture to exercise the SHA-mismatch path; the implementer's evidence names 675ea11, later commits only add records.
 - Not verified: byte-for-byte identity of the attachment as seen by the validator (compared field by field); the SHA-mismatch path; iOS 26.0 and a device; other rulebooks; a fresh clone; determinism beyond two runs.
 - Next: the user reviews and merges the f16 PR on GitHub; then decides whether to unblock f04 and f12 (`deferred` until m4). Done when: the f16 PR is merged into `main` and f04 and f12 have the user's decision recorded.
+
+## 2026-10-16 — README as the delivery summary, f04 and f12 deferred
+- `README.md` is now the course delivery summary, in English and Spanish in one file, with anchor links at the top: what the app is and where it stands (tag `m4`), what it does, how it was built (the gate, the hooks, the state in the repo, approved specs and the loop) and the f16 baseline (hit@1 3/21, hit@3 4/21, no-match accuracy 3/4).
+- f04 and f12 stay `blocked`, now deferred until after the course delivery by the user's decision: the demo flow does not need them.
+- Next: the decision on how much AI enters before delivery, informed by the f16 baseline. Done when: the decision is written down.

@@ -223,7 +223,7 @@
       "Test: after delete, passage count and stored-file count for that rulebook ID are 0."
     ],
     "evidence": [],
-    "notes": "Task: after m4 (non-goal until m4). deferred: until m4, by the user's decision (docs/build-brief.md, Non-goals)."
+    "notes": "Task: after the course delivery. deferred: until after the course delivery, by the user's decision on 2026-10-16 (it was until m4; the demo flow does not need it)."
   },
   {
     "id": "f05-rulebook-id",
@@ -702,7 +702,7 @@
       "Test: import is offered again."
     ],
     "evidence": [],
-    "notes": "Task: after m4 (non-goal until m4). deferred: until m4, by the user's decision (docs/build-brief.md, Non-goals)."
+    "notes": "Task: after the course delivery. deferred: until after the course delivery, by the user's decision on 2026-10-16 (it was until m4; the demo flow does not need it)."
   },
   {
     "id": "f18-paragraph-cut-calibration",
