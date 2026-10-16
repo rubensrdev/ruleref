@@ -12,6 +12,7 @@ Status of every open decision from `docs/idea.md`:
 | Multi-column extraction | **Decided**: PDFKit line order in the MVP; tables and the two-column contents are accepted degradations, measured by F16 | `docs/adr/0002-multi-column-extraction.md` |
 | UI language | **Decided**: Spanish and English via String Catalog (`Localizable.xcstrings`) | this table |
 | Passage segmentation rule | **Decided** (f06, recalibrated in f18): a new passage starts when the vertical gap is greater than 0.03 × the page's median line height, when a line lies above the previous one, or when a line starts with the bullet `•` (U+2022) after leading whitespace; a page break always cuts; no font, indentation or other list-marker rule. f18 measured the ratio on Taifa with PDFKit on the iOS 27.0 simulator (largest gap inside a paragraph −0.017, smallest before a paragraph or heading 0.069), leaving out bullet lines (cut by the bullet rule) and page 16 (credits and two-column contents, whose credits may split line by line). Taifa now imports as 221 passages | `docs/specs/f06-extract-passages.md`, `PassageSegmenter` |
+| AI provider and fallback | **Decided** (2026-10-16): Foundation Models on the device only, with no cloud fallback; without the model the app falls back to semantic retrieval (f20) and to text search | `feature_list.json` f20–f22 |
 
 ## Blocking next phase
 
@@ -26,8 +27,8 @@ None.
 ## Later (after m4)
 
 - **Eval set.** 25 questions written on 2026-10-15 (13 normal, 4 table, 4 false premise, 4 absent), scored by page. It landed as `RuleRefTests/Fixtures/taifa-3.0-eval.json` on 2026-10-16, after tag `m4`; its 21 expected pages were checked against the fixture.
-- AI answering with Foundation Models and @Generable; abstention when the rulebook is silent; citing several passages (rule + exception).
-- Embeddings hypothesis (NLContextualEmbedding + cosine). Kept only if it beats the baseline on page precision.
+- AI answering with Foundation Models and @Generable, with the citation checked in code: f21, with its screen in f22. Still later: citing several passages (rule + exception).
+- Embeddings hypothesis: f20, with NLEmbedding sentence embeddings and cosine similarity (Apple points to NLEmbedding, not NLContextualEmbedding, for semantic similarity), measured on the eval set against the f16 baseline.
 - Open question for disputes: whether a dispute whose rulebook is gone is shown as "stale".
 - Scope already listed in `docs/build-brief.md` Non-goals (sharing, cheat sheet, photos, web importer) needs no further decision now.
 

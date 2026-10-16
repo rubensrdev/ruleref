@@ -416,3 +416,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - The user made the app icon by hand in Icon Composer (`RuleRef/AppIcon.icon`): four flat SVG layers (a page, text lines, a yellow highlight and the highlighted line) on a navy gradient, with a dark variant of the background. It replaces the empty `AppIcon.appiconset`, which the user removed; the target's App Icon name stays `AppIcon`, so the project file does not change. Checked on the iPhone 16 home screen.
 - `README.md` shows the icon from `docs/assets/app-icon.png`, a 1024 px export of the default appearance.
 - `AccentColor` stays empty for now (the system tint): a custom accent would change every control and waits until after delivery.
+
+## 2026-10-16 — m5-base tagged; on-device AI planned as f20–f22
+- Tag `m5-base` (annotated) points at 86e5fb3: the deliverable without on-device AI (m4, the eval set, the text-search baseline, the README and the app icon).
+- The user chose to build the on-device AI layer before delivery, with `m5-base` as the fallback: only accepted features reach `main`, so `main` stays deliverable after every merge.
+- Decided by the user: Foundation Models on the device only, with no cloud fallback; without the model the app falls back to semantic retrieval and to text search.
+- Added f20-semantic-retrieval (NLEmbedding sentence embeddings, measured with the eval set's `question` field), f21-ai-answer (Foundation Models answer with the citation checked in code, tested with a fake model) and f22-ask-screen. Foundation Models on the iOS Simulator is not reliable, so the gate never depends on the real model; the user checks it on the iPhone 16.
+- Next: write the f20 spec with `feature-spec` on `main`. Done when: `docs/specs/f20-semantic-retrieval.md` has the user's Approval line.

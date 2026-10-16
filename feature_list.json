@@ -1079,5 +1079,51 @@
       }
     ],
     "notes": "Task: after m4 (module 5, next to the AI it is compared against). Unblocked on 2026-10-16 after tag m4. The eval set is RuleRefTests/Fixtures/taifa-3.0-eval.json (25 questions); its 21 expected pages were checked against the fixture with pdftotext. Depends on f18 because the baseline measures the passages f18 cuts."
+  },
+  {
+    "id": "f20-semantic-retrieval",
+    "area": "retrieval",
+    "title": "Semantic passage retrieval",
+    "user_visible_behavior": "A question in natural language returns the rulebook passages closest in meaning, ranked by the cosine similarity of on-device sentence embeddings (NLEmbedding), with no network; when no sentence embedding exists for the rulebook's language, retrieval reports that it is unavailable.",
+    "depends_on": ["f08-atomic-import", "f18-paragraph-cut-calibration", "f16-baseline-eval"],
+    "status": "not_started",
+    "verification": [
+      "Test on a synthetic rulebook: the passage closest in meaning ranks first, and the order is stable.",
+      "Test: a missing embedding gives the unavailable state, never an empty ranking.",
+      "A focused `xcodebuild test -only-testing:` run attaches a report of the eval set's `question` field scored like f16 (hit@1, hit@3 and no-match accuracy), exported with `xcrun xcresulttool export attachments` and committed to `docs/eval/`; `init.sh` does not change."
+    ],
+    "evidence": [],
+    "notes": "Task: T5 (on-device AI). Added on 2026-10-16 after tag m5-base. NLEmbedding and not NLContextualEmbedding, because Apple's documentation points to NLEmbedding for semantic similarity. If the iOS 27.0 simulator has no Spanish sentence embedding, the implementer stops. Whether a similarity threshold gives a no-match state is decided in its spec."
+  },
+  {
+    "id": "f21-ai-answer",
+    "area": "ai",
+    "title": "Answer a question with a cited passage",
+    "user_visible_behavior": "With the on-device model available, a question gets a short answer that Foundation Models writes from the closest passages, citing one of them. The citation is checked in code: an answer whose cited passage is not among the given ones, or whose quote is not in that passage, is never shown. Without the model, the state says why: device not eligible, Apple Intelligence off or model not ready.",
+    "depends_on": ["f20-semantic-retrieval"],
+    "status": "not_started",
+    "verification": [
+      "Test with a fake model: a valid citation gives an answer with its passage and page.",
+      "Test with a fake model: a citation outside the given passages, or a quote not in the cited passage, gives no answer.",
+      "Test: each availability state maps to its own state; no test needs the real model.",
+      "Manual on the iPhone 16: a real question gets an answer that cites the right page (not verified by the gate)."
+    ],
+    "evidence": [],
+    "notes": "Task: T5. Foundation Models only, with no cloud fallback, by the user's decision on 2026-10-16; without the model the app falls back to f20 and to text search."
+  },
+  {
+    "id": "f22-ask-screen",
+    "area": "ask",
+    "title": "Ask a question in a game",
+    "user_visible_behavior": "In a game, the user asks a question and sees the answer with its page; tapping it opens the page viewer with the cited passage highlighted. Without the model, the closest passages are listed instead; without an embedding, text search is used.",
+    "depends_on": ["f21-ai-answer", "f15-page-viewer-highlight", "f14-no-match-state"],
+    "status": "not_started",
+    "verification": [
+      "Test: each answer outcome maps to its view state (answer, passages only, text search, unavailable).",
+      "One named #Preview per state, with sample data (DESIGN.md).",
+      "Manual on the iPhone 16: ask a question, read the answer and open its page highlighted."
+    ],
+    "evidence": [],
+    "notes": "Task: T5. A UI feature, placed after every feature it shows."
   }
 ]
