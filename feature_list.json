@@ -740,7 +740,7 @@
     "area": "search",
     "title": "Text search in a rulebook",
     "user_visible_behavior": "Text search returns passages of the game's rulebook containing all query terms, case- and diacritic-insensitively, ranked by term frequency then reading order.",
-    "depends_on": ["f08-atomic-import"],
+    "depends_on": ["f08-atomic-import", "f19-interface-conventions"],
     "status": "not_started",
     "verification": [
       "Test on a synthetic rulebook: AND semantics.",
