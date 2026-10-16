@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Baseline search evaluation
 
+Approval: approved by the user on 2026-10-16
+
 ## Source Feature
 
 - `id`: f16-baseline-eval
@@ -62,7 +64,7 @@ Then `noMatchCorrect` is true; when its state is `.matches`, it is false and `to
 
 ### Scenario 5: a malformed eval set fails
 
-Given an eval set with any of: a repeated `id`; an unknown `type`; `expectedPage` null for a type other than `absent`, or non-null for `absent`; an `expectedPage` outside 1...page count of the PDF; a `query` with no non-whitespace character
+Given an eval set with any of: a repeated `id`; an unknown `type`; an unknown `overlap`; `expectedPage` null for a type other than `absent`, or non-null for `absent`; an `expectedPage` outside 1...page count of the PDF; a `query` with no non-whitespace character
 When it is decoded and validated
 Then decoding or validation throws, and the baseline test fails. Each case has its own unit test.
 
@@ -105,7 +107,7 @@ Then it fails with a message naming the missing resource or the SHA mismatch; it
 All new code is in the test target, in a new folder `RuleRefTests/Evaluation/`, plus one helper in `RuleRefTests/Support/`.
 
 1. `TestFixture` (`Support/`): `static func url(forResource:withExtension:) throws -> URL` looks the resource up in the test bundle (private token class) and throws an error naming the file when it is missing.
-2. `EvalSet` (`nonisolated`, `Decodable` is enough; `Codable` is allowed): properties `fixture`, `fixtureSHA256`, `scoring`, `questions`, named as in the file. Nested `Question` with every field of the file (`question`, `fragment`, `note` are decoded and unused). Nested `QuestionType: String, Codable` with `normal`, `table`, `falsePremise`, `absent`: an unknown type fails decoding. `overlap` is a `String` (no rule on it). `func validate(pageCount: Int) throws` throws a nested error for: a repeated `id`; `expectedPage == nil` while `type != .absent`, or `!= nil` while `type == .absent`; `expectedPage` outside `1...pageCount`; `query` with no non-whitespace character. The error says which question and which rule.
+2. `EvalSet` (`nonisolated`, `Decodable` is enough; `Codable` is allowed): properties `fixture`, `fixtureSHA256`, `scoring`, `questions`, named as in the file. Nested `Question` with every field of the file (`question`, `fragment`, `note` are decoded and unused). Nested `QuestionType: String, Codable` with `normal`, `table`, `falsePremise`, `absent`, and nested `Overlap: String, Codable` with `low`, `high`: an unknown value of either fails decoding. `func validate(pageCount: Int) throws` throws a nested error for: a repeated `id`; `expectedPage == nil` while `type != .absent`, or `!= nil` while `type == .absent`; `expectedPage` outside `1...pageCount`; `query` with no non-whitespace character. The error says which question and which rule.
 3. `BaselineReport` (`nonisolated`, `Codable`): nested `Score { count, total, rate }` (`rate` is `count / total`, 0 when `total` is 0); `Summary { hitAt1, hitAt3, noMatchAccuracy, passageCount, fixtureSHA256, iOSVersion }`; `Row { id, type, overlap, expectedPage?, topPages, hitAt1?, hitAt3?, noMatchCorrect? }`. `Row.init(question:state:)` scores one question:
    - `topPages`: `pageNumber` of the first three matches in `SearchIndex` order, duplicates kept; `[]` for `.noMatch` or `.idle`.
    - Questions with `expectedPage` (`normal`, `table`, `falsePremise` alike): `hitAt1` = first page equals it; `hitAt3` = any of `topPages` equals it; `.noMatch` is a miss. `noMatchCorrect` is nil.
