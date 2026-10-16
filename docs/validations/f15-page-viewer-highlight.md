@@ -33,3 +33,13 @@
      - `git diff main...HEAD -- RuleRef/Shared/` mentions no `PageHighlight` and no other `Features/` type.
      - `git diff main...HEAD --stat` still lists only the spec's files plus `feature_list.json` and `PROGRESS.md`.
   5. Commit as `fix(page-viewer): keep preview sample data below Features`, then add a new evidence entry with the new commit and leave the status `passing`.
+
+## Validation 2 — accept — 2026-10-16
+- Commit validated: bfd862c (code e41a0f4 and da7e2f5, base main 6d183b5)
+- Checks rerun: `./init.sh` exit 0, all 11 checks PASS (109 tests, 0 failed, 0 skipped, 0 expected failures); focused `xcodebuild test -only-testing:RuleRefTests/PageHighlightTests -only-testing:RuleRefTests/PDFPageViewTests` TEST SUCCEEDED (4 of 4); `git diff main...HEAD --stat` the 13 spec, evidence and progress files plus this record; `git diff main...HEAD -- init.sh` empty; `PDFPageView.swift` imports `PDFKit` and `SwiftUI` only; manual read of `git diff main...HEAD -- RuleRef/` finds no `import UIKit`, `write(to:` or `dataRepresentation`; `git diff main...HEAD -- RuleRef/Shared/` mentions only `Domain/` types; `git show da7e2f5` matches the repair brief exactly.
+- Findings:
+  - Resolved: F1 (Medium in validation 1) — `SamplePDF` now exposes `previewLocator: Locator`; `Shared/` uses only `Domain/`.
+  - Low: the second evidence entry's context says "feature_list.json (status in_progress)", apparently copied from the first entry — does not block.
+  - Low (carried from validation 1, non-blocking): stale `MatchRow.swift` comment "Not tappable until the page viewer (f15)"; `PageViewerFixture` in `PageHighlightTests.swift` rather than `RuleRefTests/Support/`; a re-run of `makeUIView` for the same document would add a second annotation (in `not_verified`).
+  - Info: "Missing File" preview uses a never-created temporary path; security checklist found nothing relevant; ADR-004, `ARCHITECTURE.md` and `DESIGN.md` met.
+- Not verified: scenario 4 by hand (Taifa on the iPhone 16: search, tap a match, page titled "Page N" with the passage marked, back); the highlight's color and position and whether `go(to:on:)` in `makeUIView` scrolls before the view has a size; the previews (not rendered; `SamplePDF.data()` not run by any check); whether `NavigationLink` builds destinations eagerly and whether `makeUIView` runs once per viewer; Taifa pages 3 and 12 and memory with large rulebooks; the Spanish texts on screen; iOS 26.0, a physical device, a Release build; a fresh clone with clean DerivedData; a search-based run of the forbidden-API check (hook blocked it; diff read instead); xcresult details beyond the console and `init.sh` counts; the exact simulator build number.
