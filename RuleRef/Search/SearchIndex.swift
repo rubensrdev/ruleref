@@ -46,7 +46,7 @@ nonisolated struct SearchIndex: Sendable {
                 ? lhs.occurrences > rhs.occurrences
                 : lhs.passage.ordinal < rhs.passage.ordinal
         }
-        return .matches(matches)
+        return matches.isEmpty ? .noMatch : .matches(matches)
     }
 
     /// Non-overlapping occurrences, counted left to right.
