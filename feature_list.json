@@ -720,6 +720,22 @@
     "notes": "Task: T4. Added on 2026-10-16. f08 imported Taifa as 40 passages for 16 pages, most of them a whole page body: its paragraph gaps (0.15-0.3 x the line height, measured with PyMuPDF, not PDFKit) are below f06's 0.5 ratio. The implementer measures the gaps with PassageExtractor.lines(on:) and picks the ratio. Reading order stays as ADR-002 decides."
   },
   {
+    "id": "f19-interface-conventions",
+    "area": "interface",
+    "title": "Library and game screens follow DESIGN.md",
+    "user_visible_behavior": "The library, new-game and game screens use SF Symbols and standard button roles, and every state they can show has an Xcode preview with sample data.",
+    "depends_on": ["f17-import-action"],
+    "status": "not_started",
+    "verification": [
+      "`./init.sh` passes and the existing tests pass unchanged: behavior does not change.",
+      "Review: every view under `RuleRef/Features/` has one named `#Preview` per state it can show, with sample data only (no persistent store, no stored file, no network).",
+      "Review: every button outside an alert is a `Label` with an SF Symbol or uses a standard button role.",
+      "Manual: the user opens every preview in Xcode and checks the three screens on the iPhone 16."
+    ],
+    "evidence": [],
+    "notes": "Task: T4. Added on 2026-10-16 after the user's code review: folders, previews and SF Symbols were never written down as rules, so f02, f03 and f17 followed their specs. DESIGN.md and ARCHITECTURE.md now hold them. In scope: renaming ContentView to LibraryView and the #Preview containers left open after f17."
+  },
+  {
     "id": "f13-text-search",
     "area": "search",
     "title": "Text search in a rulebook",

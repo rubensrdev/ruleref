@@ -9,6 +9,7 @@ description: Implement one RuleRef feature from its approved spec in docs/specs,
 - One feature per run: the id you were given. Never start another feature, never set `accepted`, never edit `docs/specs/`.
 - The spec at `docs/specs/<feature-id>.md` is the contract. If it is missing, contradicts itself or does not cover a decision the code needs, stop and report the gap; never decide it yourself.
 - `AGENTS.md` rules apply in full: non-negotiables, tests, localization, Definition of Done. Never edit `RuleRef.xcodeproj`.
+- New files go in the folder `ARCHITECTURE.md` assigns. Every view you add or change follows `DESIGN.md`, previews included.
 - Done means `./init.sh` passes. Never weaken, skip or delete a test to get there.
 - Do not push. The orchestrator decides what is published.
 - Report what you could not verify.

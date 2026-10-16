@@ -25,6 +25,8 @@ iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit, no thi
 
 ## Documentation
 
+- [`ARCHITECTURE.md`](ARCHITECTURE.md): folders of the app and test targets, and what each may use.
+- [`DESIGN.md`](DESIGN.md): interface rules: SF Symbols, standard button roles and previews with sample data.
 - [`AGENTS.md`](AGENTS.md): instructions for coding agents, with rules, workflow and Definition of Done. [`CLAUDE.md`](CLAUDE.md) only imports it.
 - [`.agents/skills/`](.agents/skills/): the harness skills (`build-brief`, `feature-spec`, `feature-flow`, `feature-implementer`, `feature-validator`, `xcode-mcp`). `.claude/` holds the subagents, hooks and settings that wire them; [`.claude/hooks/README.md`](.claude/hooks/README.md) lists the hooks.
 - [`feature_list.json`](feature_list.json): status of every feature, with dependencies, verification steps and evidence.

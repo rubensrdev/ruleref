@@ -30,7 +30,7 @@ A player at the table, on an iPhone, with the game's PDF rulebook already on the
 - **Several PDFs per game** (expansions, FAQs): one rulebook per game keeps identity and search simple.
 - **Replacing a rulebook**: delete and import instead; avoids versioning.
 - **Search across games**: search runs inside one game's rulebook.
-- **Custom visual design**: screens follow Apple's Human Interface Guidelines.
+- **Custom visual design**: screens follow Apple's Human Interface Guidelines; the interface rules are in `DESIGN.md`.
 - **Baseline measurement (F16)**: moves to module 5, next to the AI it is compared against.
 - **Deleting games and rulebooks (F04, F12)**: not needed for the demo flow; after m4.
 
@@ -60,6 +60,7 @@ Ordered. IDs are stable; never renumber.
 | F17 | T3 | From a game without a rulebook, the user picks a PDF with the system file picker and imports it; the game screen then shows the rulebook as ready, with its page count. | Test: game screen state empty → ready with page count; manual: import Taifa from Files on the iPhone 16. |
 | F12 | after m4 | User deletes a game's rulebook; the game stays and can import again. | Test: game remains, rulebook/passages/file gone, import is offered again. |
 | F18 | T4 | Importing the Taifa rulebook splits each page into its paragraphs, so a match and its highlight cover one paragraph instead of the whole page body. | Tests on the Taifa fixture: known paragraph starts begin a passage; a mid-paragraph line does not; f06's synthetic tests still pass. |
+| F19 | T4 | The library, new-game and game screens use SF Symbols and standard button roles, and every state they can show has an Xcode preview with sample data. | `./init.sh` passes with the existing tests unchanged; review of previews and buttons against `DESIGN.md`; manual check of the previews and the iPhone 16. |
 | F13 | T4 | Text search returns passages of the game's rulebook containing all query terms, case- and diacritic-insensitively, ranked by term frequency then reading order. | Tests on a synthetic rulebook: AND semantics, "construccion" matches "construcción", ranking stable. |
 | F14 | T4 | A query with zero matches shows the no-match state, never approximate matches. | Test: search state is `.noMatch` with an empty list for an absent term. |
 | F15 | T4 | Opening a match shows its page in the page viewer with the passage rectangle highlighted. | Test: locator → page index and highlight bounds passed to the viewer equal the locator's. |

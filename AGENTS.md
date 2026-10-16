@@ -13,9 +13,10 @@ The harness is the main deliverable; the app is its test bed.
 ## Non-negotiable rules
 
 - Never edit `RuleRef.xcodeproj`. The user configures it in Xcode. If a target, setting, scheme or file membership change is needed, stop and tell the user exactly what to change.
-- New files go in the synchronized folders `RuleRef/` and `RuleRefTests/`; they need no project change.
+- New files go in the synchronized folders `RuleRef/` and `RuleRefTests/`, in the subfolder `ARCHITECTURE.md` assigns; they need no project change.
 - Swift 6 with complete strict concurrency.
 - SwiftUI, no UIKit. One exception: the PDFKit page viewer (f15), decided in ADR-004; its file imports `SwiftUI` and `PDFKit` only.
+- Interface rules (SF Symbols, standard button roles, previews with sample data): `DESIGN.md`.
 - SwiftData for persistence.
 - Swift Testing only; no XCTest.
 - Codable only; `JSONSerialization` is forbidden.
@@ -79,7 +80,7 @@ Speak Spanish with the user. Code, comments, files and commit messages are in En
 
 ## Naming
 
-- UPPERCASE only for `AGENTS.md`, `CLAUDE.md`, `PROGRESS.md`, `CONTEXT.md` and `SKILL.md`; lowercase-kebab for everything else.
+- UPPERCASE only for `AGENTS.md`, `CLAUDE.md`, `PROGRESS.md`, `CONTEXT.md`, `ARCHITECTURE.md`, `DESIGN.md` and `SKILL.md`; lowercase-kebab for everything else.
 - Swift files are named after their type.
 - Domain terms are the ones in `CONTEXT.md`.
 
@@ -107,6 +108,7 @@ What each hook blocks and how to test it: `.claude/hooks/README.md`. Run the hoo
 - [ ] `./init.sh` ends in PASS.
 - [ ] Tests cover all new logic.
 - [ ] New visible texts are in the catalog with their Spanish translation.
+- [ ] Views added or changed follow `DESIGN.md`, previews included.
 - [ ] `feature_list.json` is updated with status and evidence.
 - [ ] Docs and `README.md` are up to date if what they say changed.
 - [ ] `PROGRESS.md` has an entry with what closed and what comes next.
