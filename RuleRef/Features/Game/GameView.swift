@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// The game screen: owns the import and its error; `GameContent` shows them.
 struct GameView: View {
     let game: Game
 
@@ -11,49 +12,21 @@ struct GameView: View {
     @State private var errorMessage: LocalizedStringResource?
 
     var body: some View {
-        content
-            // StringProtocol overload: the name is user data, never a catalog key.
-            .navigationTitle(game.name)
-            .fileImporter(isPresented: $isPickingFile, allowedContentTypes: [.pdf]) { result in
-                switch result {
-                case .success(let url):
-                    importRulebook(at: url)
-                case .failure:
-                    // The picker could not hand over a file.
-                    errorMessage = ImportErrorMessage.message(for: .unreadable)
-                }
-            }
-            .alert(
-                "Import Failed",
-                isPresented: Binding(
-                    get: { errorMessage != nil },
-                    set: { isPresented in if !isPresented { errorMessage = nil } }
-                ),
-                presenting: errorMessage
-            ) { _ in
-                Button("OK") {}
-            } message: { message in
-                Text(message)
-            }
-    }
-
-    @ViewBuilder
-    private var content: some View {
-        switch GameScreenState(game: game) {
-        case .empty:
-            ContentUnavailableView {
-                Label("No Rulebook Yet", systemImage: "book.closed")
-            } actions: {
-                // The button is hidden while importing, so a second import cannot start.
-                if isImporting {
-                    ProgressView("Importing…")
-                } else {
-                    Button("Import Rulebook") { isPickingFile = true }
-                }
-            }
-        case .ready(let pageCount):
-            List {
-                LabeledContent("Pages", value: pageCount, format: .number)
+        GameContent(
+            title: game.name,
+            state: GameScreenState(game: game),
+            isImporting: isImporting,
+            errorMessage: errorMessage,
+            importRulebook: { isPickingFile = true },
+            dismissError: { errorMessage = nil }
+        )
+        .fileImporter(isPresented: $isPickingFile, allowedContentTypes: [.pdf]) { result in
+            switch result {
+            case .success(let url):
+                importRulebook(at: url)
+            case .failure:
+                // The picker could not hand over a file.
+                errorMessage = ImportErrorMessage.message(for: .unreadable)
             }
         }
     }
@@ -68,3 +41,14 @@ struct GameView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Game", traits: .modifier(GamesPreview())) {
+    @Previewable @Query(Library.alphabeticalGames) var games: [Game]
+    NavigationStack {
+        if let game = games.first {
+            GameView(game: game)
+        }
+    }
+}
+#endif

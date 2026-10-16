@@ -771,14 +771,57 @@
     "title": "Library and game screens follow DESIGN.md",
     "user_visible_behavior": "The library, new-game and game screens use SF Symbols and standard button roles, and every state they can show has an Xcode preview with sample data.",
     "depends_on": ["f17-import-action"],
-    "status": "not_started",
+    "status": "accepted",
     "verification": [
       "`./init.sh` passes and the existing tests pass unchanged: behavior does not change.",
       "Review: every view under `RuleRef/Features/` has one named `#Preview` per state it can show, with sample data only (no persistent store, no stored file, no network).",
       "Review: every button outside an alert is a `Label` with an SF Symbol or uses a standard button role.",
       "Manual: the user opens every preview in Xcode and checks the three screens on the iPhone 16."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/NewGameFailureTests -only-testing:RuleRefTests/GameScreenStateTests -only-testing:RuleRefTests/LibraryTests; grep -rn ContentView RuleRef RuleRefTests (ContentUnavailableView excluded); git diff main...HEAD --stat",
+        "expected": "init.sh exits 0 with every check PASS (string-catalog and catalog-coverage included), 0 failed, 0 skipped, and the count is 91 plus the new test; the focused run succeeds; no ContentView remains; the diff touches only the spec's files (plus feature_list.json and PROGRESS.md in the evidence commit) and adds only NewGameFailureTests.swift under RuleRefTests/.",
+        "observed": "init.sh exit 0 on 8d1eda6 (run twice: before and after the commit): totalTestCount=92, failedTests=0, skippedTests=0, expectedFailures=0 (91 before, plus 1 new); PASS xcode-version (Xcode 27.1), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED, 7 tests (8 runs, blankNameIsRejected has 2 arguments), 0 failed, including scenario 1 NewGameFailureTests/sheetFailureMappingIsUnchanged() (GameNameError.blank -> .blank, .duplicate -> .duplicate, CocoaError(.fileWriteUnknown) -> .saveFailed). No ContentView left in RuleRef/ or RuleRefTests/; RuleRefApp shows LibraryView(). Diff at 8d1eda6: RuleRefApp.swift, GameContent.swift (new), GameView.swift, ContentView.swift -> LibraryView.swift (rename), NewGameFailure.swift (new), NewGameForm.swift (new), NewGameSheet.swift, Localizable.xcstrings, Shared/SampleLibrary.swift (new), RuleRefTests/Features/Library/NewGameFailureTests.swift (new); no existing test file changed. Buttons: LibraryView toolbar Button(\"New Game\", systemImage: \"plus\") with .labelStyle(.iconOnly); NewGameForm Button(role: .cancel, action: cancel) and Button(role: .confirm, action: create); GameContent Button(\"Import Rulebook\", systemImage: \"square.and.arrow.down\", action: importRulebook); the alert keeps Button(\"OK\"). Previews, all inside #if DEBUG: LibraryView \"Empty\" (EmptyLibraryPreview), \"Games\" (GamesPreview); NewGameForm \"Empty\", \"Blank Name\", \"Duplicate\", \"Save Failed\" (plain values); NewGameSheet \"Sheet\" (EmptyLibraryPreview); GameContent \"Empty\", \"Importing\", \"Ready\" (16 pages), \"Import Failed\" (.noTextLayer message), each in a NavigationStack titled \"Taifa\"; GameView \"Game\" (GamesPreview, first game of @Previewable @Query). Sample data: SampleLibrary (in-memory ModelContainer for Game, Rulebook and Passage, games Taifa, Catán, Carcassonne created through Library.createGame; no rulebook, no file). Catalog keys removed: \"Cancel\" and \"Create\"; no key added.",
+        "context": {
+          "date": "2026-10-16 11:30 CEST",
+          "commit": "8d1eda64b577bd919be1e2d9c77e1ab8576db12c",
+          "xcode": "Xcode 27.1 (27A9275)",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Working checkout on branch feat/f19-interface-conventions, clean tree at the code commit except feature_list.json (status in_progress), warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The interface and every preview (scenario 5): the three screens on the iPhone 16 in English and Spanish, and each preview opened in Xcode.",
+          "How Button(role: .cancel) and Button(role: .confirm) render in the sheet toolbar on iOS 26.0 and 27 (symbol or title).",
+          "Whether the alert shows in the \"Import Failed\" preview.",
+          "SF Symbol rendering of plus and square.and.arrow.down on iOS 26.0.",
+          "A Release build (the previews and SampleLibrary sit in #if DEBUG; init.sh builds Debug only).",
+          "iOS 26.0 (the deployment target) and a physical device.",
+          "A fresh clone with clean DerivedData."
+        ]
+      },
+      {
+        "command": "feature-validator, validation 1: ./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/NewGameFailureTests -only-testing:RuleRefTests/GameScreenStateTests -only-testing:RuleRefTests/LibraryTests; git diff -M main...HEAD (full, --stat, --stat -- RuleRefTests/); git ls-files RuleRef RuleRefTests; git log -S ContentView|\"Cancel\"|\"Create\" --name-status -- RuleRef RuleRefTests; every changed view read against DESIGN.md and ARCHITECTURE.md; Cupertino MCP for Button.init(role:action:) and PreviewModifier.",
+        "expected": "init.sh exits 0 with all 11 checks PASS and 92 tests (0 failed, 0 skipped); the focused run succeeds, including scenario 1; the diff holds only the spec's files and adds only NewGameFailureTests.swift under RuleRefTests/; buttons, roles, symbols and named previews as in scenarios 2 and 3, all inside #if DEBUG with in-memory sample data only; no ContentView left; \"Cancel\" and \"Create\" removed, no key added; no behavior change.",
+        "observed": "init.sh exit 0, init.sh: PASS, all 11 checks PASS; totalTestCount=92, failedTests=0, skippedTests=0, expectedFailures=0. Focused run: TEST SUCCEEDED, 8 test-case runs passed, including NewGameFailureTests/sheetFailureMappingIsUnchanged(). Diff: 12 files, the spec's list plus feature_list.json and PROGRESS.md; ContentView.swift -> LibraryView.swift (R078); the only test change is the new NewGameFailureTests.swift. ContentView occurred only in RuleRefApp.swift and the renamed file, and neither contains it at HEAD; \"Cancel\" and \"Create\" removed from NewGameSheet.swift and the catalog. Scenarios 2, 3 and 4 match the spec. Button.init(role:action:) is available from iOS 26.0. Working tree clean after the runs. Findings: low, the \"Sheet\" and LibraryView \"Empty\" previews share one cached in-memory container; info only otherwise.",
+        "context": {
+          "date": "2026-10-16 11:35 CEST",
+          "commit": "d34d5a4e01709dc2d7d14e011207acdf674120a0",
+          "xcode": "Xcode 27.1 (build number not read by the validator)",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Existing checkout on branch feat/f19-interface-conventions, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Scenario 5: the three screens on the iPhone 16 in English and Spanish (the user checked every named preview in Xcode on 2026-10-16; the device check is left for m4).",
+          "How the .cancel and .confirm role buttons and the plus and square.and.arrow.down symbols render on iOS 26.0.",
+          "The shared-preview-container effect between \"Sheet\" and \"Empty\".",
+          "A Release build: init.sh builds Debug only.",
+          "iOS 26.0 (the deployment target) and a physical device.",
+          "A fresh clone with clean DerivedData.",
+          "A plain-text grep for ContentView by the validator (git pickaxe used instead) and the xcresult bundle."
+        ]
+      }
+    ],
     "notes": "Task: T4. Added on 2026-10-16 after the user's code review: folders, previews and SF Symbols were never written down as rules, so f02, f03 and f17 followed their specs. DESIGN.md and ARCHITECTURE.md now hold them. In scope: renaming ContentView to LibraryView and the #Preview containers left open after f17."
   },
   {
