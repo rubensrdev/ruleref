@@ -12,7 +12,7 @@ import SwiftUI
 struct RuleRefApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LibraryView()
         }
         .modelContainer(for: [Game.self, Rulebook.self, Passage.self])
     }

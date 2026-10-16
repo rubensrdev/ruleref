@@ -1,15 +1,8 @@
-//
-//  ContentView.swift
-//  RuleRef
-//
-//  Created by Rubén Segura Romo on 07/10/2026.
-//
-
 import SwiftData
 import SwiftUI
 
 /// The library screen.
-struct ContentView: View {
+struct LibraryView: View {
     @Query(Library.alphabeticalGames) private var games: [Game]
     @State private var isCreatingGame = false
 
@@ -34,7 +27,8 @@ struct ContentView: View {
             .navigationTitle("Library")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button("New Game") { isCreatingGame = true }
+                    Button("New Game", systemImage: "plus") { isCreatingGame = true }
+                        .labelStyle(.iconOnly)
                 }
             }
             .navigationDestination(for: Game.self) { game in
@@ -47,7 +41,12 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Game.self, inMemory: true)
+#if DEBUG
+#Preview("Empty", traits: .modifier(EmptyLibraryPreview())) {
+    LibraryView()
 }
+
+#Preview("Games", traits: .modifier(GamesPreview())) {
+    LibraryView()
+}
+#endif
