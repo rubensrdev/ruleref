@@ -22,7 +22,7 @@ The Xcode 27 MCP server is declared in `.mcp.json` as `xcode` (`xcrun mcpbridge`
 
 1. `XcodeOpenWorkspace` with the absolute path of `RuleRef.xcodeproj` at the repo root. It returns a `workspaceIdentifier`.
 2. Pass that `workspaceIdentifier` to every other call.
-3. Paths are Xcode project paths, not filesystem paths: `RuleRef/RuleRef/ContentView.swift`, `RuleRef/RuleRefTests/RuleRefTests.swift`.
+3. Paths are Xcode project paths, not filesystem paths: `RuleRef/RuleRef/App/RuleRefApp.swift`, `RuleRef/RuleRefTests/App/RuleRefTests.swift`.
 4. `XcodeCloseWorkspace` when done.
 
 ## Allowed (no prompt)

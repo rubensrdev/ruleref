@@ -279,3 +279,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - New feature f19-interface-conventions (T4), after f18 and before f13, depending on f17: the three existing screens follow `DESIGN.md`. It absorbs the open `#Preview` container item from f17.
 - Not yet enforced by `init.sh`: a check that every view has a `#Preview` waits for the post-m4 harness batch; until then the spec and the validator's review cover it.
 - Next: move the existing files into the folders `ARCHITECTURE.md` defines, on `main`, renames only. Done when: `./init.sh` passes after the move with the same 84 tests and no `.swift` file is left in the root of `RuleRef/` or `RuleRefTests/`.
+
+## 2026-10-16 — Harness: files moved into the ARCHITECTURE.md folders
+- Renames only, no file content changed: `RuleRef/` now holds `App/`, `Domain/`, `Persistence/`, `Import/` and `Features/Library/` and `Features/Game/`; `RuleRefTests/` mirrors them and adds `Support/` for `SyntheticPDF.swift`. `Fixtures/`, `Assets.xcassets` and `Localizable.xcstrings` stay where they were.
+- Confirmed by `./init.sh` with the same 84 tests: the synchronized folders compile files in subfolders with no change to `RuleRef.xcodeproj`, and the Taifa fixture still reaches the test bundle.
+- The `xcode-mcp` skill's path example points to the new location. Approved specs, validation records and earlier evidence keep the old paths: they record what was true then.
+- Next: write the specs of f18, f19, f13, f14, f15 and f16 with `feature-spec` on `main`. Done when: each of the six has `docs/specs/<id>.md` with the user's Approval line.
