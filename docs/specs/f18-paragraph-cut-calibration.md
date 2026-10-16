@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Paragraph cut calibrated on Taifa
 
+Approval: approved by the user on 2026-10-16
+
 ## Source Feature
 
 - `id`: f18-paragraph-cut-calibration
@@ -91,7 +93,7 @@ Consequence: a ratio that separates Taifa (somewhere in about 0.0–0.07) cuts e
 
 ## Technical Approach
 
-1. Measure. Add a test `taifaGapMeasurement` in the new `TaifaSegmentationTests` that, for each of the 16 pages, records every non-blank line's gap ÷ the page median and its first 40 characters with `Attachment.record(…, named: "taifa-gaps.txt")`. It asserts only that the fixture has 16 pages. Run it on the simulator (`./init.sh` or a focused run) and export the attachment.
+1. Measure. Add a test `taifaGapMeasurement` in the new `TaifaSegmentationTests` that, for each of the 16 pages, records every non-blank line's gap ÷ the page median and its first 40 characters with `Attachment.record(…, named: "taifa-gaps.txt")`. It asserts only that the fixture has 16 pages. Run it with a focused `xcodebuild test -only-testing:RuleRefTests/TaifaSegmentationTests` run, not `./init.sh` (which deletes its result bundle when it passes), and export the attachment from that run's result bundle with `xcrun xcresulttool export attachments`.
 2. Choose the ratio from that file:
    - `maxInside`: the largest gap between two lines of the same paragraph, over all pages.
    - `minBetween`: the smallest gap before a line that starts a paragraph or heading, over all pages, ignoring the cut before a page number.
@@ -138,7 +140,7 @@ Existing Taifa tests: no change. `TaifaImportTests` asserts no passage count; on
 1. Confirm f08 is accepted; otherwise stop.
 2. Add `TaifaSegmentationTests.taifaGapMeasurement`, run it, export `taifa-gaps.txt`, choose the ratio.
 3. Change the ratio, apply the declared test changes, add scenarios 1–3.
-4. `./init.sh`; read `taifa-passages.txt` for pages 3, 5 and 12; update the risks row; commit; record evidence and `PROGRESS.md`; commit.
+4. `./init.sh`; export `taifa-passages.txt` from a focused run of `TaifaImportTests` (same way as step 2) and read pages 3, 5 and 12; update the risks row; commit; record evidence and `PROGRESS.md`; commit.
 
 ## Implementation Tasks
 

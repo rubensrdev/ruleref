@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Library and game screens follow DESIGN.md
 
+Approval: approved by the user on 2026-10-16
+
 ## Source Feature
 
 - `id`: f19-interface-conventions

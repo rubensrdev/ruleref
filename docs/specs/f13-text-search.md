@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Text search in a rulebook
 
+Approval: approved by the user on 2026-10-16
+
 ## Source Feature
 
 - `id`: f13-text-search

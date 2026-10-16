@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Open a match highlighted on its page
 
+Approval: approved by the user on 2026-10-16
+
 ## Source Feature
 
 - `id`: f15-page-viewer-highlight
@@ -86,7 +88,7 @@ APIs checked in the Cupertino MCP on 2026-10-16:
 - `UIViewRepresentable` (iOS 13+, `@MainActor`): `makeUIView(context:)`, `updateUIView(_:context:)`, `associatedtype UIViewType: UIView`; SwiftUI controls the view's frame, so the code never sets it.
 - `PDFDocument(url:)` (failable). `PDFView.autoScales` (`@MainActor`). `PDFView.go(to:on:)` (iOS 11+): rect in page space; does nothing if already visible.
 - `PDFAnnotation(bounds:forType:withProperties:)` (iOS 11+): bounds in page-space coordinates. `PDFAnnotationSubtype.highlight`. `PDFPage.addAnnotation(_:)`.
-- **Not verified** (ADR-004 lists them too): that the representable compiles with `SwiftUI` and `PDFKit` alone under Swift 6 and member import visibility; whether `go(to:on:)` called in `makeUIView` scrolls before the view has a size; whether PDFKit keeps the annotation's `bounds` exactly (scenario 2 checks it; if not exact, stop and report); the highlight's default color and look on iOS 26.0 and 27.
+- **Not verified** (ADR-004 lists them too): that the representable compiles with `SwiftUI` and `PDFKit` alone under Swift 6 and member import visibility; whether `go(to:on:)` called in `makeUIView` scrolls before the view has a size; whether PDFKit keeps the annotation's `bounds` exactly (scenario 2 checks it; if not exact, stop and report); the highlight's default color and look on iOS 26.0 and 27; whether `NavigationLink` builds its destination eagerly (known SwiftUI behaviour, not stated on the API page; the design above does not depend on it).
 
 Pieces in `RuleRef/Features/PageViewer/`:
 
@@ -95,16 +97,17 @@ Pieces in `RuleRef/Features/PageViewer/`:
    - `static func addHighlight(_ highlight: PageHighlight, to document: PDFDocument) -> PDFPage?`: if `0 <= pageIndex < document.pageCount`, add `PDFAnnotation(bounds: highlight.bounds, forType: .highlight, withProperties: nil)` to that page and return it; otherwise `nil`. No color or other property is set.
    - `makeUIView`: `PDFView()`, `autoScales = true`, `document = document`; if `addHighlight` returns a page, `go(to: highlight.bounds, on: page)`. Uses only members declared in PDFKit.
    - `updateUIView`: empty, with a comment: a viewer shows one fixed highlight; another match pushes another viewer.
-3. `PageViewerContent.swift`: `PageViewerContent(pageNumber: Int, document: PDFDocument?, highlight: PageHighlight)`. If `document` holds the page: `PDFPageView`; otherwise `ContentUnavailableView("Page Unavailable", systemImage: "exclamationmark.triangle", description: Text("The rulebook file could not be opened."))`. Title `Text("Page \(pageNumber)")` (f13's key), inline display mode.
-4. `PageViewer.swift`: wrapper `PageViewer(highlight: PageHighlight, pageNumber: Int, store: RulebookStore = .app)`; `@State private var document: PDFDocument?` set once in `init` from `static func openDocument(for id: RulebookID, store: RulebookStore) -> PDFDocument?` (`PDFDocument(url: store.fileURL(for: id))`). It never calls `write(to:)` or `dataRepresentation()`.
-5. Opening from a match (`RuleRef/Features/Game/`): `GameContent` gains a generic destination builder `destination: (Match) -> Destination` and wraps each `MatchRow` in `NavigationLink { destination(match) } label: { MatchRow(match: match) }`. `GameView` passes `PageViewer(highlight: PageHighlight(locator: match.passage.locator), pageNumber: match.pageNumber)`. `GameContent`'s previews pass `EmptyView()`, so no preview opens a stored file.
-6. Sample data: `RuleRef/Shared/SamplePDF.swift` (`#if DEBUG`): `static func data() -> Data`, one page with two invented paragraphs drawn with Core Graphics and Core Text (no PDFKit, no UIKit), and `static let secondParagraphBounds: CGRect` computed from the drawing constants. Previews (`#if DEBUG`): `PageViewerContent` "Highlighted" (`PDFDocument(data: SamplePDF.data())`, a highlight on `secondParagraphBounds`) and "Unavailable" (`nil`); `PDFPageView` "Page"; `PageViewer` "Missing File" with a store over an empty temporary directory. The previews' locators use the f13 preview exception.
+3. `PageDocument.swift`: `enum PageDocument { case loading, ready(PDFDocument), unavailable }` (main actor, holds a non-`Sendable` `PDFDocument`).
+4. `PageViewerContent.swift`: `PageViewerContent(pageNumber: Int, document: PageDocument, highlight: PageHighlight)`. `.loading`: a `ProgressView()` with no title. `.ready` whose document holds the page: `PDFPageView`. `.ready` without that page, or `.unavailable`: `ContentUnavailableView("Page Unavailable", systemImage: "exclamationmark.triangle", description: Text("The rulebook file could not be opened."))`. Title `Text("Page \(pageNumber)")` (f13's key), inline display mode.
+5. `PageViewer.swift`: wrapper `PageViewer(highlight: PageHighlight, pageNumber: Int, store: RulebookStore = .app)`. Its `init` only stores values and never touches the file: a `NavigationLink` with a destination builder may build the destination with every row, and an `init` that opened the PDF would read the file once per row on every render. `@State private var document: PageDocument = .loading`; `.task` opens it once, when the viewer appears, with `static func openDocument(for id: RulebookID, store: RulebookStore) -> PDFDocument?` (`PDFDocument(url: store.fileURL(for: id))`), and sets `.ready` or `.unavailable`. It never calls `write(to:)` or `dataRepresentation()`.
+6. Opening from a match (`RuleRef/Features/Game/`): `GameContent` gains a generic destination builder `destination: (Match) -> Destination` and wraps each `MatchRow` in `NavigationLink { destination(match) } label: { MatchRow(match: match) }`. `GameView` passes `PageViewer(highlight: PageHighlight(locator: match.passage.locator), pageNumber: match.pageNumber)`. `GameContent`'s previews pass `EmptyView()`, so no preview opens a stored file.
+7. Sample data: `RuleRef/Shared/SamplePDF.swift` (`#if DEBUG`): `static func data() -> Data`, one page with two invented paragraphs drawn with Core Graphics and Core Text (no PDFKit, no UIKit), and `static let secondParagraphBounds: CGRect` computed from the drawing constants. Previews (`#if DEBUG`): `PageViewerContent` "Loading" (`.loading`), "Highlighted" (`.ready(PDFDocument(data: SamplePDF.data()))`, a highlight on `secondParagraphBounds`) and "Unavailable" (`.unavailable`); `PDFPageView` "Page"; `PageViewer` "Missing File" with a store over an empty temporary directory. The previews' locators use the f13 preview exception.
 
 Texts (key → `es`, `translated`): `Page Unavailable` → `Página no disponible`; `The rulebook file could not be opened.` → `No se ha podido abrir el archivo del reglamento.`
 
 ## Expected File Changes
 
-- `RuleRef/Features/PageViewer/PageHighlight.swift`, `PDFPageView.swift`, `PageViewerContent.swift`, `PageViewer.swift` — create.
+- `RuleRef/Features/PageViewer/PageHighlight.swift`, `PDFPageView.swift`, `PageDocument.swift`, `PageViewerContent.swift`, `PageViewer.swift` — create.
 - `RuleRef/Features/Game/GameContent.swift`, `GameView.swift` — modify; links and destination.
 - `RuleRef/Shared/SamplePDF.swift` — create.
 - `RuleRef/Localizable.xcstrings` — modify; two keys.
@@ -113,7 +116,7 @@ Texts (key → `es`, `translated`): `Page Unavailable` → `Página no disponibl
 ## Visual Design Impact
 
 - UI involved: yes. Design source: `DESIGN.md` and ADR-004.
-- States: viewer with highlight; page unavailable. Match rows become navigation links.
+- States: viewer loading, with highlight, page unavailable. Match rows become navigation links.
 - New design artifact required: no.
 
 ## Durable Documentation Impact
@@ -132,7 +135,7 @@ Texts (key → `es`, `translated`): `Page Unavailable` → `Página no disponibl
 
 - [ ] Preconditions checked.
 - [ ] `PageHighlightTests`, `PDFPageViewTests`.
-- [ ] `PageHighlight`; `PDFPageView` with `addHighlight`; `PageViewerContent`; `PageViewer` with `openDocument`.
+- [ ] `PageHighlight`; `PDFPageView` with `addHighlight`; `PageDocument`; `PageViewerContent`; `PageViewer` with `openDocument` called from `.task`.
 - [ ] Links from matches; `SamplePDF`; previews per `DESIGN.md`.
 - [ ] Two catalog keys; `./init.sh` green (`no-uikit-xctest` included); evidence and `PROGRESS.md`.
 
@@ -154,5 +157,6 @@ Texts (key → `es`, `translated`): `Page Unavailable` → `Página no disponibl
 - [ ] ADR-004 followed: one representable, imports `SwiftUI` and `PDFKit` only, its own `PDFDocument`, never written, one `.highlight` annotation with exactly the locator's bounds, then `go(to:on:)`.
 - [ ] `PageHighlight(locator:)` is the only locator-to-viewer path; scenarios 1–3 pass.
 - [ ] A missing file or page shows the unavailable state; no crash path.
+- [ ] `PageViewer.init` does no file access; the document opens once, in `.task`.
 - [ ] Previews use `SamplePDF` or an empty temporary store, never `RulebookStore.app` or a stored file; `GameContent` previews do not open the viewer.
 - [ ] `init.sh` unchanged; two keys with `es`; `feature_list.json` and `PROGRESS.md` updated correctly; the interface is in `not_verified`.

@@ -1,5 +1,7 @@
 # Feature Implementation Spec: Explicit no-match state
 
+Approval: approved by the user on 2026-10-16
+
 ## Source Feature
 
 - `id`: f14-no-match-state
