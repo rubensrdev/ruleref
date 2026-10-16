@@ -25,4 +25,5 @@ How the app and test targets are divided. Each folder is a boundary, not a file 
 ## RuleRefTests/
 
 - Tests mirror the app folders: `App/`, `Features/<Screen>/`, `Persistence/`, `Import/`, `Domain/`, and `Search/` from f13.
-- `Fixtures/` holds the Taifa fixture and its attribution; `Support/` holds shared test helpers such as the synthetic PDF builder.
+- `Fixtures/` holds the Taifa fixture, its attribution and the eval set; `Support/` holds shared test helpers such as the synthetic PDF builder and `TestFixture` (test bundle lookup that fails on a missing resource).
+- `Evaluation/` holds the eval set model, the page scoring and the baseline run (f16), whose report is exported to `docs/eval/`.

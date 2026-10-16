@@ -37,7 +37,7 @@ None.
 - Taifa 3.0 (CC BY-NC-SA) can be versioned in the test target with an attribution file, never shipped in the app.
 - Xcode 27 and an iOS 27 simulator are available on the dev machine. The iPhone 16 runs iOS 27.
 - Queries and rulebook share a language (Spanish for the demo).
-- Text search alone answers enough eval questions for the baseline to be a meaningful comparison.
+- Text search alone answers enough eval questions for the baseline to be a meaningful comparison. Measured by f16 on the iOS 27.0 simulator (221 passages): hit@1 3/21 (0.143), hit@3 4/21 (0.190), no-match accuracy 3/4 (0.75); 16 of the 21 page questions get no match at all, because every query term must occur in one passage. Report: [`docs/eval/f16-baseline-taifa-3.0.json`](eval/f16-baseline-taifa-3.0.json).
 
 ## Risks
 

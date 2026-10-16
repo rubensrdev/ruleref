@@ -34,6 +34,7 @@ iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit, no thi
 - [`docs/build-brief.md`](docs/build-brief.md): problem, goals, non-goals and feature slices up to m4.
 - [`docs/domain-model.md`](docs/domain-model.md): core concepts and rules.
 - [`docs/risks-and-open-questions.md`](docs/risks-and-open-questions.md): status of open decisions, assumptions and risks.
+- [`docs/eval/`](docs/eval/): baseline reports of search on the eval set, exported from a focused test run.
 - [`docs/adr/0001-stack-and-build-doctrine.md`](docs/adr/0001-stack-and-build-doctrine.md): stack and CLI build doctrine.
 - [`docs/adr/0002-multi-column-extraction.md`](docs/adr/0002-multi-column-extraction.md): PDFKit line order in the MVP, no reading-order reconstruction.
 - [`docs/adr/0003-scope-cut.md`](docs/adr/0003-scope-cut.md): scope cut, with no web importer and no parallel worktrees.

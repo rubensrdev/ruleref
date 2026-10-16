@@ -392,3 +392,17 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - The eval set lands as `RuleRefTests/Fixtures/taifa-3.0-eval.json`: 25 questions (13 normal, 4 table, 4 false premise, 4 absent; 19 low and 6 high overlap), scored by page. Each of the 21 expected pages is the 1-based page shown to the user, and its fragment was found on that page alone with `pdftotext`, not PDFKit.
 - f16-baseline-eval is `not_started`: the `deferred` note is removed and f18 is added to its `depends_on`, because the baseline measures the passages f18 cuts.
 - Next: write the f16 spec with `feature-spec` on `main`. Done when: `docs/specs/f16-baseline-eval.md` has the user's Approval line.
+
+## 2026-10-16 — f16: baseline eval passing
+- f16-baseline-eval is `passing` on branch `feat/f16-baseline-eval` (test code 8cf7ec8, report and docs 675ea11). Test target only: `Support/TestFixture` (throws naming a missing resource), `Evaluation/EvalSet` (Codable, unknown `type`/`overlap` fail decoding, `validate(pageCount:)`), `Evaluation/BaselineReport` (page scoring, summary, sorted pretty JSON) and `BaselineEvalTests.taifaBaseline()` (SHA check, import through `Library`, `SearchIndex` on each `query`, `Attachment.record`).
+- Report exported from a focused run with `xcrun xcresulttool export attachments` and committed byte-identical as `docs/eval/f16-baseline-taifa-3.0.json` (SHA-256 938e9ae1…).
+- Baseline on the iOS 27.0 simulator, 221 passages: hit@1 3/21 (0.143), hit@3 4/21 (0.190), no-match accuracy 3/4 (0.75). 16 of the 21 page questions get no match: every query term must occur in one passage. Recorded in the text-search assumption of `docs/risks-and-open-questions.md`.
+- `./init.sh` green on 675ea11: 130 tests (109 plus 21), 0 failed, 0 skipped. `ARCHITECTURE.md` and `README.md` list `Evaluation/` and `docs/eval/`.
+- Not verified: iOS 26.0 and a device, other rulebooks, the validator re-extracting the attachment, a repeat run giving the same report.
+- Next: the f16 validator run through `/feature-flow`, then its PR. Done when: f16 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-16 — f16: baseline eval accepted
+- The validator returned `accept` on 31b1521 (validation 1, 0 of 3 revise rounds): `./init.sh` green with 130 tests, 0 failed, 0 skipped; the focused run of `BaselineEvalTests`, `EvalSetTests` and `BaselineReportTests` 21 tests / 31 runs; exactly one attachment, whose payload equals `docs/eval/f16-baseline-taifa-3.0.json` field by field; the summary recomputed from the rows (hit@1 3/21, hit@3 4/21, no-match 3/4). The user confirmed in the chat.
+- Validator notes, none blocking: no test swaps the fixture to exercise the SHA-mismatch path; the implementer's evidence names 675ea11, later commits only add records.
+- Not verified: byte-for-byte identity of the attachment as seen by the validator (compared field by field); the SHA-mismatch path; iOS 26.0 and a device; other rulebooks; a fresh clone; determinism beyond two runs.
+- Next: the user reviews and merges the f16 PR on GitHub; then decides whether to unblock f04 and f12 (`deferred` until m4). Done when: the f16 PR is merged into `main` and f04 and f12 have the user's decision recorded.
