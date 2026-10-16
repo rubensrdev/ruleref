@@ -11,3 +11,4 @@
   - Info: the implementer's declared deviations hold (`RuleRefApp.swift` changes one line and keeps its template header; untitled role buttons as the spec says).
   - Info: security checklist found nothing relevant.
 - Not verified: scenario 5 (the three screens on the iPhone 16 in English and Spanish); every Xcode preview opened and rendered; how the `.cancel` and `.confirm` role buttons render on iOS 26.0 and 27; whether the alert shows in the "Import Failed" preview; how `plus` and `square.and.arrow.down` render on iOS 26.0; the shared-preview-container effect; a Release build; iOS 26.0 and a physical device; a fresh clone with clean DerivedData; the exact Xcode build number; a plain-text grep for `ContentView` (git pickaxe used instead); the xcresult bundle.
+- User: confirmed

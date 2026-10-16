@@ -321,3 +321,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green on 8d1eda6: 92 tests (91 plus `NewGameFailureTests`), 0 failed, 0 skipped.
 - Left: the user opens every preview in Xcode and checks the three screens on the iPhone 16 (scenario 5), including how the role buttons render.
 - Next: the f19 validator run through `/feature-flow`, then its PR. Done when: f19 is `accepted` and its PR is merged; then f13 starts.
+
+## 2026-10-16 — T4: f19 accepted
+- The validator returned `accept` on d34d5a4 (validation 1, 0 of 3 revise rounds): `./init.sh` green with 92 tests, 0 failed, 0 skipped; the spec's focused run passed (8 test-case runs). The user confirmed in the chat.
+- The user opened every named preview of `LibraryView`, `NewGameForm`, `NewGameSheet`, `GameContent` and `GameView` in Xcode, and they match the spec: "+" icon only in the library; the sheet with the cancel x and the confirm ✓, no text; "Import Rulebook" with icon and text; the "Import Failed" alert with OK as text.
+- Left: scenario 5, the three screens on the iPhone 16, which the user does with the m4 check.
+- Not verified: iOS 26.0 and a device, a Release build, a fresh clone.
+- Next: the user merges the f19 PR on GitHub, then `/feature-flow` on f13-text-search. Done when: the f19 PR is merged into `main` and f13 is `accepted` with its PR open.
