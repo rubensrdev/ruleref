@@ -8,3 +8,4 @@
   - Info: `.noMatch` is handled in two places in `GameContent` (the switch's `EmptyView()` and the overlay); correct, no change required.
   - Info: security checklist found nothing relevant.
 - Not verified: scenario 5 (Taifa on the iPhone 16, a term not in the rulebook); the "No Match" preview opened in Xcode; the system wording and symbol in English and Spanish; search-field focus and the overlay while typing moves between matches and no match; the implementer's mutation check (not rerun; reasoned from the assertions); iOS 26.0, a physical device, a Release build; a fresh clone with clean DerivedData.
+- User: confirmed

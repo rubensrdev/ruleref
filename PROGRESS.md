@@ -353,3 +353,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green on 449ef36: 105 tests (101 plus 4 `NoMatchTests`), 0 failed, 0 skipped; the spec's focused run 17 of 17. Mutation check: with the old `.matches([])` return, scenarios 1-3 fail.
 - Left: scenario 5 (Taifa on the iPhone 16, a term not in the rulebook) and the "No Match" preview, checked by hand, with the system texts in Spanish.
 - Next: the f14 validator run through `/feature-flow`, then its PR. Done when: f14 is `accepted` and its PR is merged; then f15 starts.
+
+## 2026-10-16 — T4: f14 accepted
+- The validator returned `accept` on babe1cc (validation 1, 0 of 3 revise rounds): `./init.sh` green with 105 tests, 0 failed, 0 skipped; the spec's focused run 17 of 17; the `SearchIndex.swift` diff is the single zero-match return. The user confirmed in the chat.
+- The user accepts the deviation: the no-match view is an overlay on the empty `List` instead of replacing it, the pattern Apple's documentation shows for `ContentUnavailableView.search`.
+- Left: scenario 5 (Taifa on the iPhone 16, a term not in the rulebook), which the user checks with the m4 review; the "No Match" preview and the system texts in Spanish, checked by hand.
+- Not verified: search-field focus while typing moves between matches and no match, iOS 26.0 and a physical device, a Release build, a fresh clone.
+- Next: the user merges the f14 PR on GitHub, then `/feature-flow` on f15-page-viewer-highlight. Done when: the f14 PR is merged into `main` and f15 is `accepted` with its PR open.
