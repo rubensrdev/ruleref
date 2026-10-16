@@ -386,3 +386,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - For the post-m4 batch, by the user's decision: the stale `MatchRow.swift` comment ("Not tappable until the page viewer (f15)"); move `PageViewerFixture` to `RuleRefTests/Support/`; the context text copied into f15's second evidence entry ("status in_progress").
 - Not verified: iOS 26.0, a Release build, a fresh clone; Taifa pages 3 and 12 and memory with large rulebooks; whether `makeUIView` runs once per viewer beyond the single highlight seen.
 - Next: the user merges the f15 PR on GitHub; then, on `main`, set tag `m4`. Done when: the f15 PR is merged into `main` and tag `m4` is set and pushed.
+
+## 2026-10-16 — m4 tagged, f16 unblocked
+- Tag `m4` (annotated) points at f3749e5, the merge of the f15 PR: `./init.sh` green with 109 tests, 0 failed, 0 skipped. The base app without AI is complete: import, search, no-match and the page viewer with the highlight.
+- The eval set lands as `RuleRefTests/Fixtures/taifa-3.0-eval.json`: 25 questions (13 normal, 4 table, 4 false premise, 4 absent; 19 low and 6 high overlap), scored by page. Each of the 21 expected pages is the 1-based page shown to the user, and its fragment was found on that page alone with `pdftotext`, not PDFKit.
+- f16-baseline-eval is `not_started`: the `deferred` note is removed and f18 is added to its `depends_on`, because the baseline measures the passages f18 cuts.
+- Next: write the f16 spec with `feature-spec` on `main`. Done when: `docs/specs/f16-baseline-eval.md` has the user's Approval line.

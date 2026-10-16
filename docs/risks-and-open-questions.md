@@ -25,7 +25,7 @@ None.
 
 ## Later (after m4)
 
-- **Eval set.** 25 questions written on 2026-10-15 (13 normal, 4 table, 4 false premise, 4 absent), scored by page. It lands as `RuleRefTests/Fixtures/taifa-3.0-eval.json` with F16's spec.
+- **Eval set.** 25 questions written on 2026-10-15 (13 normal, 4 table, 4 false premise, 4 absent), scored by page. It landed as `RuleRefTests/Fixtures/taifa-3.0-eval.json` on 2026-10-16, after tag `m4`; its 21 expected pages were checked against the fixture.
 - AI answering with Foundation Models and @Generable; abstention when the rulebook is silent; citing several passages (rule + exception).
 - Embeddings hypothesis (NLContextualEmbedding + cosine). Kept only if it beats the baseline on page precision.
 - Open question for disputes: whether a dispute whose rulebook is gone is shown as "stale".

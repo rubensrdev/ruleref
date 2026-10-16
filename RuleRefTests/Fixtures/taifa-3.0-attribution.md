@@ -16,3 +16,4 @@
 - Only in the `RuleRefTests` target, for non-commercial testing and evaluation of import and search. Never bundled in the app.
 - The file is unmodified; only its name changed.
 - Its FAQ is a source of hard questions for evaluations, never ground truth.
+- `taifa-3.0-eval.json` quotes short fragments of the rulebook to trace each expected page. It is derived from the rulebook and shares its use and license.

@@ -1,0 +1,257 @@
+{
+  "fixture": "taifa-3.0.pdf",
+  "fixtureSHA256": "1f7c4ae3304b4bd90339825fdf6e756eec20377af575e1dd35ded28bdc4f67bd",
+  "scoring": "page",
+  "questions": [
+    {
+      "id": "q01",
+      "question": "¿Con qué números del dado se cuenta que he acertado?",
+      "query": "dado acertado",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 2,
+      "fragment": "obtienen un impacto con un resultado de 4, 5 o 6",
+      "note": "\"acertado\" stands for \"impacto\""
+    },
+    {
+      "id": "q02",
+      "question": "Si gano el asalto, ¿qué pasa con el castillo del rival que había en esa zona?",
+      "query": "castillo asalto",
+      "type": "normal",
+      "overlap": "high",
+      "expectedPage": 5,
+      "fragment": "6. Si el atacante gana, se elimina cualquier marcador de castillo y",
+      "note": null
+    },
+    {
+      "id": "q03",
+      "question": "¿Cuántas fortalezas tengo que plantar en el mapa para ganar de golpe sin esperar al final?",
+      "query": "fortalezas ganar",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 7,
+      "fragment": "todos sus castillos disponibles en áreas del mapa, gana",
+      "note": "the \"13\" is on the next line of the same paragraph"
+    },
+    {
+      "id": "q05",
+      "question": "Si saqueo al vecino sin asaltar ninguna zona, ¿qué tiro y qué pierde él?",
+      "query": "saqueo",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 5,
+      "fragment": "Con un resultado de 4, 5 o 6 el oponente descarta aleatoriamente una carta",
+      "note": "\"saquear\" stands for \"incursión\""
+    },
+    {
+      "id": "q06",
+      "question": "Me sobran cartas en la mano al acabar el turno, ¿me penaliza de alguna forma?",
+      "query": "sobran cartas",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 6,
+      "fragment": "que quedan en sus manos se arrastran al siguiente turno",
+      "note": null
+    },
+    {
+      "id": "q07",
+      "question": "¿Hasta dónde puede subir o bajar el marcador de robar cartas?",
+      "query": "marcador robar cartas",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 2,
+      "fragment": "Su posición puede estar entre -2 y +2",
+      "note": null
+    },
+    {
+      "id": "q08",
+      "question": "¿Con cuántas zonas bajo mi control empiezo la partida?",
+      "query": "zonas empiezo",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 3,
+      "fragment": "Cada reino comienza controlando las 8 áreas marcadas en el mapa",
+      "note": null
+    },
+    {
+      "id": "q10",
+      "question": "Hay un hueco sin dueño pegado a mi territorio: si lo asalto, ¿quién tira los dados de la defensa?",
+      "query": "dados defensa",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 5,
+      "fragment": "cualquier jugador puede tirar los dados por el defensor",
+      "note": null
+    },
+    {
+      "id": "q11",
+      "question": "La carta con la P naranja, ¿la descarto nada más usarla?",
+      "query": "carta naranja",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 5,
+      "fragment": "boca arriba frente al reino para recordar que su efecto dura todo el turno",
+      "note": "\"P naranja\" stands for \"permanente\""
+    },
+    {
+      "id": "q12",
+      "question": "Las fichas de guarnición de las zonas de al lado, ¿me sirven para defender la que me atacan?",
+      "query": "guarnición defender",
+      "type": "normal",
+      "overlap": "high",
+      "expectedPage": 4,
+      "fragment": "en y adyacentes al área atacada, con el fin de obtener dados extra",
+      "note": "player rule; for bots page 8 says the opposite"
+    },
+    {
+      "id": "q15",
+      "question": "Dos reinos acabamos con los mismos territorios al terminar el tercer turno, ¿cómo se desempata?",
+      "query": "desempata turno",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 7,
+      "fragment": "En caso de empate, el (o los) que tenga el Bonus de Carta",
+      "note": null
+    },
+    {
+      "id": "q16",
+      "question": "Jugando solo con El Cid, ¿qué parte del mapa se usa?",
+      "query": "cid mapa",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 10,
+      "fragment": "Sólo se juegan las áreas al este de la línea blanca del mapa",
+      "note": null
+    },
+    {
+      "id": "q17",
+      "question": "Me han quitado todas las tierras, ¿puedo atacar en algún sitio todavía?",
+      "query": "tierras atacar",
+      "type": "normal",
+      "overlap": "low",
+      "expectedPage": 4,
+      "fragment": "sólo puede realizar ataques contra su capital",
+      "note": null
+    },
+    {
+      "id": "q18",
+      "question": "¿De qué color juega León?",
+      "query": "color león",
+      "type": "table",
+      "overlap": "low",
+      "expectedPage": 2,
+      "fragment": "León Azul oscuro",
+      "note": "an icon glyph follows each kingdom name"
+    },
+    {
+      "id": "q19",
+      "question": "¿Quién mueve justo después de Castilla?",
+      "query": "después castilla",
+      "type": "table",
+      "overlap": "low",
+      "expectedPage": 2,
+      "fragment": "Castilla Rojo Condados Catalanes Amarillo",
+      "note": "turn order exists only in the table; an icon glyph follows each name"
+    },
+    {
+      "id": "q20",
+      "question": "En el escenario de El Cid, ¿cuántas cartas recibe el bot almorávide?",
+      "query": "almorávide cartas",
+      "type": "table",
+      "overlap": "high",
+      "expectedPage": 11,
+      "fragment": "Almorávides Verde claro Bot 12",
+      "note": null
+    },
+    {
+      "id": "q21",
+      "question": "¿Con cuántas cartas arranco yo si llevo al Cid?",
+      "query": "cartas cid",
+      "type": "table",
+      "overlap": "low",
+      "expectedPage": 11,
+      "fragment": "El Cid Azul oscuro Jugador 7",
+      "note": null
+    },
+    {
+      "id": "q22",
+      "question": "Si empatamos a aciertos gana el que ataca, ¿no? Entonces, ¿qué hago con la zona?",
+      "query": "empatamos ataca",
+      "type": "falsePremise",
+      "overlap": "low",
+      "expectedPage": 5,
+      "fragment": "hace el mismo número o menos, el defensor gana",
+      "note": "false: a tie goes to the defender"
+    },
+    {
+      "id": "q23",
+      "question": "Quiero poner dos castillos míos en la misma zona para reforzarla, ¿cuentan los dos para ganar?",
+      "query": "dos castillos zona",
+      "type": "falsePremise",
+      "overlap": "high",
+      "expectedPage": 2,
+      "fragment": "Sólo se permite un castillo de cualquier color en un área a la vez",
+      "note": "false: one castle per area"
+    },
+    {
+      "id": "q24",
+      "question": "Los bots también pasan cuando les conviene, ¿cómo decido cuándo pasa el bot?",
+      "query": "bots pasan",
+      "type": "falsePremise",
+      "overlap": "low",
+      "expectedPage": 6,
+      "fragment": "los bots sólo pasan cuando ya no tienen cartas en la mano",
+      "note": "false: a bot passes only with no cards left"
+    },
+    {
+      "id": "q26",
+      "question": "En el escenario del Cid los almorávides tienen la capital en Sevilla, ¿no?",
+      "query": "capital almorávides",
+      "type": "falsePremise",
+      "overlap": "low",
+      "expectedPage": 11,
+      "fragment": "La capital de los Almorávides es Málaga",
+      "note": "false: it is Málaga"
+    },
+    {
+      "id": "q27",
+      "question": "¿Cuántos dados añade la carta Milicia cuando me defiendo?",
+      "query": "milicia",
+      "type": "absent",
+      "overlap": "high",
+      "expectedPage": null,
+      "fragment": null,
+      "note": "on the cards (2 dice); \"Milicia\" does not appear in the rulebook"
+    },
+    {
+      "id": "q28",
+      "question": "¿Qué valor de defensa tiene Toledo?",
+      "query": "toledo defensa",
+      "type": "absent",
+      "overlap": "low",
+      "expectedPage": null,
+      "fragment": null,
+      "note": "on the map (4); \"Toledo\" appears only in the historical context on page 15"
+    },
+    {
+      "id": "q29",
+      "question": "¿Cuántas cartas de Mesnada hay en el mazo cristiano?",
+      "query": "mesnada",
+      "type": "absent",
+      "overlap": "high",
+      "expectedPage": null,
+      "fragment": null,
+      "note": "on the cards (6); \"Mesnada\" does not appear in the rulebook"
+    },
+    {
+      "id": "q31",
+      "question": "¿Qué número de identificación tiene Zaragoza en el mapa?",
+      "query": "zaragoza",
+      "type": "absent",
+      "overlap": "low",
+      "expectedPage": null,
+      "fragment": null,
+      "note": "on the map (20); \"Zaragoza\" appears in the page 13 example without its number: a false-positive bait"
+    }
+  ]
+}

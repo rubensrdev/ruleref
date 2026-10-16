@@ -1028,14 +1028,14 @@
     "area": "evaluation",
     "title": "Baseline search evaluation",
     "user_visible_behavior": "Baseline run: the eval set (Codable JSON) is evaluated against search over the Taifa fixture and a report with hit@1, hit@3 and no-match accuracy is written, tagged with OS version.",
-    "depends_on": ["f13-text-search", "f14-no-match-state"],
-    "status": "blocked",
+    "depends_on": ["f13-text-search", "f14-no-match-state", "f18-paragraph-cut-calibration"],
+    "status": "not_started",
     "verification": [
       "A focused `xcodebuild test -only-testing:` run attaches the report to its result bundle (Swift Testing `Attachment`) and `xcrun xcresulttool export attachments` extracts it; `init.sh` does not change.",
       "Test: fails if the eval set is malformed.",
       "Test: fails if the fixture is missing."
     ],
     "evidence": [],
-    "notes": "Task: after m4 (module 5, next to the AI it is compared against). deferred: until m4, by the user's decision (docs/build-brief.md, Non-goals)."
+    "notes": "Task: after m4 (module 5, next to the AI it is compared against). Unblocked on 2026-10-16 after tag m4. The eval set is RuleRefTests/Fixtures/taifa-3.0-eval.json (25 questions); its 21 expected pages were checked against the fixture with pdftotext. Depends on f18 because the baseline measures the passages f18 cuts."
   }
 ]
