@@ -52,6 +52,15 @@ struct GameContent: View {
                     ForEach(matches) { match in
                         MatchRow(match: match)
                     }
+                case .noMatch:
+                    EmptyView()
+                }
+            }
+            // An overlay keeps the List, and with it the search field, in place while the state changes.
+            .overlay {
+                if searchState == .noMatch {
+                    // The system's texts and symbol: no catalog keys.
+                    ContentUnavailableView.search(text: query.wrappedValue)
                 }
             }
             // Only in ready: a game without a rulebook offers no search.
@@ -93,6 +102,16 @@ struct GameContent: View {
         GameContent(
             title: "Taifa", state: .ready(pageCount: 16), isImporting: false, errorMessage: nil,
             query: .constant(SampleSearch.query), searchState: .matches(SampleSearch.matches),
+            importRulebook: {}, dismissError: {}
+        )
+    }
+}
+
+#Preview("No Match") {
+    NavigationStack {
+        GameContent(
+            title: "Taifa", state: .ready(pageCount: 16), isImporting: false, errorMessage: nil,
+            query: .constant("dragon"), searchState: .noMatch,
             importRulebook: {}, dismissError: {}
         )
     }

@@ -346,3 +346,17 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Left: scenario 9 (the screen with Taifa on the iPhone 16, in English and Spanish), where the search field appears on iOS 26.0 and 27, and the previews, checked by hand.
 - Not verified: search speed on a device, iOS 26.0 and a physical device, a Release build, a fresh clone, rulebooks other than synthetic ones.
 - Next: the user merges the f13 PR on GitHub; then, on `main`, add `Import/` to the `Search/` row of `ARCHITECTURE.md`; then `/feature-flow` on f14-no-match-state. Done when: the f13 PR is merged, the `ARCHITECTURE.md` fix is committed on `main`, and f14 is `accepted` with its PR open.
+
+## 2026-10-16 — T4: f14 passing
+- f14-no-match-state is `passing` on branch `feat/f14-no-match-state` (code commit 449ef36). `SearchState` gains `noMatch` and `matches` (empty for `idle` and `noMatch`); `SearchIndex.search(_:)` returns `.noMatch` when a query with terms matches no passage, so `.matches` is never empty. Nothing approximate is added.
+- Game screen: in `ready`, `.noMatch` shows `ContentUnavailableView.search(text:)` with the query as an overlay on the empty `List`, so the list and its `.searchable` field stay in place. New `GameContent` preview "No Match". No catalog change (the system's texts).
+- `./init.sh` green on 449ef36: 105 tests (101 plus 4 `NoMatchTests`), 0 failed, 0 skipped; the spec's focused run 17 of 17. Mutation check: with the old `.matches([])` return, scenarios 1-3 fail.
+- Left: scenario 5 (Taifa on the iPhone 16, a term not in the rulebook) and the "No Match" preview, checked by hand, with the system texts in Spanish.
+- Next: the f14 validator run through `/feature-flow`, then its PR. Done when: f14 is `accepted` and its PR is merged; then f15 starts.
+
+## 2026-10-16 — T4: f14 accepted
+- The validator returned `accept` on babe1cc (validation 1, 0 of 3 revise rounds): `./init.sh` green with 105 tests, 0 failed, 0 skipped; the spec's focused run 17 of 17; the `SearchIndex.swift` diff is the single zero-match return. The user confirmed in the chat.
+- The user accepts the deviation: the no-match view is an overlay on the empty `List` instead of replacing it, the pattern Apple's documentation shows for `ContentUnavailableView.search`.
+- Left: scenario 5 (Taifa on the iPhone 16, a term not in the rulebook), which the user checks with the m4 review; the "No Match" preview and the system texts in Spanish, checked by hand.
+- Not verified: search-field focus while typing moves between matches and no match, iOS 26.0 and a physical device, a Release build, a fresh clone.
+- Next: the user merges the f14 PR on GitHub, then `/feature-flow` on f15-page-viewer-highlight. Done when: the f14 PR is merged into `main` and f15 is `accepted` with its PR open.
