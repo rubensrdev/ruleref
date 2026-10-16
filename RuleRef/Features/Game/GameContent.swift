@@ -1,13 +1,15 @@
 import SwiftUI
 
 /// The game screen's content. `GameView` owns the game, the import and the error.
-struct GameContent: View {
+struct GameContent<Destination: View>: View {
     let title: String
     let state: GameScreenState
     let isImporting: Bool
     let errorMessage: LocalizedStringResource?
     let query: Binding<String>
     let searchState: SearchState
+    /// The page viewer for a match; previews pass `EmptyView()`, so no preview opens a stored file.
+    let destination: (Match) -> Destination
     let importRulebook: () -> Void
     let dismissError: () -> Void
 
@@ -50,7 +52,11 @@ struct GameContent: View {
                     LabeledContent("Pages", value: pageCount, format: .number)
                 case .matches(let matches):
                     ForEach(matches) { match in
-                        MatchRow(match: match)
+                        NavigationLink {
+                            destination(match)
+                        } label: {
+                            MatchRow(match: match)
+                        }
                     }
                 case .noMatch:
                     EmptyView()
@@ -74,7 +80,7 @@ struct GameContent: View {
     NavigationStack {
         GameContent(
             title: "Taifa", state: .empty, isImporting: false, errorMessage: nil,
-            query: .constant(""), searchState: .idle, importRulebook: {}, dismissError: {}
+            query: .constant(""), searchState: .idle, destination: { _ in EmptyView() }, importRulebook: {}, dismissError: {}
         )
     }
 }
@@ -83,7 +89,7 @@ struct GameContent: View {
     NavigationStack {
         GameContent(
             title: "Taifa", state: .empty, isImporting: true, errorMessage: nil,
-            query: .constant(""), searchState: .idle, importRulebook: {}, dismissError: {}
+            query: .constant(""), searchState: .idle, destination: { _ in EmptyView() }, importRulebook: {}, dismissError: {}
         )
     }
 }
@@ -92,7 +98,7 @@ struct GameContent: View {
     NavigationStack {
         GameContent(
             title: "Taifa", state: .ready(pageCount: 16), isImporting: false, errorMessage: nil,
-            query: .constant(""), searchState: .idle, importRulebook: {}, dismissError: {}
+            query: .constant(""), searchState: .idle, destination: { _ in EmptyView() }, importRulebook: {}, dismissError: {}
         )
     }
 }
@@ -101,7 +107,7 @@ struct GameContent: View {
     NavigationStack {
         GameContent(
             title: "Taifa", state: .ready(pageCount: 16), isImporting: false, errorMessage: nil,
-            query: .constant(SampleSearch.query), searchState: .matches(SampleSearch.matches),
+            query: .constant(SampleSearch.query), searchState: .matches(SampleSearch.matches), destination: { _ in EmptyView() },
             importRulebook: {}, dismissError: {}
         )
     }
@@ -111,7 +117,7 @@ struct GameContent: View {
     NavigationStack {
         GameContent(
             title: "Taifa", state: .ready(pageCount: 16), isImporting: false, errorMessage: nil,
-            query: .constant("dragon"), searchState: .noMatch,
+            query: .constant("dragon"), searchState: .noMatch, destination: { _ in EmptyView() },
             importRulebook: {}, dismissError: {}
         )
     }
@@ -122,7 +128,7 @@ struct GameContent: View {
         GameContent(
             title: "Taifa", state: .empty, isImporting: false,
             errorMessage: ImportErrorMessage.message(for: .noTextLayer),
-            query: .constant(""), searchState: .idle, importRulebook: {}, dismissError: {}
+            query: .constant(""), searchState: .idle, destination: { _ in EmptyView() }, importRulebook: {}, dismissError: {}
         )
     }
 }

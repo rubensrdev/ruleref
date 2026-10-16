@@ -131,6 +131,16 @@
         }
       }
     },
+    "Page Unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página no disponible"
+          }
+        }
+      }
+    },
     "Pages" : {
       "localizations" : {
         "es" : {
@@ -167,6 +177,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se ha podido guardar el reglamento. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "The rulebook file could not be opened." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido abrir el archivo del reglamento."
           }
         }
       }
