@@ -59,10 +59,11 @@ Ordered. IDs are stable; never renumber.
 | F11 | T3 | Re-importing the same file into the same game is a no-op; the same file into another game is refused, naming that game. | Test: locators before and after are equal and counts unchanged; second game gets `.alreadyImported(gameName)`. |
 | F17 | T3 | From a game without a rulebook, the user picks a PDF with the system file picker and imports it; the game screen then shows the rulebook as ready, with its page count. | Test: game screen state empty → ready with page count; manual: import Taifa from Files on the iPhone 16. |
 | F12 | after m4 | User deletes a game's rulebook; the game stays and can import again. | Test: game remains, rulebook/passages/file gone, import is offered again. |
+| F18 | T4 | Importing the Taifa rulebook splits each page into its paragraphs, so a match and its highlight cover one paragraph instead of the whole page body. | Tests on the Taifa fixture: known paragraph starts begin a passage; a mid-paragraph line does not; f06's synthetic tests still pass. |
 | F13 | T4 | Text search returns passages of the game's rulebook containing all query terms, case- and diacritic-insensitively, ranked by term frequency then reading order. | Tests on a synthetic rulebook: AND semantics, "construccion" matches "construcción", ranking stable. |
 | F14 | T4 | A query with zero matches shows the no-match state, never approximate matches. | Test: search state is `.noMatch` with an empty list for an absent term. |
 | F15 | T4 | Opening a match shows its page in the page viewer with the passage rectangle highlighted. | Test: locator → page index and highlight bounds passed to the viewer equal the locator's. |
-| F16 | after m4 | Baseline run: the eval set (Codable JSON) is evaluated against search over the Taifa fixture and a report with hit@1, hit@3 and no-match accuracy is written, tagged with OS version. | `./init.sh` produces the report file; the test fails if the eval set is malformed or the fixture missing. |
+| F16 | after m4 | Baseline run: the eval set (Codable JSON) is evaluated against search over the Taifa fixture and a report with hit@1, hit@3 and no-match accuracy is written, tagged with OS version. | A focused test run attaches the report to its result bundle and `xcresulttool` extracts it (`init.sh` unchanged); the test fails if the eval set is malformed or the fixture missing. |
 
 ## Validation plan
 

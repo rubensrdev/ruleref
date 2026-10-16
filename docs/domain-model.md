@@ -88,7 +88,7 @@ No lifecycle: they exist only in a fully imported, immutable state, and are dele
 - Paragraph split across a page break → two passages, one per page.
 - Hyphenated line breaks ("cons-⏎truir") → joined in passage text. Genuine hyphenated words that happen to end a line may be joined wrongly; accepted.
 - Mixed pages (some text, some image-only) → import succeeds; image pages are unsearchable.
-- Multi-column layouts → reading order is whatever PDFKit gives; correct handling deferred to ADR-002.
+- Multi-column layouts → reading order is whatever PDFKit gives (ADR-002); no reading-order reconstruction in the MVP.
 - Query with only whitespace → `idle`, not `noMatch`.
 - Query differing only in case or accents → same matches.
 - Game name differing only in case/accents/surrounding spaces → rejected as duplicate.

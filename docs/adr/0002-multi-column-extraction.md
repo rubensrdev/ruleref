@@ -9,7 +9,7 @@ Board game rulebooks are often laid out in columns, with boxes, tables and text 
 Layout check of `RuleRefTests/Fixtures/taifa-3.0.pdf` on 2026-10-14, all 16 pages rendered and read:
 - The body is single-column with a text layer.
 - Text wraps around images, as on pages 3 and 12.
-- Pages 2 and 10 hold small tables.
+- Pages 2 and 11 hold small tables.
 - The table of contents on page 16 is in two columns.
 
 ## Decision
@@ -26,3 +26,8 @@ Layout check of `RuleRefTests/Fixtures/taifa-3.0.pdf` on 2026-10-14, all 16 page
 - f06, f07 and f08 stay as specified.
 - A match on a table or on the table of contents may show a mixed passage; the page and the highlight still point to the right place.
 - Revisit after m4 if the f16 baseline shows misses on table questions, or if a target rulebook is multi-column. Either alternative is additive behind the import contract (ADR-003).
+
+## Revision 2026-10-16
+- Corrected: the second small table is on page 11, not page 10.
+- Finding (f08, 2026-10-15): with the 0.5 ratio from f06, Taifa imports as 40 passages for 16 pages, most of them a whole page body, because its paragraph gaps are below 0.5 × the median line height.
+- Consequence: f18 recalibrates the paragraph ratio on Taifa, measured with PDFKit through `PassageExtractor.lines(on:)`. The decision above does not change: PDFKit line order, no reading-order reconstruction, no Vision, and a page break always cuts.

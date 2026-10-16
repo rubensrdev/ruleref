@@ -15,7 +15,7 @@ The harness is the main deliverable; the app is its test bed.
 - Never edit `RuleRef.xcodeproj`. The user configures it in Xcode. If a target, setting, scheme or file membership change is needed, stop and tell the user exactly what to change.
 - New files go in the synchronized folders `RuleRef/` and `RuleRefTests/`; they need no project change.
 - Swift 6 with complete strict concurrency.
-- SwiftUI, no UIKit. Pending exception: the PDFKit page viewer (F15), which gets its own ADR.
+- SwiftUI, no UIKit. One exception: the PDFKit page viewer (f15), decided in ADR-004; its file imports `SwiftUI` and `PDFKit` only.
 - SwiftData for persistence.
 - Swift Testing only; no XCTest.
 - Codable only; `JSONSerialization` is forbidden.

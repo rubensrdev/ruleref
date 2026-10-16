@@ -705,6 +705,21 @@
     "notes": "Task: after m4 (non-goal until m4). deferred: until m4, by the user's decision (docs/build-brief.md, Non-goals)."
   },
   {
+    "id": "f18-paragraph-cut-calibration",
+    "area": "extraction",
+    "title": "Paragraph cut calibrated on Taifa",
+    "user_visible_behavior": "Importing the Taifa rulebook splits each page into its paragraphs, so a match and its highlight cover one paragraph instead of the whole page body.",
+    "depends_on": ["f08-atomic-import"],
+    "status": "not_started",
+    "verification": [
+      "Test on the Taifa fixture: known paragraph starts begin a passage, such as \"6. Si el atacante gana\" on page 5.",
+      "Test on the Taifa fixture: a line in the middle of a paragraph does not begin a passage.",
+      "The f06 synthetic segmentation tests still pass, or the spec declares their changes."
+    ],
+    "evidence": [],
+    "notes": "Task: T4. Added on 2026-10-16. f08 imported Taifa as 40 passages for 16 pages, most of them a whole page body: its paragraph gaps (0.15-0.3 x the line height, measured with PyMuPDF, not PDFKit) are below f06's 0.5 ratio. The implementer measures the gaps with PassageExtractor.lines(on:) and picks the ratio. Reading order stays as ADR-002 decides."
+  },
+  {
     "id": "f13-text-search",
     "area": "search",
     "title": "Text search in a rulebook",
@@ -743,7 +758,7 @@
       "Test: the page index and highlight bounds passed to the viewer equal the locator's."
     ],
     "evidence": [],
-    "notes": "Task: T4. The PDFKit viewer is the pending UIKit exception and needs its own ADR."
+    "notes": "Task: T4. The PDFKit viewer is the one UIKit-backed view, decided in ADR-004."
   },
   {
     "id": "f16-baseline-eval",
@@ -753,7 +768,7 @@
     "depends_on": ["f13-text-search", "f14-no-match-state"],
     "status": "blocked",
     "verification": [
-      "`./init.sh` produces the report file.",
+      "A focused `xcodebuild test -only-testing:` run attaches the report to its result bundle (Swift Testing `Attachment`) and `xcrun xcresulttool export attachments` extracts it; `init.sh` does not change.",
       "Test: fails if the eval set is malformed.",
       "Test: fails if the fixture is missing."
     ],

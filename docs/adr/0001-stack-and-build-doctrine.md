@@ -42,3 +42,7 @@ Solo developer, three weeks to a graded harness, recorded as a video. Agents mus
 - Scope: the implementer has none of its tools (`disallowedTools: mcp__xcode`) and the validator has none (explicit `tools` list). `RenderPreview` is not validation evidence: the user validates the interface by hand.
 - Consequences: the server's tool list drifts (53 tools in the morning and 54 in the afternoon of 2026-10-14), so it is listed again after every Xcode update and each new tool is classified. Machine setup (headless mode, permitted agent, permitted folder) is done by the user, by hand. Auto mode refused an agent edit that widened its own allow list; permission widenings are made in Manual mode with the user's approval.
 - How to use it: the `xcode-mcp` skill.
+
+## Revision 2026-10-16
+- Changed: "SwiftUI only (no UIKit)" has one exception, the page viewer, which wraps PDFKit's `PDFView` in a `UIViewRepresentable`. See ADR-004. Its file imports `SwiftUI` and `PDFKit` only, so `init.sh`'s UIKit rule does not change.
+- Changed: ingestion uses PDFKit only. Vision is not used in the MVP (ADR-002).

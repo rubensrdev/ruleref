@@ -17,7 +17,7 @@ No AI before m4. On-device AI comes later as a pluggable layer.
 
 ## Stack
 
-iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vision, no third-party dependencies, built and tested via `xcodebuild`. See [ADR-001](docs/adr/0001-stack-and-build-doctrine.md).
+iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit, no third-party dependencies, built and tested via `xcodebuild`. See [ADR-001](docs/adr/0001-stack-and-build-doctrine.md).
 
 ## Build and test
 
@@ -33,7 +33,9 @@ iOS 26+, iPhone only, Swift 6, SwiftUI, SwiftData, Swift Testing, PDFKit and Vis
 - [`docs/domain-model.md`](docs/domain-model.md): core concepts and rules.
 - [`docs/risks-and-open-questions.md`](docs/risks-and-open-questions.md): status of open decisions, assumptions and risks.
 - [`docs/adr/0001-stack-and-build-doctrine.md`](docs/adr/0001-stack-and-build-doctrine.md): stack and CLI build doctrine.
+- [`docs/adr/0002-multi-column-extraction.md`](docs/adr/0002-multi-column-extraction.md): PDFKit line order in the MVP, no reading-order reconstruction.
 - [`docs/adr/0003-scope-cut.md`](docs/adr/0003-scope-cut.md): scope cut, with no web importer and no parallel worktrees.
+- [`docs/adr/0004-page-viewer-pdfview.md`](docs/adr/0004-page-viewer-pdfview.md): page viewer with PDFKit's `PDFView`, the one UIKit-backed view.
 - [`CONTEXT.md`](CONTEXT.md): glossary of canonical terms.
 - [`PROGRESS.md`](PROGRESS.md): log of work sessions, recording what closed and what comes next.
 
