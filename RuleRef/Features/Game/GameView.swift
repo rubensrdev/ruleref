@@ -22,6 +22,9 @@ struct GameView: View {
             errorMessage: errorMessage,
             query: $query,
             searchState: searchState,
+            destination: { match in
+                PageViewer(highlight: PageHighlight(locator: match.passage.locator), pageNumber: match.pageNumber)
+            },
             importRulebook: { isPickingFile = true },
             dismissError: { errorMessage = nil }
         )

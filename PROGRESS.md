@@ -360,3 +360,29 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Left: scenario 5 (Taifa on the iPhone 16, a term not in the rulebook), which the user checks with the m4 review; the "No Match" preview and the system texts in Spanish, checked by hand.
 - Not verified: search-field focus while typing moves between matches and no match, iOS 26.0 and a physical device, a Release build, a fresh clone.
 - Next: the user merges the f14 PR on GitHub, then `/feature-flow` on f15-page-viewer-highlight. Done when: the f14 PR is merged into `main` and f15 is `accepted` with its PR open.
+
+## 2026-10-16 — T4: f15 passing
+- f15-page-viewer-highlight is `passing` on branch `feat/f15-page-viewer-highlight` (code commit e41a0f4). New `RuleRef/Features/PageViewer/`: `PageHighlight` (the only locator-to-viewer path), `PDFPageView` (ADR-004's one `UIViewRepresentable`; imports `PDFKit` and `SwiftUI` only, and it compiles that way), `PageDocument`, `PageViewerContent` and `PageViewer` (opens its own `PDFDocument` once, in `.task`; `init` touches no file).
+- Match rows are now `NavigationLink`s: `GameContent` takes a generic `destination`, `GameView` passes `PageViewer`, previews pass `EmptyView()`. The f14 no-match overlay is unchanged. Preview page in `RuleRef/Shared/SamplePDF.swift` (Core Graphics and Core Text).
+- PDFKit keeps the annotation's bounds exactly (`==`). Mutation check: with inset bounds only scenario 2 fails.
+- Catalog: `Page Unavailable` and `The rulebook file could not be opened.`, with Spanish values.
+- `./init.sh` green on e41a0f4: 109 tests (105 plus 4), 0 failed, 0 skipped; focused run 4 of 4.
+- Left: scenario 4 (Taifa on the iPhone 16: tap a match, the page marked, back) and the previews, checked by hand. `MatchRow`'s doc comment still says "Not tappable until the page viewer (f15)"; it is outside the spec's file list and was not changed.
+- Next: the f15 validator run through `/feature-flow`, then its PR. Done when: f15 is `accepted` and its PR is merged.
+
+## 2026-10-16 — T4: f15 revise 1 repaired
+- Validation 1 returned `revise` (F1: `Shared/SamplePDF.swift` used `PageHighlight`, a `Features/` type). Fixed in da7e2f5: `SamplePDF.previewLocator: Locator` replaces `previewHighlight`; the five page viewer previews build `PageHighlight(locator: SamplePDF.previewLocator)`. No other change.
+- `./init.sh` green on da7e2f5: 109 tests, 0 failed, 0 skipped; focused run 4 of 4; `RuleRef/Shared/` mentions no `Features/` type; the same 13 files in the `--stat` (plus the validation record).
+- f15 is `passing` again. Left as in the previous entry: scenario 4 and the previews, checked by hand; the stale `MatchRow` comment.
+- Next: f15 validation 2 through `/feature-flow`. Done when: f15 is `accepted` and its PR is merged.
+
+## 2026-10-16 — T4: f15 accepted, manual check of f19, f13, f14 and f15
+- The validator returned `accept` on bfd862c (validation 2, 1 of 3 revise rounds; F1 resolved): `./init.sh` green with 109 tests, 0 failed, 0 skipped; the spec's focused run 4 of 4; `RuleRef/Shared/` uses only `Domain/`. The user confirmed in the chat.
+- Manual check by the user on 2026-10-16, on the iPhone 16 (iOS 27) from `feat/f15-page-viewer-highlight`, app reinstalled and Taifa imported again, in Spanish; the English previews were reviewed in Xcode:
+  - f19: empty library with "+" as icon only; the new-game sheet with the system x and ✓ buttons, no text, and the blank-name error in red; the game screen with "Importar reglamento" showing icon and title.
+  - f13: the "Buscar en el reglamento" field appears at the bottom; "incursion" without the accent finds matches with "Página N" and up to three lines; the page 4 row is only the bullet "• Incursión…"; clearing the field brings back "Páginas 16".
+  - f14: "dragon" shows the system view "No hay resultados para "dragon"" with no rows, and the field keeps the text.
+  - f15: tapping the bullet opens "Página 4", scrolled to the passage, with a single yellow highlight exactly over the bullet. Accepted: the highlight touches the line above, because the box of a one-line bulleted passage is taller.
+- For the post-m4 batch, by the user's decision: the stale `MatchRow.swift` comment ("Not tappable until the page viewer (f15)"); move `PageViewerFixture` to `RuleRefTests/Support/`; the context text copied into f15's second evidence entry ("status in_progress").
+- Not verified: iOS 26.0, a Release build, a fresh clone; Taifa pages 3 and 12 and memory with large rulebooks; whether `makeUIView` runs once per viewer beyond the single highlight seen.
+- Next: the user merges the f15 PR on GitHub; then, on `main`, set tag `m4`. Done when: the f15 PR is merged into `main` and tag `m4` is set and pushed.
