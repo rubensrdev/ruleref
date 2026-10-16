@@ -360,3 +360,12 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Left: scenario 5 (Taifa on the iPhone 16, a term not in the rulebook), which the user checks with the m4 review; the "No Match" preview and the system texts in Spanish, checked by hand.
 - Not verified: search-field focus while typing moves between matches and no match, iOS 26.0 and a physical device, a Release build, a fresh clone.
 - Next: the user merges the f14 PR on GitHub, then `/feature-flow` on f15-page-viewer-highlight. Done when: the f14 PR is merged into `main` and f15 is `accepted` with its PR open.
+
+## 2026-10-16 — T4: f15 passing
+- f15-page-viewer-highlight is `passing` on branch `feat/f15-page-viewer-highlight` (code commit e41a0f4). New `RuleRef/Features/PageViewer/`: `PageHighlight` (the only locator-to-viewer path), `PDFPageView` (ADR-004's one `UIViewRepresentable`; imports `PDFKit` and `SwiftUI` only, and it compiles that way), `PageDocument`, `PageViewerContent` and `PageViewer` (opens its own `PDFDocument` once, in `.task`; `init` touches no file).
+- Match rows are now `NavigationLink`s: `GameContent` takes a generic `destination`, `GameView` passes `PageViewer`, previews pass `EmptyView()`. The f14 no-match overlay is unchanged. Preview page in `RuleRef/Shared/SamplePDF.swift` (Core Graphics and Core Text).
+- PDFKit keeps the annotation's bounds exactly (`==`). Mutation check: with inset bounds only scenario 2 fails.
+- Catalog: `Page Unavailable` and `The rulebook file could not be opened.`, with Spanish values.
+- `./init.sh` green on e41a0f4: 109 tests (105 plus 4), 0 failed, 0 skipped; focused run 4 of 4.
+- Left: scenario 4 (Taifa on the iPhone 16: tap a match, the page marked, back) and the previews, checked by hand. `MatchRow`'s doc comment still says "Not tappable until the page viewer (f15)"; it is outside the spec's file list and was not changed.
+- Next: the f15 validator run through `/feature-flow`, then its PR. Done when: f15 is `accepted` and its PR is merged.

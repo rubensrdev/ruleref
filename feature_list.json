@@ -945,11 +945,35 @@
     "title": "Open a match highlighted on its page",
     "user_visible_behavior": "Opening a match shows its page in the page viewer with the passage rectangle highlighted.",
     "depends_on": ["f13-text-search"],
-    "status": "not_started",
+    "status": "passing",
     "verification": [
       "Test: the page index and highlight bounds passed to the viewer equal the locator's."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/PageHighlightTests -only-testing:RuleRefTests/PDFPageViewTests; git diff main...HEAD --stat; grep of the imports of PDFPageView.swift and of import UIKit, write(to: and dataRepresentation in the branch diff",
+        "expected": "init.sh exits 0 with every check PASS (no-uikit-xctest and catalog-coverage included), 0 failed, 0 skipped, and the count is 105 plus the new tests; the focused run ends in ** TEST SUCCEEDED **; PDFPageView.swift imports exactly SwiftUI and PDFKit; the annotation keeps exactly the locator's bounds; the diff holds only the spec's files.",
+        "observed": "init.sh exit 0 on e41a0f4 (run before and after the commit): totalTestCount=109 (105 before, plus 4 new), failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.1), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: ** TEST SUCCEEDED **, 4 of 4 passed. Scenario tests: 1 PageHighlightTests/theViewerReceivesExactlyTheLocatorsPageAndBounds() (two-page synthetic PDF imported through Library.importRulebook into an in-memory container and a RulebookStore over a unique temporary directory; the single match for \"another\" is on page 2; rulebookID, pageIndex 1 and bounds equal the locator's and, with ==, the stored Passage's minX/minY/width/height); 2 PDFPageViewTests/theHighlightIsOneAnnotationWithTheSameBoundsAndTheFileIsUntouched() (PageViewer.openDocument then PDFPageView.addHighlight; the returned page has index 1, page 1 gains exactly one annotation and page 0 none, the annotation's bounds == highlight.bounds, the stored file's bytes are equal before and after); 3 aMissingFileIsUnavailable() (nil over an empty store) and aMissingPageIsUnavailable() (pageIndex 5 on a two-page document: nil, no page gains an annotation). Annotation bounds: exact (== holds on PDFKit's returned bounds). Mutation check, not committed: with the annotation built on highlight.bounds.insetBy(dx: 0.5, dy: 0.5), only scenario 2 fails. PDFPageView.swift imports PDFKit and SwiftUI only and compiles under Swift 6, complete concurrency checking and member import visibility; it uses PDFView(), autoScales, document and go(to:on:). The branch diff has no import UIKit, write(to: or dataRepresentation; init.sh unchanged. Names follow the f13/f14 implementation (Match.passage, Match.pageNumber, MatchRow, GameContent, GameView, SearchState.matches) and match the spec. Catalog keys added: \"Page Unavailable\" -> \"Página no disponible\" and \"The rulebook file could not be opened.\" -> \"No se ha podido abrir el archivo del reglamento.\", both translated; \"Page %lld\" reused. Small additions beyond the spec's wording: SamplePDF.previewHighlight (the shared preview locator, built from secondParagraphBounds); PageViewer's .task returns early unless the document is still .loading, so it opens once; the \"Missing File\" preview's store points at a unique temporary path that is never created (no file); the test files import CoreGraphics (member import visibility); the shared fixture PageViewerFixture lives in PageHighlightTests.swift.",
+        "context": {
+          "date": "2026-10-16 12:37 CEST",
+          "commit": "e41a0f40c30f8d7017d1babece9a613937ffcc4a",
+          "xcode": "Xcode 27.1 (27A9275)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f15-page-viewer-highlight, clean tree at the code commit except feature_list.json (status in_progress), warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The interface (scenario 4): Taifa imported on the iPhone 16, searching, tapping a match, the page with the passage marked and titled \"Page N\", going back to the matches; no UI tests by design, the user validates it by hand.",
+          "The highlight's look (default color) and position on screen, and whether go(to:on:) called in makeUIView scrolls to it before the view has a size.",
+          "The previews: PageViewerContent \"Loading\", \"Highlighted\", \"Unavailable\"; PDFPageView \"Page\"; PageViewer \"Missing File\"; the GameContent previews with the new destination.",
+          "Whether NavigationLink builds every row's destination eagerly (the design does not depend on it).",
+          "That makeUIView runs once per viewer: if SwiftUI recreated the representable for the same document, a second annotation would be added.",
+          "Taifa pages 3 and 12 (the mark over part of an image), and memory with large rulebooks.",
+          "The Spanish texts on screen; only the catalog checks ran.",
+          "iOS 26.0 (the deployment target), a physical device and a Release build.",
+          "A fresh clone with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: T4. The PDFKit viewer is the one UIKit-backed view, decided in ADR-004."
   },
   {
