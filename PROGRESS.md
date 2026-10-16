@@ -400,3 +400,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green on 675ea11: 130 tests (109 plus 21), 0 failed, 0 skipped. `ARCHITECTURE.md` and `README.md` list `Evaluation/` and `docs/eval/`.
 - Not verified: iOS 26.0 and a device, other rulebooks, the validator re-extracting the attachment, a repeat run giving the same report.
 - Next: the f16 validator run through `/feature-flow`, then its PR. Done when: f16 is `accepted` and its PR is merged into `main`.
+
+## 2026-10-16 — f16: baseline eval accepted
+- The validator returned `accept` on 31b1521 (validation 1, 0 of 3 revise rounds): `./init.sh` green with 130 tests, 0 failed, 0 skipped; the focused run of `BaselineEvalTests`, `EvalSetTests` and `BaselineReportTests` 21 tests / 31 runs; exactly one attachment, whose payload equals `docs/eval/f16-baseline-taifa-3.0.json` field by field; the summary recomputed from the rows (hit@1 3/21, hit@3 4/21, no-match 3/4). The user confirmed in the chat.
+- Validator notes, none blocking: no test swaps the fixture to exercise the SHA-mismatch path; the implementer's evidence names 675ea11, later commits only add records.
+- Not verified: byte-for-byte identity of the attachment as seen by the validator (compared field by field); the SHA-mismatch path; iOS 26.0 and a device; other rulebooks; a fresh clone; determinism beyond two runs.
+- Next: the user reviews and merges the f16 PR on GitHub; then decides whether to unblock f04 and f12 (`deferred` until m4). Done when: the f16 PR is merged into `main` and f04 and f12 have the user's decision recorded.

@@ -9,3 +9,4 @@
   - Note: the spec's task checkboxes stay unchecked because the approved spec must not be edited.
   - Info: security checklist found nothing relevant; test-only change, temporary files removed in a `defer`.
 - Not verified: byte-for-byte identity of the attachment and the committed report (no hash or export allowed to the validator; compared field by field); the SHA-mismatch failure path; a missing PDF or eval set during the actual baseline run; iOS 26.0 and a physical device; rulebooks other than Taifa 3.0; a fresh clone with clean DerivedData; search determinism beyond two runs.
+- User: confirmed

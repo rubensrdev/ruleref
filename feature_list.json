@@ -1029,7 +1029,7 @@
     "title": "Baseline search evaluation",
     "user_visible_behavior": "Baseline run: the eval set (Codable JSON) is evaluated against search over the Taifa fixture and a report with hit@1, hit@3 and no-match accuracy is written, tagged with OS version.",
     "depends_on": ["f13-text-search", "f14-no-match-state", "f18-paragraph-cut-calibration"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "A focused `xcodebuild test -only-testing:` run attaches the report to its result bundle (Swift Testing `Attachment`) and `xcrun xcresulttool export attachments` extracts it; `init.sh` does not change.",
       "Test: fails if the eval set is malformed.",
@@ -1054,6 +1054,27 @@
           "That later runs give the same report: search is deterministic, but the report was produced once.",
           "That the SHA-mismatch path fails with its message: no test swaps the fixture; it is a #require on the computed hex.",
           "A fresh clone with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/BaselineEvalTests -only-testing:RuleRefTests/EvalSetTests -only-testing:RuleRefTests/BaselineReportTests; xcrun xcresulttool get test-results summary and get test-results activities --test-id \"BaselineEvalTests/taifaBaseline()\" on that run's DerivedData bundle; xcrun xcresulttool get object --legacy --id <attachment payloadId> (stdout only); git diff --stat main...HEAD; git diff main...HEAD -- RuleRef/ init.sh RuleRefTests/Fixtures/ RuleRef.xcodeproj",
+        "expected": "init.sh exits 0 with every check PASS, 0 failed, 0 skipped; the focused run ends in ** TEST SUCCEEDED ** with one attachment f16-baseline-taifa-3.0.json; the attachment's content equals the committed docs/eval/f16-baseline-taifa-3.0.json; the report has 25 rows in eval-set order, totals 21/21/4, summary counts equal to the counts from its rows, the eval set's fixtureSHA256 and an iOSVersion; only test files, docs/eval/, the declared docs, feature_list.json and PROGRESS.md changed.",
+        "observed": "Independent validator run. init.sh: PASS (exit 0), totalTestCount=130, failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.1), simulator, no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage. Focused run: ** TEST SUCCEEDED **, 21 tests / 31 runs passed, 0 failed, 0 skipped; taifaBaseline() 0.110 s. Activities: exactly one attachment titled f16-baseline-taifa-3.0.json (keepAlways). Attachment payload printed with xcresulttool get object: every row and summary field equals the committed report. Committed report: 25 rows q01...q31 in file order, type/overlap/expectedPage equal to the eval set; recomputed hit@1 3/21 (q21, q24, q26), hit@3 4/21 (+q10), no-match 3/4 (q31 matches p13), rates 0.14285714285714285/0.19047619047619047/0.75; fixtureSHA256 1f7c4ae3304b4bd90339825fdf6e756eec20377af575e1dd35ded28bdc4f67bd equals the eval set; iOSVersion 27.0.0; passageCount 221. Diff: 12 files, all declared; RuleRef/, init.sh, RuleRefTests/Fixtures/ and the project unchanged. Code review: Codable decoding with the file's field names, query searched as written, import through Library into an in-memory container, SHA check with RulebookID before import, scoring per scenarios 3-4, no expectation on any score, one test per scenario 5 case plus the missing-fixture test.",
+        "context": {
+          "date": "2026-10-16 17:58 CEST",
+          "commit": "31b1521 (code at 8cf7ec8, report at 675ea11)",
+          "xcode": "Xcode 27.1",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Validator subagent on the working checkout, branch feat/f16-baseline-eval, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "Byte-for-byte identity of the attachment and the committed report: the validator compared every field of the printed payload but cannot hash it (shasum not allowed) or export it (xcresulttool export not allowed).",
+          "The SHA-mismatch failure path and its message: no test swaps the fixture; it is a #require on the computed hex, checked by reading the code.",
+          "A missing PDF or eval set during the actual baseline run: only TestFixture's missing-resource throw is tested, with a nonexistent name.",
+          "iOS 26.0 (the deployment target) and a physical device; only the iOS 27.0 simulator ran.",
+          "Rulebooks other than Taifa 3.0.",
+          "A fresh clone with clean DerivedData.",
+          "Search determinism beyond two runs: the implementer's and the validator's runs gave the same report content."
         ]
       }
     ],
