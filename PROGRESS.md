@@ -328,3 +328,21 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Left: scenario 5, the three screens on the iPhone 16, which the user does with the m4 check.
 - Not verified: iOS 26.0 and a device, a Release build, a fresh clone.
 - Next: the user merges the f19 PR on GitHub, then `/feature-flow` on f13-text-search. Done when: the f19 PR is merged into `main` and f13 is `accepted` with its PR open.
+
+## 2026-10-16 — T4: f13 passing
+- f13-text-search is `passing` on branch `feat/f13-text-search` (code commit dfbf8e8). New `RuleRef/Search/`: `SearchFolding` (`GameName`'s options and locale), `Match` (`id` is the ordinal, `pageNumber` is `pageIndex + 1`), `SearchState` (`idle`, `matches`) and `SearchIndex` (AND over whitespace-separated folded terms, substring match, repeated terms once, ranked by occurrences then ordinal; `init(rulebook:)` on the main actor). It reads passages only, never the stored file.
+- Game screen: `.searchable` ("Search the rulebook") only in `ready`; the list shows the "Pages" row when idle and one `MatchRow` ("Page N" and up to three lines) per match; rows are not tappable until f15. `GameView` owns the query and rebuilds the index on each change. Previews: `GameContent` "Matches", `MatchRow` "Match", with invented passages in `RuleRef/Shared/SampleSearch.swift`; `docs/domain-model.md` lists preview data as the second locator exception.
+- Catalog: `Page %lld` (the compiler's key, as the spec expected) and `Search the rulebook`, with Spanish values.
+- `./init.sh` green on dfbf8e8: 101 tests (92 plus 9), 0 failed, 0 skipped; focused run 15 of 15. Mutation check: without the repeated-term dedupe only scenario 5 fails.
+- Left: scenario 9 (the screen with Taifa on the iPhone 16) and the previews, checked by hand; the no-match state is f14.
+- Next: the f13 validator run through `/feature-flow`, then its PR. Done when: f13 is `accepted` and its PR is merged; then f14 starts.
+
+## 2026-10-16 — T4: f13 accepted
+- The validator returned `accept` on 5106583 (validation 1, 0 of 3 revise rounds): `./init.sh` green with 101 tests, 0 failed, 0 skipped; the spec's focused run 15 of 15. The user confirmed in the chat.
+- Three low findings, none blocking. The user decided:
+  - The stale comment in `RuleRef/Persistence/Passage.swift` ("the one exception to 'only extraction builds locators'"; `docs/domain-model.md` now lists two) waits for the post-m4 batch.
+  - The `Search/` row of `ARCHITECTURE.md` gains `Import/` (search uses `ExtractedPassage`); fixed on `main` before f14 starts.
+  - `Match.pageNumber` switches over every `Locator` case, against ADR-003's "a new variant does not touch search"; it matters only if a second import source arrives after m4.
+- Left: scenario 9 (the screen with Taifa on the iPhone 16, in English and Spanish), where the search field appears on iOS 26.0 and 27, and the previews, checked by hand.
+- Not verified: search speed on a device, iOS 26.0 and a physical device, a Release build, a fresh clone, rulebooks other than synthetic ones.
+- Next: the user merges the f13 PR on GitHub; then, on `main`, add `Import/` to the `Search/` row of `ARCHITECTURE.md`; then `/feature-flow` on f14-no-match-state. Done when: the f13 PR is merged, the `ARCHITECTURE.md` fix is committed on `main`, and f14 is `accepted` with its PR open.
