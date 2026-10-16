@@ -830,13 +830,35 @@
     "title": "Text search in a rulebook",
     "user_visible_behavior": "Text search returns passages of the game's rulebook containing all query terms, case- and diacritic-insensitively, ranked by term frequency then reading order.",
     "depends_on": ["f08-atomic-import", "f19-interface-conventions"],
-    "status": "not_started",
+    "status": "passing",
     "verification": [
       "Test on a synthetic rulebook: AND semantics.",
       "Test: \"construccion\" matches \"construcción\".",
       "Test: ranking is stable."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/SearchIndexTests -only-testing:RuleRefTests/SearchFoldingTests -only-testing:RuleRefTests/SearchIndexRulebookTests; plutil -p MatchRow.stringsdata (DerivedData); git diff main...HEAD --stat; git diff main...HEAD -- RuleRef/Search/",
+        "expected": "init.sh exits 0 with every check PASS (catalog-coverage with the two new keys), 0 failed, 0 skipped; the focused run succeeds; the compiler's key for Text(\"Page \\(match.pageNumber)\") is recorded; the diff holds only the spec's files; RuleRef/Search/ imports only Foundation (no SwiftUI, PDFKit).",
+        "observed": "init.sh exit 0 on dfbf8e8 (run before and after the commit): totalTestCount=101 (92 before, plus 9 new: SearchFoldingTests 1 with 3 arguments, SearchIndexTests 7, SearchIndexRulebookTests 1), failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.1), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: TEST SUCCEEDED, 15 test-case runs passed, 0 failed (scenarios 1-8: andSemantics, caseDiacriticsAndWidthAreFolded x3, termMatchesInsideAWord, rankingByOccurrencesThenOrdinal, repeatedTermsCountOnce, emptyQueryIsIdle x3, matchCarriesItsPassageUnchanged, searchOverAnImportedRulebook; foldingMatchesGameNameKey x3). Generated key: MatchRow.stringsdata lists \"Page %lld\", as the spec expected; catalog keys added: \"Page %lld\" -> \"Página %lld\", \"Search the rulebook\" -> \"Buscar en el reglamento\", both translated. Mutation check, not committed: without the repeated-term dedupe only repeatedTermsCountOnce fails. Diff at dfbf8e8: 13 files, the spec's list (Search/ x4, MatchRow, GameContent, GameView, SampleSearch, Localizable.xcstrings, the three test files, docs/domain-model.md); RuleRef/Search/ imports Foundation only. GameContent and GameView names match f19's implementation; GameContent gains the \"Matches\" preview, MatchRow has \"Match\", sample passages are invented English text with hand-built locators in RuleRef/Shared/SampleSearch.swift (#if DEBUG).",
+        "context": {
+          "date": "2026-10-16 12:00 CEST",
+          "commit": "dfbf8e887a2f2e754d932c3d73dc54d813d14a0a",
+          "xcode": "Xcode 27.1 (27A9275)",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Working checkout on branch feat/f13-text-search, clean tree at the code commit except feature_list.json (status in_progress), warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The interface (scenario 9): Taifa imported on the iPhone 16, typing a query, the match rows with \"Page N\" and three lines, clearing the field back to the \"Pages\" row, in English and Spanish.",
+          "Where the search field appears on iOS 26.0 and 27 (navigation bar or bottom toolbar).",
+          "The previews (GameContent \"Matches\" and the updated ones, MatchRow \"Match\") opened in Xcode.",
+          "Search speed on a real device, with the index rebuilt on each body evaluation.",
+          "iOS 26.0 (the deployment target) and a physical device; a Release build.",
+          "Rulebooks other than synthetic ones and Taifa (no test searches Taifa).",
+          "A fresh clone with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: T4."
   },
   {
