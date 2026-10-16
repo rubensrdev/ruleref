@@ -336,3 +336,13 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green on dfbf8e8: 101 tests (92 plus 9), 0 failed, 0 skipped; focused run 15 of 15. Mutation check: without the repeated-term dedupe only scenario 5 fails.
 - Left: scenario 9 (the screen with Taifa on the iPhone 16) and the previews, checked by hand; the no-match state is f14.
 - Next: the f13 validator run through `/feature-flow`, then its PR. Done when: f13 is `accepted` and its PR is merged; then f14 starts.
+
+## 2026-10-16 — T4: f13 accepted
+- The validator returned `accept` on 5106583 (validation 1, 0 of 3 revise rounds): `./init.sh` green with 101 tests, 0 failed, 0 skipped; the spec's focused run 15 of 15. The user confirmed in the chat.
+- Three low findings, none blocking. The user decided:
+  - The stale comment in `RuleRef/Persistence/Passage.swift` ("the one exception to 'only extraction builds locators'"; `docs/domain-model.md` now lists two) waits for the post-m4 batch.
+  - The `Search/` row of `ARCHITECTURE.md` gains `Import/` (search uses `ExtractedPassage`); fixed on `main` before f14 starts.
+  - `Match.pageNumber` switches over every `Locator` case, against ADR-003's "a new variant does not touch search"; it matters only if a second import source arrives after m4.
+- Left: scenario 9 (the screen with Taifa on the iPhone 16, in English and Spanish), where the search field appears on iOS 26.0 and 27, and the previews, checked by hand.
+- Not verified: search speed on a device, iOS 26.0 and a physical device, a Release build, a fresh clone, rulebooks other than synthetic ones.
+- Next: the user merges the f13 PR on GitHub; then, on `main`, add `Import/` to the `Search/` row of `ARCHITECTURE.md`; then `/feature-flow` on f14-no-match-state. Done when: the f13 PR is merged, the `ARCHITECTURE.md` fix is committed on `main`, and f14 is `accepted` with its PR open.

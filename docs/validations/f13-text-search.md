@@ -10,3 +10,4 @@
   - Info: `SearchFolding` repeats `GameName`'s options instead of sharing them (`GameName.swift` is not in the spec's files); `SearchFoldingTests` checks they agree.
   - Info: security checklist found nothing relevant.
 - Not verified: scenario 9 (Taifa on the iPhone 16 in English and Spanish); where the search field appears on iOS 26.0 and 27; the previews (`GameContent` Empty, Importing, Ready, Matches, Import Failed; `MatchRow` "Match"; `GameView` "Game"); search speed on a device with the index rebuilt per body evaluation; iOS 26.0, a physical device, a Release build; rulebooks other than synthetic ones (no test searches Taifa); a fresh clone with clean DerivedData; the implementer's mutation check and `plutil` read of the `Page %lld` key (catalog-coverage is indirect evidence); the exact Xcode build number.
+- User: confirmed

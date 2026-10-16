@@ -830,7 +830,7 @@
     "title": "Text search in a rulebook",
     "user_visible_behavior": "Text search returns passages of the game's rulebook containing all query terms, case- and diacritic-insensitively, ranked by term frequency then reading order.",
     "depends_on": ["f08-atomic-import", "f19-interface-conventions"],
-    "status": "passing",
+    "status": "accepted",
     "verification": [
       "Test on a synthetic rulebook: AND semantics.",
       "Test: \"construccion\" matches \"construcción\".",
@@ -856,6 +856,29 @@
           "iOS 26.0 (the deployment target) and a physical device; a Release build.",
           "Rulebooks other than synthetic ones and Taifa (no test searches Taifa).",
           "A fresh clone with clean DerivedData."
+        ]
+      },
+      {
+        "command": "Validator (validation 1): ./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/SearchIndexTests -only-testing:RuleRefTests/SearchFoldingTests -only-testing:RuleRefTests/SearchIndexRulebookTests; git diff --stat main...HEAD; git diff main...HEAD",
+        "expected": "init.sh exits 0 with every check PASS, 0 failed, 0 skipped; the focused run succeeds; the diff holds only the spec's files plus feature_list.json and PROGRESS.md, and RuleRef/Search/ imports no SwiftUI or PDFKit; scenarios 1-8 implemented as the spec says.",
+        "observed": "init.sh: PASS, exit 0; totalTestCount=101, failedTests=0, skippedTests=0, expectedFailures=0; all 11 checks PASS (xcode-version Xcode 27.1, simulator iPhone 18 Pro iOS 27.0, no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage). Focused run: TEST SUCCEEDED, 15 of 15 test cases passed. Diff: 15 files, the spec's list plus feature_list.json and PROGRESS.md; Search/ imports Foundation only. Code review: folding options and locale identical to GameName's; AND, substring, repeated-term rule, ranking and idle match the spec; .searchable only in .ready, rows not tappable, previews for every state, both catalog keys with es values. Three low notes, none blocking: the stale \"one exception\" comment in Passage.swift, the Import/ gap in ARCHITECTURE.md's Search/ row, Match.pageNumber switching over every locator case versus ADR-003.",
+        "context": {
+          "date": "2026-10-16",
+          "commit": "5106583 (code dfbf8e8, base main cfc729a)",
+          "xcode": "Xcode 27.1 (build number not checked by the validator)",
+          "simulator": "iPhone 18 Pro, iOS 27.0",
+          "workspace": "Branch feat/f13-text-search, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The interface (scenario 9): Taifa imported on the iPhone 16, typing a query, match rows with \"Page N\" and up to three lines, clearing the field back to the \"Pages\" row, in English and Spanish.",
+          "Where the search field appears on iOS 26.0 and iOS 27.",
+          "The previews: GameContent (Empty, Importing, Ready, Matches, Import Failed), MatchRow \"Match\" and GameView \"Game\".",
+          "Search speed on a real device, with the index rebuilt on every body evaluation.",
+          "iOS 26.0 (the deployment target), a physical device, a Release build.",
+          "Rulebooks other than synthetic ones; no test searches Taifa.",
+          "A fresh clone with clean DerivedData.",
+          "The implementer's mutation check (not rerun: it needs a code edit).",
+          "The implementer's plutil read of MatchRow.stringsdata (catalog-coverage passing is indirect evidence that the key is Page %lld)."
         ]
       }
     ],
