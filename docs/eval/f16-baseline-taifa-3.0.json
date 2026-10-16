@@ -1,0 +1,294 @@
+{
+  "rows" : [
+    {
+      "expectedPage" : 2,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q01",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 5,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q02",
+      "overlap" : "high",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 7,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q03",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 5,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q05",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 6,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q06",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 2,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q07",
+      "overlap" : "low",
+      "topPages" : [
+        6
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 3,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q08",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 5,
+      "hitAt1" : false,
+      "hitAt3" : true,
+      "id" : "q10",
+      "overlap" : "low",
+      "topPages" : [
+        4,
+        5,
+        12
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 5,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q11",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 4,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q12",
+      "overlap" : "high",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 7,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q15",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 10,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q16",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 4,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q17",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "normal"
+    },
+    {
+      "expectedPage" : 2,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q18",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "table"
+    },
+    {
+      "expectedPage" : 2,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q19",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "table"
+    },
+    {
+      "expectedPage" : 11,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q20",
+      "overlap" : "high",
+      "topPages" : [
+
+      ],
+      "type" : "table"
+    },
+    {
+      "expectedPage" : 11,
+      "hitAt1" : true,
+      "hitAt3" : true,
+      "id" : "q21",
+      "overlap" : "low",
+      "topPages" : [
+        11,
+        2
+      ],
+      "type" : "table"
+    },
+    {
+      "expectedPage" : 5,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q22",
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "falsePremise"
+    },
+    {
+      "expectedPage" : 2,
+      "hitAt1" : false,
+      "hitAt3" : false,
+      "id" : "q23",
+      "overlap" : "high",
+      "topPages" : [
+
+      ],
+      "type" : "falsePremise"
+    },
+    {
+      "expectedPage" : 6,
+      "hitAt1" : true,
+      "hitAt3" : true,
+      "id" : "q24",
+      "overlap" : "low",
+      "topPages" : [
+        6
+      ],
+      "type" : "falsePremise"
+    },
+    {
+      "expectedPage" : 11,
+      "hitAt1" : true,
+      "hitAt3" : true,
+      "id" : "q26",
+      "overlap" : "low",
+      "topPages" : [
+        11
+      ],
+      "type" : "falsePremise"
+    },
+    {
+      "id" : "q27",
+      "noMatchCorrect" : true,
+      "overlap" : "high",
+      "topPages" : [
+
+      ],
+      "type" : "absent"
+    },
+    {
+      "id" : "q28",
+      "noMatchCorrect" : true,
+      "overlap" : "low",
+      "topPages" : [
+
+      ],
+      "type" : "absent"
+    },
+    {
+      "id" : "q29",
+      "noMatchCorrect" : true,
+      "overlap" : "high",
+      "topPages" : [
+
+      ],
+      "type" : "absent"
+    },
+    {
+      "id" : "q31",
+      "noMatchCorrect" : false,
+      "overlap" : "low",
+      "topPages" : [
+        13
+      ],
+      "type" : "absent"
+    }
+  ],
+  "summary" : {
+    "fixtureSHA256" : "1f7c4ae3304b4bd90339825fdf6e756eec20377af575e1dd35ded28bdc4f67bd",
+    "hitAt1" : {
+      "count" : 3,
+      "rate" : 0.14285714285714285,
+      "total" : 21
+    },
+    "hitAt3" : {
+      "count" : 4,
+      "rate" : 0.19047619047619047,
+      "total" : 21
+    },
+    "iOSVersion" : "27.0.0",
+    "noMatchAccuracy" : {
+      "count" : 3,
+      "rate" : 0.75,
+      "total" : 4
+    },
+    "passageCount" : 221
+  }
+}
