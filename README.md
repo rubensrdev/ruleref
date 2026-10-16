@@ -1,5 +1,7 @@
 # RuleRef
 
+<p align="center"><img src="docs/assets/app-icon.png" width="160" alt="RuleRef app icon"></p>
+
 [🇺🇸 English](#english) · [🇪🇸 Español](#español)
 
 ## English

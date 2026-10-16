@@ -411,3 +411,8 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `README.md` is now the course delivery summary, in English and Spanish in one file, with anchor links at the top: what the app is and where it stands (tag `m4`), what it does, how it was built (the gate, the hooks, the state in the repo, approved specs and the loop) and the f16 baseline (hit@1 3/21, hit@3 4/21, no-match accuracy 3/4).
 - f04 and f12 stay `blocked`, now deferred until after the course delivery by the user's decision: the demo flow does not need them.
 - Next: the decision on how much AI enters before delivery, informed by the f16 baseline. Done when: the decision is written down.
+
+## 2026-10-16 — App icon
+- The user made the app icon by hand in Icon Composer (`RuleRef/AppIcon.icon`): four flat SVG layers (a page, text lines, a yellow highlight and the highlighted line) on a navy gradient, with a dark variant of the background. It replaces the empty `AppIcon.appiconset`, which the user removed; the target's App Icon name stays `AppIcon`, so the project file does not change. Checked on the iPhone 16 home screen.
+- `README.md` shows the icon from `docs/assets/app-icon.png`, a 1024 px export of the default appearance.
+- `AccentColor` stays empty for now (the system tint): a custom accent would change every control and waits until after delivery.
