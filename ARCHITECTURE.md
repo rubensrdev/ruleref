@@ -9,7 +9,7 @@ How the app and test targets are divided. Each folder is a boundary, not a file 
 | `App/` | The app entry point and its scene. | Everything below. |
 | `Features/<Screen>/` | One screen: its views, its screen state and the messages it shows. Today `Library` and `Game`; `PageViewer` arrives with f15. | Everything below. |
 | `Shared/` | Preview sample data (inside `#if DEBUG`) and helpers used by more than one feature. | Everything below. |
-| `Search/` | Query folding, matching and ranking. Arrives with f13. | `Persistence/`, `Domain/`. |
+| `Search/` | Query folding, matching and ranking. Arrives with f13. | `Persistence/`, `Import/`, `Domain/`. |
 | `Persistence/` | SwiftData models, the `Library` service over a `ModelContext`, import outcomes and the rulebook file store. | `Import/`, `Domain/`. |
 | `Import/` | Reading a PDF and preparing its passages before anything is stored. | `Domain/`. |
 | `Domain/` | Value types, identifiers and errors. | Foundation, CoreGraphics and CryptoKit only. |
