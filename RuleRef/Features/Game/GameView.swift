@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// The game screen: owns the import and its error; `GameContent` shows them.
+/// The game screen: owns the import, its error and the query; `GameContent` shows them.
 struct GameView: View {
     let game: Game
 
@@ -10,13 +10,18 @@ struct GameView: View {
     @State private var isPickingFile = false
     @State private var isImporting = false
     @State private var errorMessage: LocalizedStringResource?
+    @State private var query = ""
 
     var body: some View {
+        // Rebuilt on every change; for a rulebook of Taifa's size that is accepted, caching is out of scope.
+        let searchState = game.rulebook.map { SearchIndex(rulebook: $0).search(query) } ?? .idle
         GameContent(
             title: game.name,
             state: GameScreenState(game: game),
             isImporting: isImporting,
             errorMessage: errorMessage,
+            query: $query,
+            searchState: searchState,
             importRulebook: { isPickingFile = true },
             dismissError: { errorMessage = nil }
         )
