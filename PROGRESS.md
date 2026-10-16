@@ -292,3 +292,24 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - The validator agent reads `ARCHITECTURE.md` and reviews views against `DESIGN.md`; it said the repo had neither.
 - f16's spec and the eval set JSON wait until after tag m4; f16 stays `blocked`.
 - Next: `/feature-flow` on f18, then f19, f13, f14 and f15, one PR each. Done when: the five are `accepted`, their PRs are merged, the user has checked the screens on the iPhone 16, and tag `m4` is set.
+
+## 2026-10-16 — T4: f18 stopped on a spec gap
+- f18-paragraph-cut-calibration is `in_progress` on branch `feat/f18-paragraph-cut-calibration`. Done (commit 4c22ea6): `TaifaSegmentationTests.taifaGapMeasurement()` records every non-blank line's gap ÷ the page median for the 16 pages as `taifa-gaps.txt`; exported from a focused run with `xcresulttool export attachments`. `./init.sh` green: 85 tests, 0 failed, 0 skipped (Xcode 27.1 now reported).
+- Measured on the iOS 27.0 simulator, page median 13.22 on pages 1-15 and 12.02 on page 16. Between two body-text lines of one paragraph: -0.047 to -0.017 (lower after a bullet line or an inline icon). Before a paragraph or heading with no bullet: 0.069 to 0.252 (smallest 0.069 on page 8 before "9.2 Ataques de los Bots", which follows a bullet line; next 0.097 on page 1 before "2.1 Cartas"). Printed page numbers 0.74 to 28.6.
+- Gap: the spec's rule (`maxInside < ratio < minBetween`, only page-number cuts ignored) has no solution. (1) Bullet lines are 19.8-20.4 pt high, so a new bullet item starts at -0.349 to -0.198, below the in-paragraph gaps; the first bullet after a heading is at -0.236 (page 7 after "9.1 Cómo usan las cartas los bots"; page 11 after "10.3 Cómo ganar"). (2) On page 16 the credits wrap "Inspirado en …" / "mos creadores." at +0.180 inside one paragraph, above most paragraph gaps. A ratio exists only if bullet items are not paragraph starts and page 16 is left out: then `maxInside` -0.017 and `minBetween` 0.069 give 0.03. The planner's macOS figures excluded both cases.
+- The ratio is unchanged; the declared test changes and scenarios 1-3 are not applied.
+- Next: the user decides whether bullet items and page 16 are excluded from the measurement (spec revision and re-approval), or that the rule needs another cut criterion (out of f18's scope). Done when: the f18 spec is re-approved with a rule that has a solution on the measured values, and the implementer resumes from 4c22ea6.
+
+## 2026-10-16 — T4: f18 passing
+- The spec was revised and re-approved (0b07d84): a line starting with `•` (U+2022) cuts, and page 16 is left out of the measurement. The re-run measurement on the iOS 27.0 simulator matches the stop run: maxInside -0.017 (body lines of one paragraph, every page 1-15), minBetween 0.069 (page 8, "9.2 Ataques de los Bots"). All 20 bullet lines start with U+2022.
+- Code commit 072c1ad: `PassageSegmenter.paragraphGapRatio` 0.5 -> 0.03 and the bullet rule; the declared f06 test changes (line height 25 in the exact-threshold tests, so the gap equals the threshold in floating point); `SyntheticPDF.lineStep` 12; scenarios 1-4 in `TaifaSegmentationTests`, scenario 5 in `PassageSegmenterTests`; the segmentation row of `docs/risks-and-open-questions.md`.
+- Taifa now imports as 221 passages (was 40); text around the images on pages 3 and 12 stays in its paragraphs. Table rows on pages 2 and 11 become one passage per row; page 16 one passage per contents entry and credit line (accepted by the spec).
+- `./init.sh` green on 072c1ad: 91 tests, 0 failed, 0 skipped. f18 is `passing`, awaiting the validator.
+- Next: the f18 validator run through `/feature-flow`, then its PR. Done when: f18 is `accepted` and its PR is merged; then f19 starts.
+
+## 2026-10-16 — T4: f18 accepted
+- The validator returned `accept` on 8f68b61 (validation 1, 0 of 3 revise rounds): `./init.sh` green with 91 tests, 0 failed, 0 skipped; the spec's focused run 26 of 26. The user confirmed in the chat.
+- Taifa goes from 40 to 221 passages. The ratio is 0.03, with the bullet rule (a line starting with `•` cuts).
+- The table rows on pages 2 and 11 become one passage each. The spec did not foresee it; the user accepted it, because ADR-002 treats tables as an accepted degradation, and f16 measures it.
+- Not verified: the measured values re-extracted by the validator, iOS 26.0 and a device, other rulebooks, how matches look in the app (no search yet).
+- Next: the user merges the f18 PR on GitHub, then `/feature-flow` on f19-interface-conventions. Done when: the f18 PR is merged into `main` and f19 is `accepted` with its PR open.

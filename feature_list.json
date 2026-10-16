@@ -710,14 +710,60 @@
     "title": "Paragraph cut calibrated on Taifa",
     "user_visible_behavior": "Importing the Taifa rulebook splits each page into its paragraphs, so a match and its highlight cover one paragraph instead of the whole page body.",
     "depends_on": ["f08-atomic-import"],
-    "status": "not_started",
+    "status": "accepted",
     "verification": [
       "Test on the Taifa fixture: known paragraph starts begin a passage, such as \"6. Si el atacante gana\" on page 5.",
       "Test on the Taifa fixture: a line in the middle of a paragraph does not begin a passage.",
       "The f06 synthetic segmentation tests still pass, or the spec declares their changes."
     ],
-    "evidence": [],
-    "notes": "Task: T4. Added on 2026-10-16. f08 imported Taifa as 40 passages for 16 pages, most of them a whole page body: its paragraph gaps (0.15-0.3 x the line height, measured with PyMuPDF, not PDFKit) are below f06's 0.5 ratio. The implementer measures the gaps with PassageExtractor.lines(on:) and picks the ratio. Reading order stays as ADR-002 decides."
+    "evidence": [
+      {
+        "command": "xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/TaifaSegmentationTests (+ xcrun xcresulttool export attachments -> taifa-gaps.txt); the same with -only-testing for TaifaSegmentationTests, PassageSegmenterTests, PassageExtractorTests, HyphenationExtractionTests and TaifaImportTests (+ export -> taifa-passages.txt); ./init.sh; the spec's focused run (TaifaSegmentationTests, PassageSegmenterTests, PassageExtractorTests, HyphenationExtractionTests); git diff main...HEAD --stat",
+        "expected": "taifa-gaps.txt gives maxInside < ratio < minBetween with page 16 and bullet lines left out, and bullet lines whose text starts with U+2022; scenarios 1-5 pass; init.sh exits 0 with every check PASS, 0 failed, 0 skipped, and the test count rises only by the new tests; the focused run succeeds; the diff touches only the spec's files plus feature_list.json and PROGRESS.md.",
+        "observed": "Measurement (taifa-gaps.txt, iOS 27.0 simulator, identical to the export of the stop run at 4c22ea6): page median 13.222 on pages 1-6 and 8-15, 13.233 on page 7, 12.020 on page 16. maxInside = -0.017, the gap between two body lines of one paragraph on every page 1-15, first at page 1 line 4 (\"de “El Cid”, donde cada jugador (o Bot)\"); other in-paragraph gaps are lower (-0.033, -0.047 on page 6 line 2, -0.121 after a bullet line, -1.0/-1.2 for lines split by an inline icon or a heading number). minBetween = 0.069 at page 8 line 3 (\"9.2 Ataques de los Bots\", after the bullet line \"• En caso de que el Bot no pueda jugar u\"); next 0.097 (page 1 \"2.1 Cartas\", page 12 \"11.1 Ejemplo de combate\"); body paragraphs 0.160-0.252; printed page numbers 0.740-28.574 (ignored). Table rows on pages 2 and 11 (0.279, header 0.462; cells of one row at -0.924/-0.909) were counted as separate units, not as lines of one paragraph. Ratio: midpoint 0.026 -> 0.03 (two decimals). Bullet lines: all 20 lines containing U+2022 start with it, e.g. \"• Atacar: El reino selecciona un área fr\" and \"• Incursión: El reino selecciona un opon\" (page 4; bytes E2 80 A2 20). Passages (taifa-passages.txt): 221 (was 40); per pageIndex 0:8, 1:17, 2:18, 3:18, 4:18, 5:18, 6:17, 7:16, 8:6, 9:6, 10:15, 11:8, 12:4, 13:4, 14:6, 15:42 (page 16: one per contents entry and credit line). Page 3 (pageIndex 2): 18 passages, one per heading, paragraph and numbered item, plus the page number; the text wrapped around the map image stays in its paragraphs (\"El mapa muestra las 58 ciudades ... como el resto.\", \"El mapa también muestra seis rutas de invasión externa desde fuera de la península.\", \"Las áreas con un escudo de tamaño más grande son capitales de reino.\"). Page 5 (pageIndex 4): 18 passages, including \"6. Si el atacante gana, ... avanzar una posición en su marcador de Bonus de Carta ...\" as one passage and \"Seguidamente el defensor suma ...\"; the two inline-icon paragraphs (\"Si el evento está marcado con el símbolo (permanente) ...\") stay whole. Page 12 (pageIndex 11): 8 passages; the narrow lines beside the combat image stay in their paragraphs (\"Partiendo de la situación de la izquierda, ... (controlada por la Taifa de Valencia).\", \"Los Condados Catalanes tirarán 5 dados ... 3 impactos.\", \"La Taifa de Valencia lanza 5 dados ... 2 impactos\" continuing below the image). init.sh exit 0 on 072c1ad: totalTestCount=91, failedTests=0, skippedTests=0, expectedFailures=0 (85 before, plus 6 new); PASS xcode-version (Xcode 27.1), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Spec focused run: 26 of 26 passed. Scenario tests: 1 TaifaSegmentationTests/numberedParagraphBeginsAPassage(); 2 plainParagraphBeginsAPassage(); 3 lineInTheMiddleOfAParagraphDoesNot(); 4 bulletItemBeginsAPassage(); 5 PassageSegmenterTests/bulletLineStartsANewPassage() and bulletInsideALineDoesNotCut(); 6 the renamed and changed f06 tests plus PassageExtractorTests and HyphenationExtractionTests, all passing with no assertion changed outside the declared list. Mutation checks, not committed: with the bullet rule removed, bulletLineStartsANewPassage and bulletItemBeginsAPassage fail; with the ratio back at 0.5 (bullet rule kept), scenarios 1-3 fail. Declared test changes: the exact-threshold tests use line height 25, because with height 10 the measured gap (0.29999999999999716) is not equal to 0.03 x 10; the guard is unchanged. bulletLineStartsANewPassage also checks that a bullet after leading whitespace cuts. git diff main...HEAD --stat: the spec's files, feature_list.json, PROGRESS.md and the spec itself (revised by the orchestrator in 0b07d84).",
+        "context": {
+          "date": "2026-10-16 11:17 CEST",
+          "commit": "072c1adaeee373fb1238666033bafdb4084a858f",
+          "xcode": "Xcode 27.1 (27A9275)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f18-paragraph-cut-calibration, clean tree at the code commit, warm DerivedData; not a fresh clone. Attachments exported from focused runs on the same code (taifa-passages.txt from the run just before the commit, identical sources)."
+        },
+        "not_verified": [
+          "The measurement on iOS 26.0 (the deployment target) and on a device; only the iOS 27.0 simulator.",
+          "Other rulebooks than Taifa; the 0.03 ratio and the bullet rule are calibrated on one PDF.",
+          "How matches look in the app: there is no search yet (f13).",
+          "Re-extraction of taifa-gaps.txt and taifa-passages.txt by the validator; xcresulttool export is not on its allowlist.",
+          "That the table rows on pages 2 and 11 should be separate passages: the spec does not classify table rows; they were treated as separate units, and any ratio below 0.279 splits them.",
+          "Rulebooks imported before f18 keep their old passages (no migration, by the spec's Non-Goals).",
+          "A fresh clone with clean DerivedData."
+        ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/TaifaSegmentationTests -only-testing:RuleRefTests/PassageSegmenterTests -only-testing:RuleRefTests/PassageExtractorTests -only-testing:RuleRefTests/HyphenationExtractionTests; xcrun xcresulttool get test-results summary on that run's bundle; git diff main...HEAD (stat, RuleRef/, the changed tests); git diff 4c22ea6 8f68b61 -- RuleRefTests/Import/TaifaSegmentationTests.swift; git show --stat per branch commit",
+        "expected": "init.sh exits 0 with every check PASS, 0 failed, 0 skipped, and the test count rises only by the new tests; the focused run succeeds; the diff touches only the spec's files plus feature_list.json, PROGRESS.md and the orchestrator's spec revision; existing tests change only as declared; the ratio lies strictly between the recorded maxInside and minBetween.",
+        "observed": "Independent validator run (feature-validator, validation 1). init.sh exit 0, all 11 checks PASS (Xcode 27.1; iPhone 18 Pro, iOS 27.0); totalTestCount=91, failedTests=0, skippedTests=0, expectedFailures=0 (85 plus 6 new). Focused run: TEST SUCCEEDED, 26 of 26 passed, including scenarios 1-4 (numberedParagraphBeginsAPassage, plainParagraphBeginsAPassage, lineInTheMiddleOfAParagraphDoesNot, bulletItemBeginsAPassage), scenario 5 (bulletLineStartsANewPassage, bulletInsideALineDoesNotCut) and the renamed or changed f06 tests. Code review: app code changes only the ratio (0.03, with an f18 comment naming -0.017 and 0.069), the bullet rule (first non-whitespace character U+2022) and the doc comment; the gap, line-above and page-break cuts and reading order are untouched; 0.03 is strictly inside (-0.017, 0.069) and the closest two-decimal value to the midpoint. Existing tests change only as declared; the exact-threshold guard is kept, with line height 25 (allowed by the spec); SyntheticPDF lineStep 12 with the bound 0.5 x ratio x height. Deviations accepted: line height 25; the extra leading-whitespace assertion; table rows on pages 2 and 11 treated as their own units (disclosed; accepted by the user on 2026-10-16); the spec revision 0b07d84 by the orchestrator.",
+        "context": {
+          "date": "2026-10-16 11:22 CEST",
+          "commit": "8f68b6140884627c3ba3b5e162465fb1978d3093",
+          "xcode": "Xcode 27.1, as reported by init.sh; build number not checked",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Existing checkout on branch feat/f18-paragraph-cut-calibration, clean tree, warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The measured values in taifa-gaps.txt and taifa-passages.txt (maxInside -0.017, minBetween 0.069, 221 passages, the per-page counts, the text of pages 3, 5 and 12, all 20 bullet lines starting with U+2022); xcresulttool export is not on the validator's allowlist, so they were checked only through the scenario tests and the comment in the code.",
+          "That leaving out table rows (pages 2 and 11) and page 16 is the right classification for maxInside; the spec does not classify table rows.",
+          "The implementer's mutation checks (bullet rule removed, ratio back at 0.5); the validator is read-only.",
+          "iOS 26.0 (the deployment target) and a physical device.",
+          "Other rulebooks than Taifa.",
+          "How matches look in the app; there is no search yet (f13).",
+          "Rulebooks imported before f18 keeping their old passages (no migration, by the spec's Non-Goals).",
+          "A fresh clone with clean DerivedData.",
+          "The exact Xcode build number.",
+          "A separate TaifaImportTests run at this commit; it ran only inside init.sh."
+        ]
+      }
+    ],
+    "notes": "Task: T4. Added on 2026-10-16. f08 imported Taifa as 40 passages for 16 pages, most of them a whole page body: its paragraph gaps (0.15-0.3 x the line height, measured with PyMuPDF, not PDFKit) are below f06's 0.5 ratio. The implementer measures the gaps with PassageExtractor.lines(on:) and picks the ratio. Reading order stays as ADR-002 decides. History: a first implementation stopped on 2026-10-16 (spec gap, not a verdict; commit c80235d) because no ratio separated the gaps once bullet items (about 20 pt high, gaps -0.35 to -0.20) and the page 16 credits (+0.180 inside a paragraph) were counted. The user revised and re-approved the spec (0b07d84): bullet lines cut by a text rule and page 16 is left out of the measurement. The ratio is now 0.03 (maxInside -0.017, minBetween 0.069)."
   },
   {
     "id": "f19-interface-conventions",
