@@ -972,6 +972,28 @@
           "iOS 26.0 (the deployment target), a physical device and a Release build.",
           "A fresh clone with clean DerivedData."
         ]
+      },
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/PageHighlightTests -only-testing:RuleRefTests/PDFPageViewTests; git diff main...HEAD -- RuleRef/Shared/; git diff main...HEAD --stat; grep -w of every type declared in RuleRef/Features over RuleRef/Shared/",
+        "expected": "Repair brief of validation 1 (F1): init.sh exits 0 with every check PASS, totalTestCount=109, failedTests=0, skippedTests=0; the focused run passes 4 of 4; RuleRef/Shared/ mentions no PageHighlight and no other Features/ type; the --stat lists only the spec's files plus feature_list.json and PROGRESS.md (and the orchestrator's docs/validations/f15-page-viewer-highlight.md).",
+        "observed": "init.sh exit 0 on da7e2f5 (run before and after the commit): totalTestCount=109, failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.1), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run: ** TEST SUCCEEDED **, 4 of 4 passed (PageHighlightTests/theViewerReceivesExactlyTheLocatorsPageAndBounds, PDFPageViewTests/theHighlightIsOneAnnotationWithTheSameBoundsAndTheFileIsUntouched, aMissingFileIsUnavailable, aMissingPageIsUnavailable). Change: SamplePDF.previewHighlight: PageHighlight became SamplePDF.previewLocator: Locator (same .pdf(rulebookID: RulebookID(bytes: Data(\"sample page\".utf8)), pageIndex: 0, bounds: secondParagraphBounds), doc comment on the docs/domain-model.md exception kept); the five previews (PDFPageView \"Page\"; PageViewerContent \"Loading\", \"Highlighted\", \"Unavailable\"; PageViewer \"Missing File\") now pass PageHighlight(locator: SamplePDF.previewLocator); no helper added. Locator and RulebookID live in Domain/, below Shared/. git diff main...HEAD -- RuleRef/Shared/ matches none of the Features/ types (GameContent, GameScreenState, GameView, ImportErrorMessage, LibraryView, MatchRow, NewGameFailure, NewGameForm, NewGameSheet, PageDocument, PageHighlight, PageViewer, PageViewerContent, PDFPageView). --stat: the 13 files of validation 1 plus docs/validations/f15-page-viewer-highlight.md; per-file line counts unchanged, as the edits replace lines one for one.",
+        "context": {
+          "date": "2026-10-16 12:44 CEST",
+          "commit": "da7e2f594413b06b5e6454434ba60a3a4ec54f6d",
+          "xcode": "Xcode 27.1 (27A9275)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f15-page-viewer-highlight, clean tree at the code commit except feature_list.json (status in_progress), warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "The previews: they compile in the Debug build, but none was rendered and no check runs SamplePDF.data().",
+          "The interface (scenario 4): Taifa imported on the iPhone 16, searching, tapping a match, the page with the passage marked and titled \"Page N\", going back to the matches; no UI tests by design, the user validates it by hand.",
+          "The highlight's look (default color) and position on screen, and whether go(to:on:) called in makeUIView scrolls to it before the view has a size.",
+          "That makeUIView runs once per viewer: if SwiftUI recreated the representable for the same document, a second annotation would be added.",
+          "Taifa pages 3 and 12 (the mark over part of an image), and memory with large rulebooks.",
+          "The Spanish texts on screen; only the catalog checks ran.",
+          "iOS 26.0 (the deployment target), a physical device and a Release build.",
+          "A fresh clone with clean DerivedData."
+        ]
       }
     ],
     "notes": "Task: T4. The PDFKit viewer is the one UIKit-backed view, decided in ADR-004."

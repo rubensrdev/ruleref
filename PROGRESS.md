@@ -369,3 +369,9 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - `./init.sh` green on e41a0f4: 109 tests (105 plus 4), 0 failed, 0 skipped; focused run 4 of 4.
 - Left: scenario 4 (Taifa on the iPhone 16: tap a match, the page marked, back) and the previews, checked by hand. `MatchRow`'s doc comment still says "Not tappable until the page viewer (f15)"; it is outside the spec's file list and was not changed.
 - Next: the f15 validator run through `/feature-flow`, then its PR. Done when: f15 is `accepted` and its PR is merged.
+
+## 2026-10-16 — T4: f15 revise 1 repaired
+- Validation 1 returned `revise` (F1: `Shared/SamplePDF.swift` used `PageHighlight`, a `Features/` type). Fixed in da7e2f5: `SamplePDF.previewLocator: Locator` replaces `previewHighlight`; the five page viewer previews build `PageHighlight(locator: SamplePDF.previewLocator)`. No other change.
+- `./init.sh` green on da7e2f5: 109 tests, 0 failed, 0 skipped; focused run 4 of 4; `RuleRef/Shared/` mentions no `Features/` type; the same 13 files in the `--stat` (plus the validation record).
+- f15 is `passing` again. Left as in the previous entry: scenario 4 and the previews, checked by hand; the stale `MatchRow` comment.
+- Next: f15 validation 2 through `/feature-flow`. Done when: f15 is `accepted` and its PR is merged.
