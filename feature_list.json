@@ -710,14 +710,14 @@
     "title": "Paragraph cut calibrated on Taifa",
     "user_visible_behavior": "Importing the Taifa rulebook splits each page into its paragraphs, so a match and its highlight cover one paragraph instead of the whole page body.",
     "depends_on": ["f08-atomic-import"],
-    "status": "not_started",
+    "status": "in_progress",
     "verification": [
       "Test on the Taifa fixture: known paragraph starts begin a passage, such as \"6. Si el atacante gana\" on page 5.",
       "Test on the Taifa fixture: a line in the middle of a paragraph does not begin a passage.",
       "The f06 synthetic segmentation tests still pass, or the spec declares their changes."
     ],
     "evidence": [],
-    "notes": "Task: T4. Added on 2026-10-16. f08 imported Taifa as 40 passages for 16 pages, most of them a whole page body: its paragraph gaps (0.15-0.3 x the line height, measured with PyMuPDF, not PDFKit) are below f06's 0.5 ratio. The implementer measures the gaps with PassageExtractor.lines(on:) and picks the ratio. Reading order stays as ADR-002 decides."
+    "notes": "Task: T4. Added on 2026-10-16. f08 imported Taifa as 40 passages for 16 pages, most of them a whole page body: its paragraph gaps (0.15-0.3 x the line height, measured with PyMuPDF, not PDFKit) are below f06's 0.5 ratio. The implementer measures the gaps with PassageExtractor.lines(on:) and picks the ratio. Reading order stays as ADR-002 decides. Implementation stopped on 2026-10-16 (spec gap, not a verdict): on the iOS 27.0 simulator no ratio satisfies maxInside < ratio < minBetween. Bullet lines are about 20 pt high against a 13.22 median, so a new bullet item starts at a gap of -0.35 to -0.20, and the page 16 credits wrap at +0.180 inside a paragraph; the smallest non-bullet gap between paragraphs is 0.069 (page 8, before \"9.2 Ataques de los Bots\"). The ratio is unchanged; only the measurement test is committed (4c22ea6)."
   },
   {
     "id": "f19-interface-conventions",
