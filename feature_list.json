@@ -1029,13 +1029,34 @@
     "title": "Baseline search evaluation",
     "user_visible_behavior": "Baseline run: the eval set (Codable JSON) is evaluated against search over the Taifa fixture and a report with hit@1, hit@3 and no-match accuracy is written, tagged with OS version.",
     "depends_on": ["f13-text-search", "f14-no-match-state", "f18-paragraph-cut-calibration"],
-    "status": "not_started",
+    "status": "passing",
     "verification": [
       "A focused `xcodebuild test -only-testing:` run attaches the report to its result bundle (Swift Testing `Attachment`) and `xcrun xcresulttool export attachments` extracts it; `init.sh` does not change.",
       "Test: fails if the eval set is malformed.",
       "Test: fails if the fixture is missing."
     ],
-    "evidence": [],
+    "evidence": [
+      {
+        "command": "./init.sh; xcodebuild test -project RuleRef.xcodeproj -scheme RuleRef -destination \"platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0\" -only-testing:RuleRefTests/BaselineEvalTests -resultBundlePath <scratchpad>/f16.xcresult; xcrun xcresulttool export attachments --path <scratchpad>/f16.xcresult --output-path <scratchpad>/f16-attachments; cp of the file manifest.json names to docs/eval/f16-baseline-taifa-3.0.json; shasum -a 256 of both; git diff main...HEAD --stat; git diff main...HEAD -- RuleRef/ init.sh RuleRefTests/Fixtures/",
+        "expected": "init.sh exits 0 with every check PASS, 0 failed, 0 skipped, and the count is 109 plus only the new tests; the focused run ends in ** TEST SUCCEEDED ** and attaches one report; the exported file and the committed copy have the same SHA-256; the report has 25 rows in file order, totals 21, 21 and 4, the fixture SHA-256 and the iOS version; no app, init.sh, fixture or eval set change.",
+        "observed": "init.sh exit 0 on 675ea11 (and before on 8cf7ec8): totalTestCount=130 (109 plus 21 new in EvalSetTests, BaselineReportTests and BaselineEvalTests), failedTests=0, skippedTests=0, expectedFailures=0; PASS xcode-version (Xcode 27.1), simulator (iPhone 18 Pro, iOS 27.0), no-jsonserialization, no-uikit-xctest, no-third-party-deps, no-pdf-in-app, string-catalog, feature-list, xcodebuild-test, test-results, catalog-coverage; init.sh: PASS. Focused run on 8cf7ec8: ** TEST SUCCEEDED **, BaselineEvalTests/taifaBaseline() passed (0.085 s). Export: 1 attachment for BaselineEvalTests/taifaBaseline(), manifest suggestedHumanReadableName f16-baseline-taifa-3.0_0_<uuid>.json, exportedFileName 85604E84-E94B-47C5-B698-C2F1F990317E.json; shasum -a 256 of the exported file and of docs/eval/f16-baseline-taifa-3.0.json both 938e9ae1d681f8932148f462d9078f10f8310c192966c03bd3fce12b10b045c7. Report: 25 rows in the eval set's order (q01 ... q31); hit@1 3/21 (0.14285714285714285: q21, q24, q26), hit@3 4/21 (0.19047619047619047: adds q10), no-match accuracy 3/4 (0.75: q31 matches page 13); 16 of the 21 page questions get .noMatch; passageCount 221; fixtureSHA256 1f7c4ae3304b4bd90339825fdf6e756eec20377af575e1dd35ded28bdc4f67bd (equals the eval set's); iOSVersion 27.0.0. The summary counts were recomputed from the rows and agree. Scenario tests: 1 and 6 BaselineEvalTests/taifaBaseline() (SHA check with #require before import; TestFixture throws naming a missing resource); 2 BaselineReportTests/noMatchForEveryQuestionStillBuildsAReport() and no expectation on any score in the baseline; 3 aPageQuestionWithMatches / aPageQuestionWithNoMatchIsAMiss (normal, table, falsePremise); 4 anAbsentQuestionWithNoMatchIsCorrect / anAbsentQuestionWithMatchesIsWrong; 5 EvalSetTests: aRepeatedIDFails, anUnknownTypeFailsDecoding, anUnknownOverlapFailsDecoding, aNullExpectedPageOnAPageQuestionFails, anExpectedPageOnAnAbsentQuestionFails, anExpectedPageOutsideThePDFFails (0, 17, -1), aBlankQueryFails, plus theTaifaEvalSetValidatesClean (page count 16) and aMissingFixtureThrowsNamingTheFile. The diff of RuleRef/, init.sh and RuleRefTests/Fixtures/ against main is empty.",
+        "context": {
+          "date": "2026-10-16 17:55 CEST",
+          "commit": "675ea11ca73294d55e2b6ca0819f145a1ff0536b (test code at 8cf7ec8)",
+          "xcode": "Xcode 27.1 (27A9275)",
+          "simulator": "iPhone 18 Pro, iOS 27.0 (24A434)",
+          "workspace": "Working checkout on branch feat/f16-baseline-eval, clean tree at the commit except feature_list.json (status in_progress), warm DerivedData; not a fresh clone."
+        },
+        "not_verified": [
+          "iOS 26.0 (the deployment target) and a physical device; only the iOS 27.0 simulator ran.",
+          "Rulebooks other than Taifa 3.0.",
+          "The validator's re-extraction of the attachment: its hook forbids -resultBundlePath and xcresulttool export, so it reads the committed copy.",
+          "That later runs give the same report: search is deterministic, but the report was produced once.",
+          "That the SHA-mismatch path fails with its message: no test swaps the fixture; it is a #require on the computed hex.",
+          "A fresh clone with clean DerivedData."
+        ]
+      }
+    ],
     "notes": "Task: after m4 (module 5, next to the AI it is compared against). Unblocked on 2026-10-16 after tag m4. The eval set is RuleRefTests/Fixtures/taifa-3.0-eval.json (25 questions); its 21 expected pages were checked against the fixture with pdftotext. Depends on f18 because the baseline measures the passages f18 cuts."
   }
 ]
