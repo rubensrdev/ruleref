@@ -18,6 +18,47 @@ struct TaifaSegmentationTests {
         return try #require(PDFDocument(url: url))
     }
 
+    /// Passages of one page; `pageIndex` is the printed page number minus one.
+    private static func passages(onPage pageIndex: Int) throws -> [ExtractedPassage] {
+        let document = try taifa()
+        // The ID only goes into the locator; it does not affect segmentation.
+        let rulebookID = RulebookID(bytes: Data("taifa-3.0".utf8))
+        return PassageExtractor.extract(from: document, rulebookID: rulebookID).filter {
+            guard case let .pdf(_, index, _) = $0.locator else { return false }
+            return index == pageIndex
+        }
+    }
+
+    // MARK: Scenarios 1-3: page 5
+
+    @Test func numberedParagraphBeginsAPassage() throws {
+        let page5 = try Self.passages(onPage: 4)
+        #expect(page5.contains { $0.text.hasPrefix("6. Si el atacante gana") })
+    }
+
+    @Test func plainParagraphBeginsAPassage() throws {
+        let page5 = try Self.passages(onPage: 4)
+        #expect(page5.contains { $0.text.hasPrefix("Seguidamente el defensor suma") })
+    }
+
+    @Test func lineInTheMiddleOfAParagraphDoesNot() throws {
+        let page5 = try Self.passages(onPage: 4)
+        let middle = "avanzar una posición en su marcador de Bonus de Carta"
+        #expect(!page5.contains { $0.text.hasPrefix(middle) })
+        let paragraph = try #require(page5.first { $0.text.hasPrefix("6. Si el atacante gana") })
+        #expect(paragraph.text.contains(middle))
+    }
+
+    // MARK: Scenario 4: page 4
+
+    @Test func bulletItemBeginsAPassage() throws {
+        let bulletItems = try Self.passages(onPage: 3).filter { $0.text.hasPrefix("•") }
+        let attack = try #require(bulletItems.first { $0.text.contains("Atacar: El reino selecciona") })
+        let raid = try #require(bulletItems.first { $0.text.contains("Incursión: El reino selecciona") })
+        #expect(attack != raid)
+        #expect(!attack.text.contains("Incursión: El reino selecciona"))
+    }
+
     private static func format(_ value: CGFloat) -> String {
         Double(value).formatted(.number.precision(.fractionLength(3)))
     }

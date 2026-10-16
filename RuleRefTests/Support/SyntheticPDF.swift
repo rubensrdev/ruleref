@@ -22,7 +22,7 @@ enum SyntheticPDF {
     static let mediaBox = CGRect(x: 0, y: 0, width: 612, height: 792)
     static let fontSize: CGFloat = 12
     /// Baseline to baseline inside a paragraph.
-    static let lineStep: CGFloat = 14
+    static let lineStep: CGFloat = 12
     /// Baseline to baseline between the last line of a paragraph and the first of the next.
     static let paragraphStep: CGFloat = 32
 
@@ -90,7 +90,7 @@ enum SyntheticPDF {
     }
 
     /// Fails the test unless the measured lines keep the layout's spacing: inside a paragraph
-    /// the gap is at most 0.25 x line height, between paragraphs at least 1.0 x.
+    /// the gap is at most half the cut ratio x line height, between paragraphs at least 1.0 x.
     static func requireSpacing(of lines: [PageLine], paragraphStarts: Set<Int>) throws {
         let heights = lines.map(\.bounds.height).sorted()
         try #require(!heights.isEmpty)
@@ -100,7 +100,7 @@ enum SyntheticPDF {
             if paragraphStarts.contains(index) {
                 try #require(gap >= 1.0 * height, "gap \(gap) before line \(index) is not a paragraph gap")
             } else {
-                try #require(gap <= 0.25 * height, "gap \(gap) before line \(index) is not an in-paragraph gap")
+                try #require(gap <= 0.5 * PassageSegmenter.paragraphGapRatio * height, "gap \(gap) before line \(index) is not an in-paragraph gap")
             }
         }
     }

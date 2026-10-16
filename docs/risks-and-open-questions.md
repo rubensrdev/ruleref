@@ -11,7 +11,7 @@ Status of every open decision from `docs/idea.md`:
 | Answer not in rulebook / exceptions | **Decided for m4**: explicit no-match state, never approximate (F14). AI behaviour **Deferred**: after m4, measured with 3–5 unanswerable questions in the eval set | `docs/build-brief.md` F14 |
 | Multi-column extraction | **Decided**: PDFKit line order in the MVP; tables and the two-column contents are accepted degradations, measured by F16 | `docs/adr/0002-multi-column-extraction.md` |
 | UI language | **Decided**: Spanish and English via String Catalog (`Localizable.xcstrings`) | this table |
-| Passage segmentation rule | **Decided** (f06): a new passage starts when the vertical gap is greater than 0.5 × the page's median line height or a line lies above the previous one; a page break always cuts; no font or indentation rule. The ratio is recalibrated on Taifa in f18 | `docs/specs/f06-extract-passages.md`, `PassageSegmenter` |
+| Passage segmentation rule | **Decided** (f06, recalibrated in f18): a new passage starts when the vertical gap is greater than 0.03 × the page's median line height, when a line lies above the previous one, or when a line starts with the bullet `•` (U+2022) after leading whitespace; a page break always cuts; no font, indentation or other list-marker rule. f18 measured the ratio on Taifa with PDFKit on the iOS 27.0 simulator (largest gap inside a paragraph −0.017, smallest before a paragraph or heading 0.069), leaving out bullet lines (cut by the bullet rule) and page 16 (credits and two-column contents, whose credits may split line by line). Taifa now imports as 221 passages | `docs/specs/f06-extract-passages.md`, `PassageSegmenter` |
 
 ## Blocking next phase
 
