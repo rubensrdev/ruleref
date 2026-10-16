@@ -55,14 +55,14 @@ enum SamplePDF {
         return CGRect(x: margin, y: bottom, width: mediaBox.width - 2 * margin, height: top - bottom)
     }
 
-    /// A highlight on the second paragraph. Preview data is an exception to
+    /// A locator on the second paragraph. Preview data is an exception to
     /// "only extraction builds locators" (docs/domain-model.md).
-    static var previewHighlight: PageHighlight {
-        PageHighlight(locator: .pdf(
+    static var previewLocator: Locator {
+        .pdf(
             rulebookID: RulebookID(bytes: Data("sample page".utf8)),
             pageIndex: 0,
             bounds: secondParagraphBounds
-        ))
+        )
     }
 
     static func data() -> Data {

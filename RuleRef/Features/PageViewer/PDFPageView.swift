@@ -35,7 +35,7 @@ struct PDFPageView: UIViewRepresentable {
 #if DEBUG
 #Preview("Page") {
     if let document = PDFDocument(data: SamplePDF.data()) {
-        PDFPageView(document: document, highlight: SamplePDF.previewHighlight)
+        PDFPageView(document: document, highlight: PageHighlight(locator: SamplePDF.previewLocator))
     }
 }
 #endif

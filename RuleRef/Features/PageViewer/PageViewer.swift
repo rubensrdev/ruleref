@@ -36,7 +36,7 @@ struct PageViewer: View {
 #Preview("Missing File") {
     NavigationStack {
         PageViewer(
-            highlight: SamplePDF.previewHighlight,
+            highlight: PageHighlight(locator: SamplePDF.previewLocator),
             pageNumber: 1,
             // A unique temporary directory that holds no file.
             store: RulebookStore(baseDirectory: URL.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory))

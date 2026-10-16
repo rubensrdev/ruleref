@@ -33,7 +33,7 @@ struct PageViewerContent: View {
 #if DEBUG
 #Preview("Loading") {
     NavigationStack {
-        PageViewerContent(pageNumber: 1, document: .loading, highlight: SamplePDF.previewHighlight)
+        PageViewerContent(pageNumber: 1, document: .loading, highlight: PageHighlight(locator: SamplePDF.previewLocator))
     }
 }
 
@@ -42,14 +42,14 @@ struct PageViewerContent: View {
         PageViewerContent(
             pageNumber: 1,
             document: PDFDocument(data: SamplePDF.data()).map(PageDocument.ready) ?? .unavailable,
-            highlight: SamplePDF.previewHighlight
+            highlight: PageHighlight(locator: SamplePDF.previewLocator)
         )
     }
 }
 
 #Preview("Unavailable") {
     NavigationStack {
-        PageViewerContent(pageNumber: 1, document: .unavailable, highlight: SamplePDF.previewHighlight)
+        PageViewerContent(pageNumber: 1, document: .unavailable, highlight: PageHighlight(locator: SamplePDF.previewLocator))
     }
 }
 #endif
