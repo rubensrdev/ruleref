@@ -306,3 +306,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Taifa now imports as 221 passages (was 40); text around the images on pages 3 and 12 stays in its paragraphs. Table rows on pages 2 and 11 become one passage per row; page 16 one passage per contents entry and credit line (accepted by the spec).
 - `./init.sh` green on 072c1ad: 91 tests, 0 failed, 0 skipped. f18 is `passing`, awaiting the validator.
 - Next: the f18 validator run through `/feature-flow`, then its PR. Done when: f18 is `accepted` and its PR is merged; then f19 starts.
+
+## 2026-10-16 — T4: f18 accepted
+- The validator returned `accept` on 8f68b61 (validation 1, 0 of 3 revise rounds): `./init.sh` green with 91 tests, 0 failed, 0 skipped; the spec's focused run 26 of 26. The user confirmed in the chat.
+- Taifa goes from 40 to 221 passages. The ratio is 0.03, with the bullet rule (a line starting with `•` cuts).
+- The table rows on pages 2 and 11 become one passage each. The spec did not foresee it; the user accepted it, because ADR-002 treats tables as an accepted degradation, and f16 measures it.
+- Not verified: the measured values re-extracted by the validator, iOS 26.0 and a device, other rulebooks, how matches look in the app (no search yet).
+- Next: the user merges the f18 PR on GitHub, then `/feature-flow` on f19-interface-conventions. Done when: the f18 PR is merged into `main` and f19 is `accepted` with its PR open.

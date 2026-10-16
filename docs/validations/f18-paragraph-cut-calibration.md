@@ -11,3 +11,4 @@
   - Note: in `ignoredLinesWhitespaceLineDoesNotAffectTheMedian` the blank line's `minY` became `second.bounds.maxY - 20`, a follow-on of the declared gap change; no assertion changed.
   - Info: security checklist found nothing relevant.
 - Not verified: the measured values in `taifa-gaps.txt` and `taifa-passages.txt` (maxInside −0.017, minBetween 0.069, 221 passages, pages 3, 5 and 12, the 20 bullet lines), only checked through the scenario tests since the validator cannot export attachments; that leaving out table rows and page 16 is the right classification; the implementer's mutation checks; iOS 26.0 and a physical device; other rulebooks; how matches look in the app (no search yet); rulebooks imported before f18 keep their old passages; a fresh clone with clean DerivedData; the exact Xcode build number; a separate `TaifaImportTests` run.
+- User: confirmed
