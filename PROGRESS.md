@@ -285,3 +285,10 @@ One entry per work session, oldest first. Each entry says what closed and what c
 - Confirmed by `./init.sh` with the same 84 tests: the synchronized folders compile files in subfolders with no change to `RuleRef.xcodeproj`, and the Taifa fixture still reaches the test bundle.
 - The `xcode-mcp` skill's path example points to the new location. Approved specs, validation records and earlier evidence keep the old paths: they record what was true then.
 - Next: write the specs of f18, f19, f13, f14, f15 and f16 with `feature-spec` on `main`. Done when: each of the six has `docs/specs/<id>.md` with the user's Approval line.
+
+## 2026-10-16 — T4 specs approved
+- Approved by the user on 2026-10-16: f18-paragraph-cut-calibration, f19-interface-conventions, f13-text-search, f14-no-match-state and f15-page-viewer-highlight. Two review changes before approval: f18 exports its attachments from a focused run, because `./init.sh` deletes its result bundle when it passes; f15's `PageViewer` opens the document once in `.task`, never in `init`, with a `PageDocument` state (`loading`, `ready`, `unavailable`).
+- f13 now depends on f19, because it builds on the `GameContent`/`GameView` split.
+- The validator agent reads `ARCHITECTURE.md` and reviews views against `DESIGN.md`; it said the repo had neither.
+- f16's spec and the eval set JSON wait until after tag m4; f16 stays `blocked`.
+- Next: `/feature-flow` on f18, then f19, f13, f14 and f15, one PR each. Done when: the five are `accepted`, their PRs are merged, the user has checked the screens on the iPhone 16, and tag `m4` is set.

@@ -23,7 +23,7 @@ Validate one feature with the preloaded `feature-validator` skill. Follow it, wi
 - Never persist anything. Return the verdict; the orchestrating main session records it after the user confirms (see `AGENTS.md`).
 - The contract is `docs/specs/<feature-id>.md`. If it is missing, the verdict is `block`.
 - Rerun `./init.sh` yourself and never accept on recorded evidence alone. If it fails, the verdict cannot be `accept`.
-- Architecture and constraints are the non-negotiable rules in `AGENTS.md` and the ADRs in `docs/adr/`. This repo has no `ARCHITECTURE.md`, `CONSTRAINTS.md` or `DESIGN.md`.
+- Architecture and constraints are the non-negotiable rules in `AGENTS.md`, the folders and dependencies in `ARCHITECTURE.md` and the ADRs in `docs/adr/`. Interface rules are in `DESIGN.md`; review every view the feature adds or changes against it. This repo has no `CONSTRAINTS.md`.
 - `accepted` is a defined status in this project (`AGENTS.md`, `feature_list.json`); the rubric's note against adding it does not apply.
 - There are no UI tests by design; the user validates the interface by hand. Missing E2E coverage is not a finding unless the spec asks for it.
 - End your report with one evidence entry the orchestrator can record: `command`, `expected`, `observed`, `context` (date, commit, Xcode, simulator) and `not_verified`. List in `not_verified` every check you could not run or inspect: not being able to look is not the same as finding nothing.
